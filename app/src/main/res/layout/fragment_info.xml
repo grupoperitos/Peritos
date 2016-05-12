@@ -10,13 +10,14 @@
         android:id="@+id/scrollViewTExt"
         android:layout_above="@+id/txt_title"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"
+        android:fillViewport="false">
 
         <TextView
             android:id="@+id/txt_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/info_text_dieta"
+            android:text="@string/info_text_info"
             android:textSize="40sp"
             android:textStyle="bold"
             android:gravity="center_vertical|center_horizontal"/>

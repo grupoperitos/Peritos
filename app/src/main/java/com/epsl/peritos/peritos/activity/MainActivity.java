@@ -22,10 +22,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.epsl.peritos.info.InformationManager;
+import com.epsl.peritos.info.MessageList;
 import com.epsl.peritos.peritos.R;
 import com.epsl.peritos.peritos.fragments.DietaFragment;
 import com.epsl.peritos.peritos.fragments.EjercicioFragment;
 import com.epsl.peritos.peritos.fragments.InfoEpocFragment;
+import com.epsl.peritos.peritos.fragments.InfoFragment;
 import com.epsl.peritos.peritos.fragments.TratamientoFragment;
 
 import java.util.ArrayList;
@@ -57,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Cuidador;
 
 
-
+    //Mensajes
+    public static MessageList messageList = null;
 
     int ano, mes, dia;
     static final int DIALOG_ID = 0;
@@ -65,7 +69,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        messageList = InformationManager.loadInformation(this);
+
+
         setContentView(R.layout.activity_main);
+
+
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -96,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 }
                 startActivity(intent);
 
-                Snackbar.make(view, "LLamando a Salud Responde...", Snackbar.LENGTH_LONG)
+
+                Snackbar.make(view, getString(R.string.interfaz_saludresponde), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -157,9 +167,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     private void setupViewPager(ViewPager viewPager) {
+
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new TratamientoFragment(), "Tab_Tratamiento");
-        adapter.addFrag(new DietaFragment(), "Tab_Dieta");
+        adapter.addFrag(InfoFragment.newInstance(messageList.getNextMessage().getTitle()), "Tab_Dieta");
         adapter.addFrag(new EjercicioFragment(), "Tab_Ejercicio");
         adapter.addFrag(new InfoEpocFragment(), "Tab_Epoc");
         viewPager.setAdapter(adapter);
@@ -194,8 +205,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         @Override
         public CharSequence getPageTitle(int position) {
 
+
             return null;
         }
+
+
     }
 
 

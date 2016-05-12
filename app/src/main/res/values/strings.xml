@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Peritos</string>
-
+    <string name="error_IputOutput">Error de entrada/salida</string>
+    <string name="text_info_title">Title</string>
+    <string name="info_text_dieta">DIETA</string>
+    <string name="info_text_ejercicios">EJERCICIOS</string>
+    <string name="info_text_infoepoc">INFORMACIÓN SOBRE LA EPOC</string>
+    <string name="info_text_tratamiento">TRATAMIENTO</string>
+    <string name="info_text_info" >INFO</string>
+    <string name="interfaz_saludresponde" >LLamando a Salud Responde...</string>
 </resources>

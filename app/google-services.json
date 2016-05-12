@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "108686228916",
+    "project_id": "peritosapp"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:108686228916:android:8afdd4a1ae47e36c",
+        "android_client_info": {
+          "package_name": "com.epsl.peritos.peritos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoWx2Wbiypqrng9C2PgEjaJc21VEGdwp0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

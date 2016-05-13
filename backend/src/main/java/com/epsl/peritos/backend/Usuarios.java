@@ -4,18 +4,17 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 
-/** The Objectify object model for device registrations we are persisting */
 @Entity
-public class RegistrationRecord {
+public class Usuarios {
 
     @Id
     Long id;
 
     @Index
     private String regId;
-    // you can add more fields...
+    private String regFc;
 
-    public RegistrationRecord() {}
+    public Usuarios() {}
 
     public String getRegId() {
         return regId;
@@ -23,5 +22,13 @@ public class RegistrationRecord {
 
     public void setRegId(String regId) {
         this.regId = regId;
+    }
+
+    public String getRegFc() {
+        return regFc;
+    }
+
+    public void setRegFc(String regFc) {
+        this.regFc = regFc;
     }
 }

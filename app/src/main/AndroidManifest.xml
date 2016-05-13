@@ -16,7 +16,6 @@
             android:label="Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -26,5 +25,18 @@
             android:label="Activity Main"
             android:parentActivityName=".activity.LoginActivity" >
         </activity>
+
+
+
+        <receiver
+            android:name="com.epsl.peritos.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="MY_PACKAGE" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="com.epsl.peritos.GCMIntentService" />
     </application>
 </manifest>

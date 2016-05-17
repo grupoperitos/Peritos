@@ -5,6 +5,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -31,8 +32,10 @@ import com.epsl.peritos.peritos.fragments.InfoEpocFragment;
 import com.epsl.peritos.peritos.fragments.InfoFragment;
 import com.epsl.peritos.peritos.fragments.TratamientoFragment;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import android.content.Intent;
@@ -71,10 +74,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         super.onCreate(savedInstanceState);
         messageList = InformationManager.loadInformation(this);
 
-
         setContentView(R.layout.activity_main);
-
-
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -148,6 +148,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         });
 
 
+
+
+        //Registro del día y hora de último uso de la app
+        SharedPreferences p = getSharedPreferences("PRFS", MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String fecha = sdf.format(new Date());
+        ed.putString("LAST_USE", fecha);
+        ed.apply();
     }
 
 

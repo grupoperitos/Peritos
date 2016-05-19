@@ -180,8 +180,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(InfoFragment.newInstance(0,"Tratamiento","¡Toma tu medicación!","Tomar la medicación es importante para su enfermedad","<html><body><H1>&iexcl;Toma tu medicaci&oacute;n!</h1></body></html>"), "Tab_Tratamiento");
         adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¡Come sano siempre!","Hay alimentos que le sentarán mejor","<html><body><h1>Come muy sano</h1></body></html>"), "Tab_Dieta");
-        adapter.addFrag(new EjercicioFragment(), "Tab_Ejercicio");
-        adapter.addFrag(new InfoEpocFragment(), "Tab_Epoc");
+        adapter.addFrag(InfoFragment.newInstance(0,"Ejercicio","¡Haga ejercicio!","Haga ejercicio con regularidad y adaptado a su nivel de ahogo","<html><body><h1>Haga ejercicio con regularidad y adaptado a su nivel de ahogo</h1></body></html>"), "Tab_Ejercicio");
+        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¿Qué es la EPOC?","Es una enfermedad que provoca la obstrucción de los bronquios","<html><body><h1>Es una enfermedad que provoca la obstrucción de los bronquios</h1></body></html>"), "Tab_Epoc");
         viewPager.setAdapter(adapter);
     }
 

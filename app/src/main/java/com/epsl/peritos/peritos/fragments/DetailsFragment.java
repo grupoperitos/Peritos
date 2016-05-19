@@ -87,7 +87,7 @@ public class DetailsFragment extends android.support.v4.app.DialogFragment {
             @Override
             public void onClick(View v) {
                 dismiss();
-                
+
             }
         });
         return view;

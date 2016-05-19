@@ -8,4 +8,5 @@
     <string name="info_text_tratamiento">TRATAMIENTO</string>
     <string name="info_text_info" >INFO</string>
     <string name="interfaz_saludresponde" >LLamando a Salud Responde...</string>
+    <string name="button_back">Volver</string>
 </resources>

@@ -43,7 +43,7 @@ public class InformationManager {
     }
 
     /**
-     * Almacena los registros leídos del fichero pasado en los recursos /raw en un fichero en el almacenamiento interno de la aplicación
+     * Almacena los registros leï¿½dos del fichero pasado en los recursos /raw en un fichero en el almacenamiento interno de la aplicaciï¿½n
      *
      * @param messages
      */
@@ -86,7 +86,7 @@ public class InformationManager {
 
     public static String readMessagesFile(Context context, int resource) {
 
-        String content = "<html><body>";
+        String content = "";
         try {
             InputStreamReader is = new InputStreamReader(context
                     .getResources().openRawResource(resource), "UTF-8");
@@ -135,7 +135,6 @@ public class InformationManager {
             do {
                 line = b.readLine();
                 if (line != null) {
-
                     InformationMessage message = new InformationMessage(line);
                     result.add(message);
                 }

@@ -5,6 +5,28 @@
     tools:context="com.epsl.peritos.peritos.fragments.DietaFragment">
 
     <ScrollView
+        android:id="@+id/scroll_caption"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/txt_title"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:fillViewport="false"
+        android:clickable="false"
+        android:alpha="0">
+
+        <TextView
+            android:id="@+id/txt_caption"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/info_text_info"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="@color/colorPrimary" />
+    </ScrollView>
+
+    <ScrollView
         android:id="@+id/scroll_message"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -21,7 +43,8 @@
             android:text="@string/info_text_info"
             android:textSize="40sp"
             android:textStyle="bold"
-            android:gravity="center_vertical|center_horizontal"/>
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="@color/colorPrimary" />
     </ScrollView>
 
     <TextView
@@ -29,9 +52,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/text_info_title"
-        android:textSize="40sp"
+        android:textSize="32sp"
         android:textStyle="italic"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:textColor="@color/colorPrimaryDark" />
 
 </RelativeLayout>

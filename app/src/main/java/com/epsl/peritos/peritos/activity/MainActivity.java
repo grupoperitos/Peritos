@@ -26,11 +26,9 @@ import android.widget.Toast;
 import com.epsl.peritos.info.InformationManager;
 import com.epsl.peritos.info.MessageList;
 import com.epsl.peritos.peritos.R;
-import com.epsl.peritos.peritos.fragments.DietaFragment;
-import com.epsl.peritos.peritos.fragments.EjercicioFragment;
-import com.epsl.peritos.peritos.fragments.InfoEpocFragment;
+
 import com.epsl.peritos.peritos.fragments.InfoFragment;
-import com.epsl.peritos.peritos.fragments.TratamientoFragment;
+
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,6 +63,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     //Mensajes
     public static MessageList messageList = null;
+    public static MessageList tratamientoList = null;
+    public static MessageList dietaList = null;
+    public static MessageList ejercicioList = null;
+    public static MessageList epocList = null;
 
     int ano, mes, dia;
     static final int DIALOG_ID = 0;

@@ -1,6 +1,10 @@
 package com.epsl.peritos.peritos.fragments;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -36,7 +40,11 @@ public class InfoFragment extends Fragment {
     int mType = -1;
 
     private TextView mMessageView = null;
+    private TextView mCaptionView = null;
     private TextView mTitleView = null;
+
+    private ScrollView mScrollCaption = null;
+    private ScrollView mScrollMessage = null;
 
     public static InfoFragment newInstance(int type, String title, String caption, String message, String detail) {
         InfoFragment fragment = new InfoFragment();
@@ -68,16 +76,27 @@ public class InfoFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_info, container, false);
 
         mMessageView = (TextView) view.findViewById(R.id.txt_message);
+        mCaptionView = (TextView) view.findViewById(R.id.txt_caption);
         mTitleView = (TextView) view.findViewById(R.id.txt_title);
 
+        mScrollCaption = (ScrollView) view.findViewById(R.id.scroll_caption);
+        mScrollMessage = (ScrollView) view.findViewById(R.id.scroll_message);
 
 
         showTitle(mTitle);
-        showMessage(mCaption);
+        showCaption(mCaption);
+        showMessage(mMessage);
 
-        mMessageView.postDelayed(new FlashMessage(mMessageView,mMessage),MAIN_MESSAGE_TIME);
+        mCaptionView.postDelayed(new FlashMessage(mCaptionView,mMessageView,mMessage),MAIN_MESSAGE_TIME);
 
         mMessageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDetailsDialog();
+                //Llamar al método de la interfaz con la actividad para que añada los puntos de logro
+            }
+        });
+        mCaptionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDetailsDialog();
@@ -102,7 +121,10 @@ public class InfoFragment extends Fragment {
         mMessageView.setText(message);
         mMessageView.invalidate();
     }
-
+    protected void showCaption(String message) {
+        mCaptionView.setText(message);
+        mCaptionView.invalidate();
+    }
 
     public void actualize(InformationMessage message) {
         if (message != null) {
@@ -135,24 +157,103 @@ public class InfoFragment extends Fragment {
 
     public class FlashMessage implements Runnable {
 
-        String mMessage1 = "";
 
-        TextView mFlashTextView = null;
 
-        FlashMessage(TextView text, String message) {
-            mFlashTextView = text;
+        private TextView mCaptionTextView = null;
+        private TextView mMessageTextView = null;
+        private String mMessage1 = "";
+        protected Context mContext= null;
+
+        FlashMessage(/*Context context,*/ TextView captionview, TextView messageview, String message) {
+            //mContext = context;
+            mCaptionTextView = captionview;
+            mMessageTextView = messageview;
             mMessage1 = message;
         }
 
         @Override
         public void run() {
-            mFlashTextView.setText(mMessage1);
-            mFlashTextView.postInvalidate();
-            if (mMessage1.equals(mCaption))
+
+            if (mMessage1.equals(mCaption)) {
+                mMessageTextView.setText(mMessage);
+                mMessageTextView.postInvalidate();
+
+                final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                        R.animator.fade_out);
+                final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                        R.animator.fade_in);
+
+                set1.setTarget(mScrollCaption);
+                set1.start();
+                set2.setTarget(mScrollMessage);
+                set1.addListener(new Animator.AnimatorListener() {
+
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        set2.start();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+
+
+                });
+
+
                 mMessage1 = mMessage;
-            else
+            }
+            else {
+                mCaptionTextView.setText(mCaption);
+                mCaptionTextView.postInvalidate();
+                final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                        R.animator.fade_out);
+                final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                        R.animator.fade_in);
+                set1.setTarget(mScrollMessage);
+                set1.start();
+                set2.setTarget(mScrollCaption);
+                set1.addListener(new Animator.AnimatorListener() {
+
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        set2.start();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+
+
+                });
+
                 mMessage1 = mCaption;
-            mFlashTextView.postDelayed(new FlashMessage(mFlashTextView,mMessage1),MAIN_MESSAGE_TIME);
+
+            }
+
+            mCaptionTextView.postDelayed(new FlashMessage(mCaptionTextView,mMessageTextView,mMessage1),MAIN_MESSAGE_TIME);
 
         }
     }

@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.epsl.peritos.info.InformationManager;
 import com.epsl.peritos.info.MessageList;
+import com.epsl.peritos.info.MessageTypes;
 import com.epsl.peritos.peritos.R;
 
 import com.epsl.peritos.peritos.fragments.InfoFragment;
@@ -75,6 +76,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         messageList = InformationManager.loadInformation(this);
+        if(messageList!=null){
+            tratamientoList = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
+            dietaList =  messageList.getMessagesByType(MessageTypes.INFO_DIETA);
+            ejercicioList =  messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
+            epocList=  messageList.getMessagesByType(MessageTypes.INFO_EPOC);
+        }else
+        {
+            Toast.makeText(this,"Error al cargar el fichero de recursos",Toast.LENGTH_LONG).show();
+            finish();
+        }
 
         setContentView(R.layout.activity_main);
 
@@ -180,10 +191,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private void setupViewPager(ViewPager viewPager) {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(InfoFragment.newInstance(0,"Tratamiento","¡Toma tu medicación!","Tomar la medicación es importante para su enfermedad","<html><body><H1>&iexcl;Toma tu medicaci&oacute;n!</h1></body></html>"), "Tab_Tratamiento");
-        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¡Come sano siempre!","Hay alimentos que le sentarán mejor","<html><body><h1>Come muy sano</h1></body></html>"), "Tab_Dieta");
-        adapter.addFrag(InfoFragment.newInstance(0,"Ejercicio","¡Haga ejercicio!","Haga ejercicio con regularidad y adaptado a su nivel de ahogo","<html><body><h1>Haga ejercicio con regularidad y adaptado a su nivel de ahogo</h1></body></html>"), "Tab_Ejercicio");
-        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¿Qué es la EPOC?","Es una enfermedad que provoca la obstrucción de los bronquios","<html><body><h1>Es una enfermedad que provoca la obstrucción de los bronquios</h1></body></html>"), "Tab_Epoc");
+        //adapter.addFrag(InfoFragment.newInstance(0,"Tratamiento","¡Toma tu medicación!","Tomar la medicación es importante para su enfermedad","<html><body><H1>&iexcl;Toma tu medicaci&oacute;n!</h1></body></html>"), "Tab_Tratamiento");
+        //adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¡Come sano siempre!","Hay alimentos que le sentarán mejor","<html><body><h1>Come muy sano</h1></body></html>"), "Tab_Dieta");
+        //adapter.addFrag(InfoFragment.newInstance(0,"Ejercicio","¡Haga ejercicio!","Haga ejercicio con regularidad y adaptado a su nivel de ahogo","<html><body><h1>Haga ejercicio con regularidad y adaptado a su nivel de ahogo</h1></body></html>"), "Tab_Ejercicio");
+        //adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¿Qué es la EPOC?","Es una enfermedad que provoca la obstrucción de los bronquios","<html><body><h1>Es una enfermedad que provoca la obstrucción de los bronquios</h1></body></html>"), "Tab_Epoc");
+
+        adapter.addFrag(InfoFragment.newInstance(tratamientoList.getNextMessage()), "Tab_Tratamiento");
+        adapter.addFrag(InfoFragment.newInstance(dietaList.getNextMessage()), "Tab_Dieta");
+        adapter.addFrag(InfoFragment.newInstance(ejercicioList.getNextMessage()), "Tab_Ejercicio");
+        adapter.addFrag(InfoFragment.newInstance(epocList.getNextMessage()), "Tab_Epoc");
+
         viewPager.setAdapter(adapter);
     }
 

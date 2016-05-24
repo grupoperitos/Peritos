@@ -6,10 +6,10 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +58,17 @@ public class InfoFragment extends Fragment {
         return fragment;
     }
 
+    public static InfoFragment newInstance(InformationMessage message) {
+        InfoFragment fragment = new InfoFragment();
+        Bundle args = new Bundle();
+        args.putInt(INFO_TYPE, message.getType());
+        args.putString(INFO_TITLE, message.getTitle());
+        args.putString(INFO_CAPTION, message.getCaption());
+        args.putString(INFO_MESSAGE, message.getCommentary());
+        args.putString(INFO_DETAIL, message.getDetail());
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,7 +98,15 @@ public class InfoFragment extends Fragment {
         showCaption(mCaption);
         showMessage(mMessage);
 
-        mCaptionView.postDelayed(new FlashMessage(mCaptionView,mMessageView,mMessage),MAIN_MESSAGE_TIME);
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mCaptionView.postDelayed(new FlashMessage(mCaptionView, mMessageView, mMessage), MAIN_MESSAGE_TIME);
 
         mMessageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,13 +122,20 @@ public class InfoFragment extends Fragment {
                 //Llamar al método de la interfaz con la actividad para que añada los puntos de logro
             }
         });
-        return view;
     }
-
 
     @Override
     public void onResume() {
         super.onResume();
+    }
+
+
+    public synchronized void actualizeMessage(int type, String title, String caption, String message, String detail) {
+        mType = type;
+        mTitle = title;
+        mCaption = caption;
+        mMessage = message;
+        mDetail = detail;
     }
 
     protected void showTitle(String message) {
@@ -121,6 +147,7 @@ public class InfoFragment extends Fragment {
         mMessageView.setText(message);
         mMessageView.invalidate();
     }
+
     protected void showCaption(String message) {
         mCaptionView.setText(message);
         mCaptionView.invalidate();
@@ -128,7 +155,7 @@ public class InfoFragment extends Fragment {
 
     public void actualize(InformationMessage message) {
         if (message != null) {
-            showMessage(message.getMessage());
+            showMessage(message.getCaption());
             showTitle(message.getTitle());
 
         }
@@ -158,11 +185,10 @@ public class InfoFragment extends Fragment {
     public class FlashMessage implements Runnable {
 
 
-
         private TextView mCaptionTextView = null;
         private TextView mMessageTextView = null;
         private String mMessage1 = "";
-        protected Context mContext= null;
+        protected Context mContext = null;
 
         FlashMessage(/*Context context,*/ TextView captionview, TextView messageview, String message) {
             //mContext = context;
@@ -213,8 +239,7 @@ public class InfoFragment extends Fragment {
 
 
                 mMessage1 = mMessage;
-            }
-            else {
+            } else {
                 mCaptionTextView.setText(mCaption);
                 mCaptionTextView.postInvalidate();
                 final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
@@ -253,11 +278,10 @@ public class InfoFragment extends Fragment {
 
             }
 
-            mCaptionTextView.postDelayed(new FlashMessage(mCaptionTextView,mMessageTextView,mMessage1),MAIN_MESSAGE_TIME);
+            mCaptionTextView.postDelayed(new FlashMessage(mCaptionTextView, mMessageTextView, mMessage1), MAIN_MESSAGE_TIME);
 
         }
     }
-
 
 
 }

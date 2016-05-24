@@ -170,7 +170,6 @@ public class InformationManager {
 
             BufferedReader b = new BufferedReader(is);
             String line = "";
-
             do {
                 line = b.readLine();
                 if (line != null) {
@@ -188,17 +187,13 @@ public class InformationManager {
                     context.getResources().getString(R.string.error_IputOutput),
                     Toast.LENGTH_LONG).show();
         } catch (IOException e) {
-
             e.printStackTrace();
             Toast.makeText(
                     context,
                     context.getResources().getString(R.string.error_IputOutput),
                     Toast.LENGTH_LONG).show();
-
-        }finally {
-            return null;
         }
-
+        return null;
     }
 
 }

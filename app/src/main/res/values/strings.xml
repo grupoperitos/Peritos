@@ -7,6 +7,23 @@
     <string name="info_text_infoepoc">INFORMACIÓN SOBRE LA EPOC</string>
     <string name="info_text_tratamiento">TRATAMIENTO</string>
     <string name="info_text_info" >INFO</string>
-    <string name="interfaz_saludresponde" >LLamando a Salud Responde...</string>
     <string name="button_back">Volver</string>
+
+
+
+    <string name="btn_saludResponde">Salud Responde</string>
+    <string name="btn_cuidador">Cuidador o Familiar</string>
+    <string name="btn_sintomas">Control Sintomas</string>
+
+    <string name="menu_citasmedicas">Citas Médicas</string>
+    <string name="menu_informes">Informes Médicos</string>
+    <string name="menu_logros">Logros</string>
+    <string name="menu_preferencias">Preferencias</string>
+
+    <string name="interfaz_saludresponde" >LLamando a Salud Responde...</string>
+    <string name="interfaz_cuidador">Llamando a...</string>
+    <string name="interfaz_sintomas">Control de Sintomas</string>
+
+    <string name="dialog_aceptar">ACEPTAR</string>
+    <string name="dialog_cancelar">CANCELAR</string>
 </resources>

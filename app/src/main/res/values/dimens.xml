@@ -12,4 +12,10 @@
 
     <!--Margenes para el FAB emergencia-->
     <dimen name="margen_fab">16dp</dimen>
+
+    <!--Medidas dialogos personalizados, material design-->
+    <dimen name="dialog_body">24dp</dimen>
+    <dimen name="button_padding">8dp</dimen>
+    <dimen name="altura_cuadro_buttons">52dp</dimen>
+    <dimen name="altura_button">36dp</dimen>
 </resources>

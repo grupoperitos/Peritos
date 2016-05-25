@@ -14,11 +14,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,9 +30,7 @@ import com.epsl.peritos.info.InformationManager;
 import com.epsl.peritos.info.MessageList;
 import com.epsl.peritos.info.MessageTypes;
 import com.epsl.peritos.peritos.R;
-
 import com.epsl.peritos.peritos.fragments.InfoFragment;
-
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,10 +41,10 @@ import java.util.List;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.wdullaer.materialdatetimepicker.*;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
@@ -55,11 +56,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         return super.getApplicationContext();
     }
 
-    private com.getbase.floatingactionbutton.FloatingActionsMenu FAB_emergencia;
 
     private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_SR;
     private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Sintomas;
     private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Cuidador;
+
 
 
     //Mensajes
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     public static MessageList dietaList = null;
     public static MessageList ejercicioList = null;
     public static MessageList epocList = null;
+
 
     int ano, mes, dia;
     static final int DIALOG_ID = 0;
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             finish();
         }
 
+
         setContentView(R.layout.activity_main);
 
 
@@ -96,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
+
+
 
 
         //MiniFAB salud Responde
@@ -130,8 +135,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         miniFAB_Sintomas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "CONTROL SINTOMAS", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                AlertDialog dialogo_sintomas = createSintomasDialog();
+                dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
+                dialogo_sintomas.show();
+
+
             }
         });
 
@@ -155,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 }
                 startActivity(intent);
 
-                Snackbar.make(view, "Llamando a CUIDADOR...", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, getString(R.string.interfaz_cuidador)+"OBTENER NOMBRE DE AGENDA", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -191,15 +199,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private void setupViewPager(ViewPager viewPager) {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        //adapter.addFrag(InfoFragment.newInstance(0,"Tratamiento","¡Toma tu medicación!","Tomar la medicación es importante para su enfermedad","<html><body><H1>&iexcl;Toma tu medicaci&oacute;n!</h1></body></html>"), "Tab_Tratamiento");
-        //adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¡Come sano siempre!","Hay alimentos que le sentarán mejor","<html><body><h1>Come muy sano</h1></body></html>"), "Tab_Dieta");
-        //adapter.addFrag(InfoFragment.newInstance(0,"Ejercicio","¡Haga ejercicio!","Haga ejercicio con regularidad y adaptado a su nivel de ahogo","<html><body><h1>Haga ejercicio con regularidad y adaptado a su nivel de ahogo</h1></body></html>"), "Tab_Ejercicio");
-        //adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¿Qué es la EPOC?","Es una enfermedad que provoca la obstrucción de los bronquios","<html><body><h1>Es una enfermedad que provoca la obstrucción de los bronquios</h1></body></html>"), "Tab_Epoc");
-
+//        adapter.addFrag(InfoFragment.newInstance(0,"Tratamiento","¡Toma tu medicación!","Tomar la medicación es importante para su enfermedad","<html><body><H1>&iexcl;Toma tu medicaci&oacute;n!</h1></body></html>"), "Tab_Tratamiento");
+//        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¡Come sano siempre!","Hay alimentos que le sentarán mejor","<html><body><h1>Come muy sano</h1></body></html>"), "Tab_Dieta");
+//        adapter.addFrag(InfoFragment.newInstance(0,"Ejercicio","¡Haga ejercicio!","Haga ejercicio con regularidad y adaptado a su nivel de ahogo","<html><body><h1>Haga ejercicio con regularidad y adaptado a su nivel de ahogo</h1></body></html>"), "Tab_Ejercicio");
+//        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¿Qué es la EPOC?","Es una enfermedad que provoca la obstrucción de los bronquios","<html><body><h1>Es una enfermedad que provoca la obstrucción de los bronquios</h1></body></html>"), "Tab_Epoc");
         adapter.addFrag(InfoFragment.newInstance(tratamientoList.getNextMessage()), "Tab_Tratamiento");
         adapter.addFrag(InfoFragment.newInstance(dietaList.getNextMessage()), "Tab_Dieta");
         adapter.addFrag(InfoFragment.newInstance(ejercicioList.getNextMessage()), "Tab_Ejercicio");
         adapter.addFrag(InfoFragment.newInstance(epocList.getNextMessage()), "Tab_Epoc");
+
 
         viewPager.setAdapter(adapter);
     }
@@ -283,9 +291,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         });
 
 
-
-
-
         txtInforme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -314,6 +319,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     }
 
+    //obtener el dia seleccionado y demás de dentro del metodo onDataSet
+    String var="";
+    private String obtenerDia(String hola){
+        return hola;
+    }
+
+
     @Override
     public void onDateSet(DatePickerDialog v, int ano, int mes_ano, int dia_mes) {
         //POR DEFECTO EN JAVA LOS MESES VAN DE 0 A 11, POR ESO SUMAMOS 1, PARA MOSTRARLO BIEN
@@ -323,10 +335,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         //Añadir 0 delante si mes es menor que 10
         if(mes_ano<10){
             mes="0"+mes_ano;
+        }else{
+            mes=String.valueOf(mes_ano);
         }
         //Aádir 0 delante si dia es menor que 10
         if(dia_mes<10){
-            dia="0"+dia_mes;
+            dia=""+"0"+dia_mes;
+        }else{
+            dia=String.valueOf(dia_mes);
         }
         Toast.makeText(
                 this, "El dia de la cita es: " + dia + "-" + mes + "-" + ano,
@@ -343,8 +359,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         );
         tpd.setAccentColor("#4FC3F7");
         tpd.show(getFragmentManager(), "Selector Hora");
+        var=this.obtenerDia(dia);
 
     }
+
+
 
     public void onResume() {
         super.onResume();
@@ -364,15 +383,62 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         //Añadir 0 delante si hora es menor que 10
         if(hora_dia<10){
             h="0"+hora_dia;
+        }else{
+            h=String.valueOf(hora_dia);
         }
         //Añadir 0 delante si minuto es menor que 10
         if(min<10){
             m="0"+min;
+        }else{
+            m=String.valueOf(min);
         }
         Toast.makeText(
                 this, "La hora de la cita es: " + h + ":" + m, Toast.LENGTH_LONG).show();
     }
 
+
+    /**
+     * Crea un diálogo con personalizado para comportarse
+     * como formulario de login
+     *
+     * @return Diálogo
+     */
+    public AlertDialog createSintomasDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.sintomas_dialog, null);
+
+        builder.setView(v);
+
+        Button aceptar = (Button) v.findViewById(R.id.btn_aceptar);
+        Button cancelar = (Button) v.findViewById(R.id.btn_cancelar);
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+
+        aceptar.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //CUANDO PULSEMOS ACEPTAR, GUARDAR LA INFORMACION DE SINTOMAS
+
+                    }
+                }
+        );
+
+        cancelar.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                }
+
+        );
+        return dialog;
+    }
 }
 
 

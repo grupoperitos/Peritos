@@ -17,7 +17,7 @@
         android:drawablePadding="15dp"
         android:gravity="center_vertical"
         android:padding="15dp"
-        android:text="Citas Médicas"
+        android:text="@string/menu_citasmedicas"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 
@@ -39,7 +39,7 @@
         android:drawablePadding="15dp"
         android:gravity="center_vertical"
         android:padding="15dp"
-        android:text="Informes Médicos(Exclusivo Médico)"
+        android:text="@string/menu_informes"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 
@@ -60,7 +60,7 @@
         android:drawablePadding="15dp"
         android:gravity="center_vertical"
         android:padding="15dp"
-        android:text="Logros"
+        android:text="@string/menu_logros"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 
@@ -83,7 +83,7 @@
         android:drawablePadding="15dp"
         android:gravity="center_vertical"
         android:padding="15dp"
-        android:text="Preferencias"
+        android:text="@string/menu_preferencias"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </LinearLayout>

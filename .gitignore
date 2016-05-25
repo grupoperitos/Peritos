@@ -6,3 +6,4 @@
 .DS_Store
 /build
 /captures
+/backend/src/main/webapp/assets

@@ -27,7 +27,7 @@ dependencies {
 
 
 
-
+    compile 'net.colindodd:toggleimagebutton:1.2'
     compile 'com.android.support:appcompat-v7:23.0.+'
     compile 'com.android.support:design:23.0.+'
     compile 'konifar:fab-transformation:1.0.0'

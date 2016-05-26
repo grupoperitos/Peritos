@@ -1,40 +1,194 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:paddingTop="@dimen/dialog_body"
     android:paddingLeft="@dimen/dialog_body"
     android:gravity="center_horizontal">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Control de Síntomas"
+            android:textColor="#4FC3F7"
+            android:textAppearance="?android:attr/textAppearanceSearchResultTitle"
+            android:textSize="22dp"
+            android:textStyle="bold"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingBottom="10dp"
+        android:gravity="center|top"
+        android:paddingTop="24dp"
         android:paddingRight="@dimen/dialog_body">
 
-        <SeekBar
-            android:id="@+id/seekBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:progressDrawable="@drawable/seekbar_progressbar"
-            android:progress="0"
-            android:thumbTintMode="multiply"
-
-            android:max="6" />
-
+        <!--Apartado color Esputo-->
         <TextView
-            android:id="@+id/count"
+            android:id="@+id/pregunta2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Progreso 0/6"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_below="@+id/seekBar"
+            android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="32dp" />
+            android:gravity="center"
+            android:text="Color de Esputo: "
+            android:layout_marginTop="@dimen/dialog_body"
+            android:layout_marginBottom="@dimen/button_padding"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <SeekBar
+            android:id="@+id/seekBar_estado_esputo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progressDrawable="@drawable/seekbar_progressbar_esputo"
+            android:progress="1"
+            android:thumbTintMode="multiply"
+            android:thumb="@drawable/seekbar"
+            android:max="2"
+            android:layout_alignEnd="@+id/count"
+            android:layout_toEndOf="@+id/imageView2" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="Amarillo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textStyle="italic"/>
+            <TextView
+                android:text="Verde"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:textStyle="italic"/>
+        </FrameLayout>
+
+
+
+
+        <!--Apartado Estado Paciente-->
+        <TextView
+            android:id="@+id/pregunta1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="¿Cómo se encuentra?"
+            android:layout_marginTop="@dimen/dialog_body"
+            android:layout_marginBottom="@dimen/button_padding"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+
+            <SeekBar
+                android:id="@+id/seekBar_estado_paciente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressDrawable="@drawable/seekbar_progressbar_paciente"
+                android:progress="3"
+                android:thumbTintMode="multiply"
+                android:thumb="@drawable/seekbar"
+                android:max="6"
+                android:layout_alignEnd="@+id/count"
+                android:layout_toEndOf="@+id/imageView2" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="Muy Bien"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textStyle="italic"/>
+            <TextView
+                android:text="Muy Mal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:textStyle="italic"/>
+        </FrameLayout>
+
+
+        <!--Apartado Fatiga-->
+        <TextView
+            android:id="@+id/pregunta3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="Indique su grado de fatiga:"
+            android:layout_marginTop="@dimen/dialog_body"
+            android:layout_marginBottom="@dimen/button_padding"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+
+        <SeekBar
+            android:id="@+id/seekBar_estado_fatiga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progressDrawable="@drawable/seekbar_progressbar_paciente"
+            android:progress="3"
+            android:thumbTintMode="multiply"
+            android:thumb="@drawable/seekbar"
+            android:max="6"
+            android:layout_alignEnd="@+id/count"
+            android:layout_toEndOf="@+id/imageView2" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="Nada"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textStyle="italic"/>
+            <TextView
+                android:text="Mucho"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:textStyle="italic"/>
+        </FrameLayout>
+
+        <!--Apartado Fiebre-->
+        <TextView
+            android:id="@+id/pregunta4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="¿Tiene Fiebre?"
+            android:layout_marginTop="@dimen/dialog_body"
+            android:layout_marginBottom="@dimen/button_padding"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center|top">
+
+            <net.colindodd.toggleimagebutton.ToggleImageButton
+                xmlns:tib="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/tb_fiebre"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                tib:tib_drawable_on="@drawable/term_fiebre"
+                tib:tib_drawable_off="@drawable/term_no_fiebre" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 

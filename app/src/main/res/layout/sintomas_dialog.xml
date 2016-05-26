@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:paddingTop="@dimen/dialog_body"
+    android:paddingLeft="@dimen/dialog_body"
+    android:gravity="center_horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingRight="@dimen/dialog_body">
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:progressDrawable="@drawable/seekbar_progressbar"
+            android:progress="0"
+            android:thumbTintMode="multiply"
+
+            android:max="6" />
+
+        <TextView
+            android:id="@+id/count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Progreso 0/6"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_below="@+id/seekBar"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/altura_cuadro_buttons"
+        android:gravity="bottom|right"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:paddingBottom="10dp"
+        android:paddingRight="@dimen/button_padding"
+        android:id="@+id/linearLayout">
+
+        <Button
+            android:id="@+id/btn_cancelar"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/altura_button"
+            android:textColor="@color/colorPrimary"
+            android:padding="@dimen/button_padding"
+            android:textStyle="bold"
+            android:text="@string/dialog_cancelar"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+
+        <Button
+            android:id="@+id/btn_aceptar"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/altura_button"
+            android:textColor="@color/colorPrimary"
+            android:padding="@dimen/button_padding"
+            android:textStyle="bold"
+            android:text="@string/dialog_aceptar"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -4,15 +4,18 @@ package com.epsl.peritos.peritos.activity;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.util.Pools;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,9 +23,9 @@ import android.support.v4.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,15 +44,34 @@ import java.util.List;
 import android.content.Intent;
 import android.net.Uri;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import net.colindodd.toggleimagebutton.ToggleImageButton;
 
-public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+
+public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, TabLayout.OnTabSelectedListener {
+    private final List<InfoFragment> mFragmentList = new ArrayList<>();
+    private final List<String> mFragmentTitleList = new ArrayList<>();
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private Handler mHandler=null;//Handled to manage tab iteration
+    public static final String CARRUSEL = "carrusel";
+
+    //Control del tiempo que está cada tab activo
+    public final long MAXPAGE_WAIT = 5000;//5 segundos
+    private long tabchangeInstant = 0L;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     public Context getApplicationContext() {
@@ -57,17 +79,17 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-    private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_SR;
-    private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Sintomas;
-    private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Cuidador;
+    private FloatingActionButton miniFAB_SR;
+    private FloatingActionButton miniFAB_Sintomas;
+    private FloatingActionButton miniFAB_Cuidador;
 
 
     //Variables para Seekbars Control sintomas.
     //Control de estados inicial, si acaban en 1000, tras darle a aceptar, el valor es
     //el central del seekbar. (Valor inicial).
-    int valor_esputo_estado_inicial=1000;
-    int valor_pacientes_estado_inicial=1000;
-    int valor_fatiga_estado_inicial=1000;
+    int valor_esputo_estado_inicial = 1000;
+    int valor_pacientes_estado_inicial = 1000;
+    int valor_fatiga_estado_inicial = 1000;
 
     //Mensajes
     public static MessageList messageList = null;
@@ -102,18 +124,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setOnTabSelectedListener(this);
         setupTabIcons();
 
 
         //MiniFAB salud Responde
-        miniFAB_SR = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_SR);
+        miniFAB_SR = (FloatingActionButton) findViewById(R.id.fab_llamar_SR);
         miniFAB_SR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 //902505060
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + 953018799));
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+902505060));
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + 902505060));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -134,21 +156,19 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
         //MiniFAB Control Sintomas
-        miniFAB_Sintomas = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_control_sintomas);
+        miniFAB_Sintomas = (FloatingActionButton) findViewById(R.id.fab_control_sintomas);
         miniFAB_Sintomas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog dialogo_sintomas = createSintomasDialog();
                 //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
                 dialogo_sintomas.show();
-
-
             }
         });
 
 
         //MiniFAB llamar cuidador
-        miniFAB_Cuidador = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_cuidador);
+        miniFAB_Cuidador = (FloatingActionButton) findViewById(R.id.fab_llamar_cuidador);
         miniFAB_Cuidador.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -179,6 +199,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         String fecha = sdf.format(new Date());
         ed.putString("LAST_USE", fecha);
         ed.apply();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
 
@@ -195,15 +218,43 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
         tabLayout.getTabAt(2).setIcon(tabIcons[2]);
         tabLayout.getTabAt(3).setIcon(tabIcons[3]);
+
+        //tabLayout.post(new Carrusel());
+
+        mHandler = new Handler(Looper.getMainLooper()) {
+            /*
+                     * handleMessage() defines the operations to perform when
+                     * the Handler receives a new Message to process.
+                     */
+            @Override
+            public void handleMessage(Message inputMessage) {
+
+                switch(inputMessage.what){
+                    case 1:
+                        tabLayout.post(new Carrusel());
+                        mHandler.removeMessages(1);
+                        Snackbar.make(viewPager, "Handler 1", Snackbar.LENGTH_SHORT).show();
+                        break;
+                    case 2:
+                        Snackbar.make(viewPager, "Handler 2", Snackbar.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+
+
+        };
+
+        Message msgObj = mHandler.obtainMessage();
+        msgObj.what=1;
+        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
     }
 
     private void setupViewPager(ViewPager viewPager) {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-//        adapter.addFrag(InfoFragment.newInstance(0,"Tratamiento","¡Toma tu medicación!","Tomar la medicación es importante para su enfermedad","<html><body><H1>&iexcl;Toma tu medicaci&oacute;n!</h1></body></html>"), "Tab_Tratamiento");
-//        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¡Come sano siempre!","Hay alimentos que le sentarán mejor","<html><body><h1>Come muy sano</h1></body></html>"), "Tab_Dieta");
-//        adapter.addFrag(InfoFragment.newInstance(0,"Ejercicio","¡Haga ejercicio!","Haga ejercicio con regularidad y adaptado a su nivel de ahogo","<html><body><h1>Haga ejercicio con regularidad y adaptado a su nivel de ahogo</h1></body></html>"), "Tab_Ejercicio");
-//        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¿Qué es la EPOC?","Es una enfermedad que provoca la obstrucción de los bronquios","<html><body><h1>Es una enfermedad que provoca la obstrucción de los bronquios</h1></body></html>"), "Tab_Epoc");
         adapter.addFrag(InfoFragment.newInstance(tratamientoList.getNextMessage()), "Tab_Tratamiento");
         adapter.addFrag(InfoFragment.newInstance(dietaList.getNextMessage()), "Tab_Dieta");
         adapter.addFrag(InfoFragment.newInstance(ejercicioList.getNextMessage()), "Tab_Ejercicio");
@@ -211,12 +262,84 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
         viewPager.setAdapter(adapter);
+
+
+        tabchangeInstant = System.currentTimeMillis();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+//        // ATTENTION: This was auto-generated to implement the App Indexing API.
+//        // See https://g.co/AppIndexing/AndroidStudio for more information.
+//        client.connect();
+//        Action viewAction = Action.newAction(
+//                Action.TYPE_VIEW, // TODO: choose an action type.
+//                "Main Page", // TODO: Define a title for the content shown.
+//                // TODO: If you have web page content that matches this app activity's content,
+//                // make sure this auto-generated web page URL is correct.
+//                // Otherwise, set the URL to null.
+//                Uri.parse("http://host/path"),
+//                // TODO: Make sure this auto-generated app URL is correct.
+//                Uri.parse("android-app://com.epsl.peritos.peritos.activity/http/host/path")
+//        );
+//        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+//        Action viewAction = Action.newAction(
+//                Action.TYPE_VIEW, // TODO: choose an action type.
+//                "Main Page", // TODO: Define a title for the content shown.
+//                // TODO: If you have web page content that matches this app activity's content,
+//                // make sure this auto-generated web page URL is correct.
+//                // Otherwise, set the URL to null.
+//                Uri.parse("http://host/path"),
+//                // TODO: Make sure this auto-generated app URL is correct.
+//                Uri.parse("android-app://com.epsl.peritos.peritos.activity/http/host/path")
+//        );
+//        AppIndex.AppIndexApi.end(client, viewAction);
+//        client.disconnect();
+    }
+
+
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+
+        Message msgObj = mHandler.obtainMessage();
+        msgObj.what=1;
+        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
+
+        //Snackbar.make(viewPager, "tab tocada 1", Snackbar.LENGTH_SHORT).show();
+
+
+    }
+
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {
+
+        Message msgObj = mHandler.obtainMessage();
+        msgObj.what=1;
+        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
+        //Snackbar.make(viewPager, "tab unselected", Snackbar.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
+
+       // Snackbar.make(viewPager, "tab reselected", Snackbar.LENGTH_SHORT).show();
+
     }
 
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<InfoFragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+
 
         public ViewPagerAdapter(FragmentManager manager) {
             super(manager);
@@ -242,8 +365,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             mFragmentTitleList.get(position);
             return null;
         }
-
-
     }
 
 
@@ -361,7 +482,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-
     public void onResume() {
         super.onResume();
 
@@ -419,18 +539,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         //Array de 4 numeros, que va a almacenar el estado de cada una de las 3
         //seekbars, asi como el de la fiebre para luego almacenarlos en el fichero de texto.
-        final int[] estados_seekbar=new int[4];
+        final int[] estados_seekbar = new int[4];
 
 
         //Barra de Color de Esputo
-        SeekBar seekBarColorEsputo = (SeekBar)v.findViewById(R.id.seekBar_estado_esputo);
+        SeekBar seekBarColorEsputo = (SeekBar) v.findViewById(R.id.seekBar_estado_esputo);
         seekBarColorEsputo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int seekBarProgress = 0;
 
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarProgress = progress;
-                valor_esputo_estado_inicial=progress;
+                valor_esputo_estado_inicial = progress;
 
             }
 
@@ -438,23 +558,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                estados_seekbar[0]=seekBarProgress;
-                valor_esputo_estado_inicial=seekBarProgress;
+                estados_seekbar[0] = seekBarProgress;
+                valor_esputo_estado_inicial = seekBarProgress;
             }
 
 
         });
 
 
-
         //Barra de estado de paciente
-        SeekBar seekBarEstadoPaciente = (SeekBar)v.findViewById(R.id.seekBar_estado_paciente);
+        SeekBar seekBarEstadoPaciente = (SeekBar) v.findViewById(R.id.seekBar_estado_paciente);
         seekBarEstadoPaciente.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int seekBarProgress = 0;
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarProgress = progress;
-                valor_pacientes_estado_inicial=progress;
+                valor_pacientes_estado_inicial = progress;
 
             }
 
@@ -463,20 +582,20 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                estados_seekbar[1]=seekBarProgress;
-                valor_pacientes_estado_inicial=seekBarProgress;
+                estados_seekbar[1] = seekBarProgress;
+                valor_pacientes_estado_inicial = seekBarProgress;
             }
         });
 
 
         //Barra de estado Fatiga
-        SeekBar seekBarEstadoFatiga = (SeekBar)v.findViewById(R.id.seekBar_estado_fatiga);
+        SeekBar seekBarEstadoFatiga = (SeekBar) v.findViewById(R.id.seekBar_estado_fatiga);
         seekBarEstadoFatiga.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int seekBarProgress = 0;
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarProgress = progress;
-                valor_fatiga_estado_inicial=progress;
+                valor_fatiga_estado_inicial = progress;
 
             }
 
@@ -485,12 +604,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                estados_seekbar[2]=seekBarProgress;
-                valor_fatiga_estado_inicial=seekBarProgress;
+                estados_seekbar[2] = seekBarProgress;
+                valor_fatiga_estado_inicial = seekBarProgress;
             }
         });
 
-        final ToggleImageButton toggleFiebre = (ToggleImageButton)v.findViewById(R.id.tb_fiebre);
+        final ToggleImageButton toggleFiebre = (ToggleImageButton) v.findViewById(R.id.tb_fiebre);
 
         aceptar.setOnClickListener(
                 new View.OnClickListener() {
@@ -498,25 +617,25 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     public void onClick(View v) {
                         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                         String fecha_actual = sdf.format(new Date());
-                        if(valor_esputo_estado_inicial==1000){
-                            estados_seekbar[0]=1;
+                        if (valor_esputo_estado_inicial == 1000) {
+                            estados_seekbar[0] = 1;
                         }
-                        if(valor_pacientes_estado_inicial==1000){
-                            estados_seekbar[1]=3;
+                        if (valor_pacientes_estado_inicial == 1000) {
+                            estados_seekbar[1] = 3;
                         }
-                        if(valor_fatiga_estado_inicial==1000){
-                            estados_seekbar[2]=3;
+                        if (valor_fatiga_estado_inicial == 1000) {
+                            estados_seekbar[2] = 3;
                         }
                         int chek;
-                        if(toggleFiebre.isChecked()){
-                            estados_seekbar[3]=1;
-                        }else{
-                            estados_seekbar[3]=0;
+                        if (toggleFiebre.isChecked()) {
+                            estados_seekbar[3] = 1;
+                        } else {
+                            estados_seekbar[3] = 0;
                         }
 
-                        Toast.makeText(MainActivity.this,"La fecha actual es: "+fecha_actual+"Estado" +
-                                "Esputo: " +estados_seekbar[0]+" Estado Paciente: "+estados_seekbar[1]+"" +
-                                "Fatiga: "+estados_seekbar[2]+"Fiebre: "+estados_seekbar[3],Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "La fecha actual es: " + fecha_actual + "Estado" +
+                                "Esputo: " + estados_seekbar[0] + " Estado Paciente: " + estados_seekbar[1] + "" +
+                                "Fatiga: " + estados_seekbar[2] + "Fiebre: " + estados_seekbar[3], Toast.LENGTH_SHORT).show();
 
                     }
                 }
@@ -529,13 +648,28 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         dialog.dismiss();
                     }
                 }
-
         );
 
 
-
-
         return dialog;
+    }
+
+    public class Carrusel implements Runnable {
+        @Override
+        public void run() {
+            int pos = tabLayout.getSelectedTabPosition();
+            int ntabs= tabLayout.getTabCount();
+            int newPos = (pos+1) % ntabs;
+            TabLayout.Tab tab = tabLayout.getTabAt(newPos);
+
+            tab.select();
+            tabLayout.setScrollPosition(newPos,0f,true);
+            tabLayout.invalidate();
+            viewPager.setCurrentItem(newPos,true);
+            viewPager.invalidate();
+
+
+        }
     }
 }
 

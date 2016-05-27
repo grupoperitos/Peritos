@@ -7,12 +7,16 @@ import android.animation.AnimatorSet;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -106,22 +110,27 @@ public class InfoFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mCaptionView.postDelayed(new FlashMessage(mCaptionView, mMessageView, mMessage), MAIN_MESSAGE_TIME);
 
         mMessageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDetailsDialog();
+                AlertDialog details = createDetailsDialog();
+                details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
+                details.show();
                 //Llamar al método de la interfaz con la actividad para que añada los puntos de logro
             }
         });
         mCaptionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDetailsDialog();
+                AlertDialog details = createDetailsDialog();
+                details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
+                details.show();
                 //Llamar al método de la interfaz con la actividad para que añada los puntos de logro
             }
         });
+
+        mCaptionView.postDelayed(new FlashMessage(mCaptionView, mMessageView, mMessage), MAIN_MESSAGE_TIME);
     }
 
     @Override
@@ -129,6 +138,36 @@ public class InfoFragment extends Fragment {
         super.onResume();
     }
 
+    public AlertDialog createDetailsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.dialog_details, null);
+
+        builder.setView(v);
+
+        Button aceptar = (Button) v.findViewById(R.id.btn_aceptar);
+
+        WebView web = (WebView) v.findViewById(R.id.text_details);
+        web.loadData(mDetail, "text/html", null);
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+
+        aceptar.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+
+                    }
+                }
+        );
+
+
+        return dialog;
+    }
 
     public synchronized void actualizeMessage(int type, String title, String caption, String message, String detail) {
         mType = type;
@@ -136,6 +175,10 @@ public class InfoFragment extends Fragment {
         mCaption = caption;
         mMessage = message;
         mDetail = detail;
+    }
+
+    public String getTitle() {
+        return mTitle;
     }
 
     protected void showTitle(String message) {

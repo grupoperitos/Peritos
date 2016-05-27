@@ -13,5 +13,6 @@ public interface MessageFormat {
     public final int POS_MENSAJE     = 5; //Mensaje corto, normalmente una frase
     public final int POS_COMENTARIO  = 6; //Comentario sobre mensaje, un par se frases
     public final int POS_DETALLE     = 7; //Texto extenso
-    public final int MESSAGE_FIELDS  = 8;
+    public final int POS_URL         = 8; //URL del recurso externo
+    public final int MESSAGE_FIELDS  = 9;
 }

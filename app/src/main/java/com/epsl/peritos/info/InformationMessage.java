@@ -13,6 +13,7 @@ public class InformationMessage {
     private String caption = "-"; //Mensaje corto, normalmente una frase
     private String commentary = "-"; //Comentario sobre mensaje, un par se frases
     private String detail = "-"; //mensaje extenso
+    private String url = "-"; //url del recurso externo
 
     private boolean isCorrect = false;
 
@@ -46,21 +47,23 @@ public class InformationMessage {
                 this.setCaption(fields[MessageFormat.POS_MENSAJE]);
                 this.setCommentary(fields[MessageFormat.POS_COMENTARIO]);
                 this.setDetail(fields[MessageFormat.POS_DETALLE]);
+                this.setURL(fields[MessageFormat.POS_URL]);
                 isCorrect = true;
         }
     }
 
 }
 
-    public String toSting() {
+    @Override
+    public String toString() {
         String result = "";
-        result = getType() + "\t" + getCode() + "\t" + getPriority() + "\t" + getAchievement() + "\t" + getTitle() + "\t" + getCaption() + "\t" + getCommentary() + "\t" + getDetail();
+        result = getType() + "\t" + getCode() + "\t" + getPriority() + "\t" + getAchievement() + "\t" + getTitle() + "\t" + getCaption() + "\t" + getCommentary() + "\t" + getDetail()+"\t" + getURL();
         return result;
     }
 
     public String toSummarySting() {
         String result = "";
-        result = " T=" + getType() + " C=" + getCode() + " P=" + getPriority() + " A=" + getAchievement() + "\n" + getTitle() + "\n" + getCaption() + "\n" + getCommentary() + "\n" + getDetail();
+        result = " T=" + getType() + " C=" + getCode() + " P=" + getPriority() + " A=" + getAchievement() + "\n" + getTitle() + "\n" + getCaption() + "\n" + getCommentary() + "\n" + getDetail()+"\n" + getURL();
 
         return result;
     }
@@ -133,6 +136,11 @@ public class InformationMessage {
         this.detail = detail;
     }
 
-
+    public void setURL(String url) {
+        this.url = url;
+    }
+    public String getURL() {
+        return this.url;
+    }
 
 }

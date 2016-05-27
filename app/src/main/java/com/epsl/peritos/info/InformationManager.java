@@ -43,8 +43,9 @@ public class InformationManager {
     }
 
     /**
-     * Almacena los registros le�dos del fichero pasado en los recursos /raw en un fichero en el almacenamiento interno de la aplicaci�n
+     * Almacena los registros leídos del fichero pasado en los recursos /raw en un fichero en el almacenamiento interno de la aplicación
      *
+     * @param context Contexto de la aplicación
      * @param messages
      */
     private static boolean saveInternalFile(Context context,MessageList messages) {
@@ -57,7 +58,7 @@ public class InformationManager {
 
             for(InformationMessage message:messages){
 
-                bw.write(message.toSting());
+                bw.write(message.toString());
                 bw.newLine();
             }
 
@@ -101,7 +102,7 @@ public class InformationManager {
                 if (line != null) {
                     fields = line.split("\t");
                     InformationMessage message = new InformationMessage(line);
-                    content = content + message.toSting() + "\r\n";
+                    content = content + message.toString() + "\r\n";
                 }
             } while (line != null);
             b.close();
@@ -184,13 +185,13 @@ public class InformationManager {
             e.printStackTrace();
             Toast.makeText(
                     context,
-                    context.getResources().getString(R.string.error_IputOutput),
+                    context.getString(R.string.error_IputOutput),
                     Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(
                     context,
-                    context.getResources().getString(R.string.error_IputOutput),
+                    context.getString(R.string.error_IputOutput),
                     Toast.LENGTH_LONG).show();
         }
         return null;

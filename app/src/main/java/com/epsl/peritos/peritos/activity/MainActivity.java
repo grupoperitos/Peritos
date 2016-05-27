@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Cuidador;
 
 
-
     //Mensajes
     public static MessageList messageList = null;
     public static MessageList tratamientoList = null;
@@ -78,14 +77,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         messageList = InformationManager.loadInformation(this);
-        if(messageList!=null){
+        if (messageList != null) {
             tratamientoList = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
-            dietaList =  messageList.getMessagesByType(MessageTypes.INFO_DIETA);
-            ejercicioList =  messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
-            epocList=  messageList.getMessagesByType(MessageTypes.INFO_EPOC);
-        }else
-        {
-            Toast.makeText(this,"Error al cargar el fichero de recursos",Toast.LENGTH_LONG).show();
+            dietaList = messageList.getMessagesByType(MessageTypes.INFO_DIETA);
+            ejercicioList = messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
+            epocList = messageList.getMessagesByType(MessageTypes.INFO_EPOC);
+        } else {
+            Toast.makeText(this, "Error al cargar el fichero de recursos", Toast.LENGTH_LONG).show();
             finish();
         }
 
@@ -101,8 +99,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         setupTabIcons();
 
 
-
-
         //MiniFAB salud Responde
         miniFAB_SR = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_SR);
         miniFAB_SR.setOnClickListener(new View.OnClickListener() {
@@ -110,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             public void onClick(View view) {
 
                 //902505060
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+953018799));
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + 953018799));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -163,12 +159,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 }
                 startActivity(intent);
 
-                Snackbar.make(view, getString(R.string.interfaz_cuidador)+"OBTENER NOMBRE DE AGENDA", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, getString(R.string.interfaz_cuidador) + "OBTENER NOMBRE DE AGENDA", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
-
-
 
 
         //Registro del día y hora de último uso de la app
@@ -213,10 +207,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-
-
     class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<InfoFragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
 
         public ViewPagerAdapter(FragmentManager manager) {
@@ -233,15 +225,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             return mFragmentList.size();
         }
 
-        public void addFrag(Fragment fragment, String title) {
+        public void addFrag(InfoFragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-
-
+            mFragmentTitleList.get(position);
             return null;
         }
 
@@ -260,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         TextView txtSettings = (TextView) view.findViewById(R.id.txt_settings);
 
 
-
         final Dialog bottomDialogMenu = new Dialog(MainActivity.this,
                 R.style.MaterialDialogMenu);
         bottomDialogMenu.setContentView(view);
@@ -269,7 +259,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         bottomDialogMenu.getWindow().setGravity(Gravity.BOTTOM);
         bottomDialogMenu.show();
-
 
 
         //BOTON LLAMADAS CALENDARIO CITAS
@@ -320,8 +309,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     //obtener el dia seleccionado y demás de dentro del metodo onDataSet
-    String var="";
-    private String obtenerDia(String hola){
+    String var = "";
+
+    private String obtenerDia(String hola) {
         return hola;
     }
 
@@ -329,20 +319,20 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     public void onDateSet(DatePickerDialog v, int ano, int mes_ano, int dia_mes) {
         //POR DEFECTO EN JAVA LOS MESES VAN DE 0 A 11, POR ESO SUMAMOS 1, PARA MOSTRARLO BIEN
-        mes_ano=mes_ano+1;
-        String mes="";
-        String dia="";
+        mes_ano = mes_ano + 1;
+        String mes = "";
+        String dia = "";
         //Añadir 0 delante si mes es menor que 10
-        if(mes_ano<10){
-            mes="0"+mes_ano;
-        }else{
-            mes=String.valueOf(mes_ano);
+        if (mes_ano < 10) {
+            mes = "0" + mes_ano;
+        } else {
+            mes = String.valueOf(mes_ano);
         }
         //Aádir 0 delante si dia es menor que 10
-        if(dia_mes<10){
-            dia=""+"0"+dia_mes;
-        }else{
-            dia=String.valueOf(dia_mes);
+        if (dia_mes < 10) {
+            dia = "" + "0" + dia_mes;
+        } else {
+            dia = String.valueOf(dia_mes);
         }
         Toast.makeText(
                 this, "El dia de la cita es: " + dia + "-" + mes + "-" + ano,
@@ -359,10 +349,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         );
         tpd.setAccentColor("#4FC3F7");
         tpd.show(getFragmentManager(), "Selector Hora");
-        var=this.obtenerDia(dia);
+        var = this.obtenerDia(dia);
 
     }
-
 
 
     public void onResume() {
@@ -371,26 +360,26 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         DatePickerDialog dpd = (DatePickerDialog) getFragmentManager().findFragmentByTag("Datepickerdialog");
         TimePickerDialog tpd = (TimePickerDialog) getFragmentManager().findFragmentByTag("TimepickerDialog");
 
-        if(dpd != null) dpd.setOnDateSetListener(this);
-        if(tpd != null) tpd.setOnTimeSetListener(this);
+        if (dpd != null) dpd.setOnDateSetListener(this);
+        if (tpd != null) tpd.setOnTimeSetListener(this);
     }
 
 
     @Override
     public void onTimeSet(RadialPickerLayout v, int hora_dia, int min, int sec) {
-        String h="";
-        String m="";
+        String h = "";
+        String m = "";
         //Añadir 0 delante si hora es menor que 10
-        if(hora_dia<10){
-            h="0"+hora_dia;
-        }else{
-            h=String.valueOf(hora_dia);
+        if (hora_dia < 10) {
+            h = "0" + hora_dia;
+        } else {
+            h = String.valueOf(hora_dia);
         }
         //Añadir 0 delante si minuto es menor que 10
-        if(min<10){
-            m="0"+min;
-        }else{
-            m=String.valueOf(min);
+        if (min < 10) {
+            m = "0" + min;
+        } else {
+            m = String.valueOf(min);
         }
         Toast.makeText(
                 this, "La hora de la cita es: " + h + ":" + m, Toast.LENGTH_LONG).show();

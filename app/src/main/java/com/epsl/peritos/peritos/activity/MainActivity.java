@@ -62,6 +62,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Cuidador;
 
 
+    //Variables para Seekbars Control sintomas.
+    //Control de estados inicial, si acaban en 1000, tras darle a aceptar, el valor es
+    //el central del seekbar. (Valor inicial).
+    int valor_esputo_estado_inicial=1000;
+    int valor_pacientes_estado_inicial=1000;
+    int valor_fatiga_estado_inicial=1000;
+
     //Mensajes
     public static MessageList messageList = null;
     public static MessageList tratamientoList = null;
@@ -70,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     public static MessageList epocList = null;
 
 
-    int ano, mes, dia;
     static final int DIALOG_ID = 0;
 
     @Override
@@ -107,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                 //902505060
                 Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + 953018799));
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+902505060));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -132,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             @Override
             public void onClick(View view) {
                 AlertDialog dialogo_sintomas = createSintomasDialog();
-                dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
+                //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
                 dialogo_sintomas.show();
 
 
@@ -354,6 +361,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
+
     public void onResume() {
         super.onResume();
 
@@ -404,14 +412,111 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         Button aceptar = (Button) v.findViewById(R.id.btn_aceptar);
         Button cancelar = (Button) v.findViewById(R.id.btn_cancelar);
 
+
         final AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(true);
+
+
+        //Array de 4 numeros, que va a almacenar el estado de cada una de las 3
+        //seekbars, asi como el de la fiebre para luego almacenarlos en el fichero de texto.
+        final int[] estados_seekbar=new int[4];
+
+
+        //Barra de Color de Esputo
+        SeekBar seekBarColorEsputo = (SeekBar)v.findViewById(R.id.seekBar_estado_esputo);
+        seekBarColorEsputo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int seekBarProgress = 0;
+
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                seekBarProgress = progress;
+                valor_esputo_estado_inicial=progress;
+
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                estados_seekbar[0]=seekBarProgress;
+                valor_esputo_estado_inicial=seekBarProgress;
+            }
+
+
+        });
+
+
+
+        //Barra de estado de paciente
+        SeekBar seekBarEstadoPaciente = (SeekBar)v.findViewById(R.id.seekBar_estado_paciente);
+        seekBarEstadoPaciente.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int seekBarProgress = 0;
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                seekBarProgress = progress;
+                valor_pacientes_estado_inicial=progress;
+
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                estados_seekbar[1]=seekBarProgress;
+                valor_pacientes_estado_inicial=seekBarProgress;
+            }
+        });
+
+
+        //Barra de estado Fatiga
+        SeekBar seekBarEstadoFatiga = (SeekBar)v.findViewById(R.id.seekBar_estado_fatiga);
+        seekBarEstadoFatiga.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int seekBarProgress = 0;
+
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                seekBarProgress = progress;
+                valor_fatiga_estado_inicial=progress;
+
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                estados_seekbar[2]=seekBarProgress;
+                valor_fatiga_estado_inicial=seekBarProgress;
+            }
+        });
+
+        final ToggleImageButton toggleFiebre = (ToggleImageButton)v.findViewById(R.id.tb_fiebre);
 
         aceptar.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //CUANDO PULSEMOS ACEPTAR, GUARDAR LA INFORMACION DE SINTOMAS
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                        String fecha_actual = sdf.format(new Date());
+                        if(valor_esputo_estado_inicial==1000){
+                            estados_seekbar[0]=1;
+                        }
+                        if(valor_pacientes_estado_inicial==1000){
+                            estados_seekbar[1]=3;
+                        }
+                        if(valor_fatiga_estado_inicial==1000){
+                            estados_seekbar[2]=3;
+                        }
+                        int chek;
+                        if(toggleFiebre.isChecked()){
+                            estados_seekbar[3]=1;
+                        }else{
+                            estados_seekbar[3]=0;
+                        }
+
+                        Toast.makeText(MainActivity.this,"La fecha actual es: "+fecha_actual+"Estado" +
+                                "Esputo: " +estados_seekbar[0]+" Estado Paciente: "+estados_seekbar[1]+"" +
+                                "Fatiga: "+estados_seekbar[2]+"Fiebre: "+estados_seekbar[3],Toast.LENGTH_SHORT).show();
 
                     }
                 }
@@ -426,6 +531,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 }
 
         );
+
+
+
+
         return dialog;
     }
 }

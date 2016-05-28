@@ -26,4 +26,5 @@
 
     <string name="dialog_aceptar">ACEPTAR</string>
     <string name="dialog_cancelar">CANCELAR</string>
+    <string name="content_description_playvideo">Reproducir vídeo</string>
 </resources>

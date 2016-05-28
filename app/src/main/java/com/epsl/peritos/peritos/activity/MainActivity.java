@@ -44,6 +44,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     public static final String CARRUSEL = "carrusel";
 
     //Control del tiempo que está cada tab activo
-    public final long MAXPAGE_WAIT = 10000;//10 segundos
+    public final long MAXPAGE_WAIT = 15000;//milisegundos
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -120,6 +121,43 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setOnTabSelectedListener(this);
+
+
+        mHandler = new Handler(Looper.getMainLooper()) {
+            /*
+                     * handleMessage() defines the operations to perform when
+                     * the Handler receives a new Message to process.
+                     */
+            @Override
+            public void handleMessage(Message inputMessage) {
+
+                switch(inputMessage.what){
+                    case 1:
+                        //Cambiar la pestaña activa
+                        mHandler.removeMessages(1);
+                        tabLayout.post(new Carrusel());
+
+
+                        Snackbar.make(viewPager, "Handler 1", Snackbar.LENGTH_SHORT).show();
+                        break;
+                    case 2:
+//                        mHandler.removeMessages(1);
+//                        int pos = tabLayout.getSelectedTabPosition();
+//                        mFragmentList.get(pos).actualize(messageTabs[pos].getNextMessage());
+//                        Message msgObj2 = mHandler.obtainMessage();
+//                        msgObj2.what=2;
+//                        mHandler.sendMessageDelayed(msgObj2,MAXPAGE_WAIT);
+                        Snackbar.make(viewPager, "Handler 2", Snackbar.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+
+
+        };
+
         setupTabControl();
 
 
@@ -197,6 +235,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+
+
+
+
     }
 
 
@@ -214,49 +257,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tabLayout.getTabAt(2).setIcon(tabIcons[2]);
         tabLayout.getTabAt(3).setIcon(tabIcons[3]);
 
-        //tabLayout.post(new Carrusel());
 
-        mHandler = new Handler(Looper.getMainLooper()) {
-            /*
-                     * handleMessage() defines the operations to perform when
-                     * the Handler receives a new Message to process.
-                     */
-            @Override
-            public void handleMessage(Message inputMessage) {
+//        Message msgObj = mHandler.obtainMessage();
+//        msgObj.what=1;
+//        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT*2);
 
-                switch(inputMessage.what){
-                    case 1:
-                        //Cambiar la pestaña activa
-                        mHandler.removeMessages(1);
-                        tabLayout.post(new Carrusel());
-
-
-                        Snackbar.make(viewPager, "Handler 1", Snackbar.LENGTH_SHORT).show();
-                        break;
-                    case 2:
-//                        mHandler.removeMessages(1);
-//                        int pos = tabLayout.getSelectedTabPosition();
-//                        mFragmentList.get(pos).actualize(messageTabs[pos].getNextMessage());
-//                        Message msgObj2 = mHandler.obtainMessage();
-//                        msgObj2.what=2;
-//                        mHandler.sendMessageDelayed(msgObj2,MAXPAGE_WAIT);
-                        Snackbar.make(viewPager, "Handler 2", Snackbar.LENGTH_SHORT).show();
-                        break;
-                    default:
-                        Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-
-
-        };
-
-        Message msgObj = mHandler.obtainMessage();
-        msgObj.what=1;
-        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT*2);
-//        Message msgObj2 = mHandler.obtainMessage();
-//        msgObj2.what=2;
-//        mHandler.sendMessageDelayed(msgObj2,MAXPAGE_WAIT);
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -274,10 +279,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     public void onStart() {
         super.onStart();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
 
-//        // ATTENTION: This was auto-generated to implement the App Indexing API.
-//        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        client.connect();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
 //        Action viewAction = Action.newAction(
 //                Action.TYPE_VIEW, // TODO: choose an action type.
 //                "Main Page", // TODO: Define a title for the content shown.
@@ -294,7 +301,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     public void onStop() {
         super.onStop();
-
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
 //        Action viewAction = Action.newAction(
@@ -308,12 +314,23 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 //                Uri.parse("android-app://com.epsl.peritos.peritos.activity/http/host/path")
 //        );
 //        AppIndex.AppIndexApi.end(client, viewAction);
+//
+//
+//        // See https://g.co/AppIndexing/AndroidStudio for more information.
 //        client.disconnect();
     }
 
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
+        int pos = tabLayout.getSelectedTabPosition();
+
+        tab.select();
+        tabLayout.setScrollPosition(pos,0f,true);
+
+        viewPager.setCurrentItem(pos,true);
+        tabLayout.invalidate();
+        viewPager.invalidate();
 
         Message msgObj = mHandler.obtainMessage();
         msgObj.what=1;
@@ -326,10 +343,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
-
-        Message msgObj = mHandler.obtainMessage();
-        msgObj.what=1;
-        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
         //Snackbar.make(viewPager, "tab unselected", Snackbar.LENGTH_SHORT).show();
 
     }
@@ -494,6 +507,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         if (dpd != null) dpd.setOnDateSetListener(this);
         if (tpd != null) tpd.setOnTimeSetListener(this);
+
+        Message msgObj = mHandler.obtainMessage();
+        msgObj.what=1;
+        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
     }
 
 

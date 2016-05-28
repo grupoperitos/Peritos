@@ -6,8 +6,12 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,11 +21,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.epsl.peritos.info.InformationMessage;
 import com.epsl.peritos.peritos.R;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by Juan Carlos on 12/05/2016.
@@ -33,24 +41,32 @@ public class InfoFragment extends Fragment {
     public static final String INFO_CAPTION = "infocaption";
     public static final String INFO_MESSAGE = "infomessage";
     public static final String INFO_DETAIL = "infodetail";
+    public static final String INFO_URL = "infourl";
 
     public static final String TAG_DETAILS = "details";
-    private static final long MAIN_MESSAGE_TIME = 10000;
+    private static final long MAIN_MESSAGE_TIME = 5000;
 
     private String mTitle = "";
     private String mMessage = "";
     private String mCaption = "";
     private String mDetail = "";
+    private String mURL = "";
     int mType = -1;
 
+    private View mFragmentView = null;
     private TextView mMessageView = null;
     private TextView mCaptionView = null;
     private TextView mTitleView = null;
+    private ImageView mPlayVideo = null;
 
     private ScrollView mScrollCaption = null;
     private ScrollView mScrollMessage = null;
 
-    public static InfoFragment newInstance(int type, String title, String caption, String message, String detail) {
+    private Handler mHandler=null;//Handled to manage tab iteration
+    public static final int HANLDER_MESSAGE_CAPTION = 2;
+    public static final int HANLDER_MESSAGE_COMMENTARY = 3;
+
+    public static InfoFragment newInstance(int type, String title, String caption, String message, String detail, String url) {
         InfoFragment fragment = new InfoFragment();
         Bundle args = new Bundle();
         args.putInt(INFO_TYPE, type);
@@ -58,6 +74,7 @@ public class InfoFragment extends Fragment {
         args.putString(INFO_CAPTION, caption);
         args.putString(INFO_MESSAGE, message);
         args.putString(INFO_DETAIL, detail);
+        args.putString(INFO_URL,url);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,6 +87,7 @@ public class InfoFragment extends Fragment {
         args.putString(INFO_CAPTION, message.getCaption());
         args.putString(INFO_MESSAGE, message.getCommentary());
         args.putString(INFO_DETAIL, message.getDetail());
+        args.putString(INFO_URL,message.getURL());
         fragment.setArguments(args);
         return fragment;
     }
@@ -87,23 +105,43 @@ public class InfoFragment extends Fragment {
         mCaption = getArguments().getString(INFO_CAPTION);
         mMessage = getArguments().getString(INFO_MESSAGE);
         mDetail = getArguments().getString(INFO_DETAIL);
+        mURL = getArguments().getString(INFO_URL);
 
-        View view = inflater.inflate(R.layout.fragment_info, container, false);
+        mFragmentView = inflater.inflate(R.layout.fragment_info, container, false);
 
-        mMessageView = (TextView) view.findViewById(R.id.txt_message);
-        mCaptionView = (TextView) view.findViewById(R.id.txt_caption);
-        mTitleView = (TextView) view.findViewById(R.id.txt_title);
+        mMessageView = (TextView) mFragmentView.findViewById(R.id.txt_message);
+        mCaptionView = (TextView) mFragmentView.findViewById(R.id.txt_caption);
+        mTitleView = (TextView) mFragmentView.findViewById(R.id.txt_title);
+        mPlayVideo = (ImageView) mFragmentView.findViewById(R.id.info_play);
 
-        mScrollCaption = (ScrollView) view.findViewById(R.id.scroll_caption);
-        mScrollMessage = (ScrollView) view.findViewById(R.id.scroll_message);
+        mScrollCaption = (ScrollView) mFragmentView.findViewById(R.id.scroll_caption);
+        mScrollMessage = (ScrollView) mFragmentView.findViewById(R.id.scroll_message);
+
+        if(mURL.equals("-") || mURL.isEmpty())
+            mPlayVideo.setVisibility(View.INVISIBLE);
+        else
+            mPlayVideo.setVisibility(View.VISIBLE);
 
 
+        mPlayVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!mURL.equals("-")) {
+                    try {
+                        URL url = new URL(mURL);
+                        String path=url.getPath();
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
         showTitle(mTitle);
         showCaption(mCaption);
         showMessage(mMessage);
 
 
-        return view;
+        return mFragmentView;
     }
 
     @Override
@@ -130,12 +168,58 @@ public class InfoFragment extends Fragment {
             }
         });
 
-        mCaptionView.postDelayed(new FlashMessage(mCaptionView, mMessageView, mMessage), MAIN_MESSAGE_TIME*2);
+        mHandler = new Handler(Looper.getMainLooper()) {
+            /*
+                     * handleMessage() defines the operations to perform when
+                     * the Handler receives a new Message to process.
+                     */
+            @Override
+            public void handleMessage(Message inputMessage) {
+
+                switch(inputMessage.what){
+                    case HANLDER_MESSAGE_CAPTION:
+                        //Cambiar la pestaña activa
+                        mHandler.removeMessages(HANLDER_MESSAGE_CAPTION);
+                        mCaptionView.post(new FlashMessage(mCaptionView, mMessageView, mCaption));
+
+                        Message msgObj = mHandler.obtainMessage();
+                        msgObj.what=HANLDER_MESSAGE_COMMENTARY;
+                        mHandler.sendMessageDelayed(msgObj,MAIN_MESSAGE_TIME);
+                        break;
+                    case HANLDER_MESSAGE_COMMENTARY:
+                        //Cambiar la pestaña activa
+                        mHandler.removeMessages(HANLDER_MESSAGE_COMMENTARY);
+                        mCaptionView.post(new FlashMessage(mCaptionView, mMessageView, mMessage));
+
+                        Message msgObj2 = mHandler.obtainMessage();
+                        msgObj2.what=HANLDER_MESSAGE_CAPTION;
+                        mHandler.sendMessageDelayed(msgObj2,MAIN_MESSAGE_TIME);
+                        break;
+
+                    default:
+
+                        break;
+                }
+            }
+
+
+        };
+
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        if(mURL.equals("-"))
+            mPlayVideo.setVisibility(View.INVISIBLE);
+        else
+            mPlayVideo.setVisibility(View.VISIBLE);
+
+        Message msgObj = mHandler.obtainMessage();
+        msgObj.what=HANLDER_MESSAGE_COMMENTARY;
+        mHandler.sendMessageDelayed(msgObj,MAIN_MESSAGE_TIME);
+
     }
 
     public AlertDialog createDetailsDialog() {
@@ -165,16 +249,7 @@ public class InfoFragment extends Fragment {
                 }
         );
 
-
         return dialog;
-    }
-
-    public synchronized void actualizeMessage(int type, String title, String caption, String message, String detail) {
-        mType = type;
-        mTitle = title;
-        mCaption = caption;
-        mMessage = message;
-        mDetail = detail;
     }
 
     public String getTitle() {
@@ -198,9 +273,23 @@ public class InfoFragment extends Fragment {
 
     public void actualize(InformationMessage message) {
         if (message != null) {
-            showCaption(message.getCaption());
-            showMessage(message.getCommentary());
-            showTitle(message.getTitle());
+            mType = message.getType();
+            mTitle= message.getTitle();
+            mCaption = message.getCaption();
+            mMessage = message.getCommentary();
+            mDetail = message.getDetail();
+            mURL =message.getURL();
+            showCaption(mCaption);
+            showMessage(mMessage);
+            showTitle(mTitle);
+
+            if(mURL.equals("-"))
+                mPlayVideo.setVisibility(View.INVISIBLE);
+            else
+                mPlayVideo.setVisibility(View.VISIBLE);
+
+
+
 
         }
     }
@@ -215,6 +304,7 @@ public class InfoFragment extends Fragment {
         outState.putString(INFO_CAPTION, mCaption);
         outState.putString(INFO_MESSAGE, mMessage);
         outState.putString(INFO_DETAIL, mDetail);
+        outState.putString(INFO_URL,mURL);
 
     }
 
@@ -322,7 +412,7 @@ public class InfoFragment extends Fragment {
 
             }
 
-            mCaptionTextView.postDelayed(new FlashMessage(mCaptionTextView, mMessageTextView, mMessage1), MAIN_MESSAGE_TIME);
+            //mCaptionTextView.postDelayed(new FlashMessage(mCaptionTextView, mMessageTextView, mMessage1), MAIN_MESSAGE_TIME);
 
         }
     }

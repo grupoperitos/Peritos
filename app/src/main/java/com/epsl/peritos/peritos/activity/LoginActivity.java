@@ -1,14 +1,22 @@
 package com.epsl.peritos.peritos.activity;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.ContactsContract;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -16,6 +24,7 @@ import com.epsl.peritos.communications.CommunicationAsynctask;
 import com.epsl.peritos.peritos.R;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,6 +35,8 @@ import java.util.List;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button btnLogin;
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1 ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +51,31 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         final SharedPreferences prefs = getSharedPreferences("PRFS", Context.MODE_PRIVATE);
         String registrationId = prefs.getString("REG_ID", "");
         if (registrationId.isEmpty()) {
-            new GcmRegistrationAsyncTask(LoginActivity.this).execute();
+            if (isOnline()) {
+                new GcmRegistrationAsyncTask(LoginActivity.this).execute();
+            }
         }
+
+
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+            } else {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+
+            }
+        }
+
+
     }
 
     @Override
@@ -54,8 +88,44 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+            return true;
+        }
+        return false;
+    }
 
 
+    /**
+     * Método para descargar la última versión del archivo de contenidos de forma manual
+     * @param context Contexto de la actividad
+     */
+    public void checkUpdate(Context context){
+        SharedPreferences prefs = getSharedPreferences("PRFS", Context.MODE_PRIVATE);
+        String gcmid = prefs.getString("REG_ID","");
+        new CommunicationAsynctask(context).execute("UPD",gcmid);
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                }
+                return;
+            }
+
+        }
+    }
 
 
 

@@ -58,7 +58,7 @@ License: You must have a valid license purchased only from themeforest(the above
             <div class="page-header-inner ">
                 <!-- BEGIN LOGO -->
                 <div class="page-logo">
-                    <a href="index.html">
+                    <a href="admin.html">
                         <img src="assets/prtsapplogo.png" alt="logo" class="logo-default" /> </a>
                     <div class="menu-toggler sidebar-toggler"> </div>
                 </div>
@@ -74,7 +74,7 @@ License: You must have a valid license purchased only from themeforest(the above
                         <li class="dropdown dropdown-user">
                             <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                 <img alt="" class="img-circle" src="assets/layouts/layout/img/avatar3_small.jpg" />
-                                <span class="username username-hide-on-mobile"> Nick </span>
+                                <span class="username username-hide-on-mobile"> Administrador </span>
                                 <i class="fa fa-angle-down"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-default">
@@ -90,14 +90,6 @@ License: You must have a valid license purchased only from themeforest(the above
                             </ul>
                         </li>
                         <!-- END USER LOGIN DROPDOWN -->
-                        <!-- BEGIN QUICK SIDEBAR TOGGLER -->
-                        <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
-                        <li class="dropdown dropdown-quick-sidebar-toggler">
-                            <a href="javascript:;" class="dropdown-toggle">
-                                <i class="icon-logout"></i>
-                            </a>
-                        </li>
-                        <!-- END QUICK SIDEBAR TOGGLER -->
                     </ul>
                 </div>
                 <!-- END TOP NAVIGATION MENU -->
@@ -159,8 +151,8 @@ License: You must have a valid license purchased only from themeforest(the above
                     <!-- END PAGE HEADER-->
                     <div class="row">
                         <div class="col-md-12">
-                           
-                            <form id="fileupload" action="assets/global/plugins/jquery-file-upload/server/php/" method="POST" enctype="multipart/form-data">
+
+                            <form id='fileupload' action='<%= blobstoreService.createUploadUrl("/upload") %>' method='post' enctype='multipart/form-data'>
                                 <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
                                 <div class="row fileupload-buttonbar">
                                     <div class="col-lg-7">
@@ -168,7 +160,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                         <span class="btn green fileinput-button">
                                             <i class="fa fa-plus"></i>
                                             <span> Seleccionar archivo </span>
-                                            <input type="file" name="files[]" multiple=""> </span>
+                                            <input type="file" name="file" > </span>
                                         <!--<button type="submit" class="btn blue start">
                                             <i class="fa fa-upload"></i>
                                             <span> Subir </span>

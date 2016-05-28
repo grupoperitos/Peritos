@@ -44,7 +44,7 @@ public class Endpoint {
 
     private static final Logger log = Logger.getLogger(Endpoint.class.getName());
     private static final String API_KEY = System.getProperty("gcm.api.key");
-
+    private static final String servingUrl = "http://storage.googleapis.com/peritosapp.appspot.com/contenidos.txt";
 
     /**
      * Punto de entrada de las comunicaciones
@@ -86,8 +86,12 @@ public class Endpoint {
             }
         }
 
-        //Mensaje para comprobar si existe alguna nueva actualización
+        //Mensaje para comprobar si descargar última versión del archivo de contenidos
         if(msgtype.equals("UPD")){
+            String gcmid=msgcontent;
+            Messaging wm = new Messaging();
+            String message = "UPDATE#"+servingUrl;
+            wm.sendMessage(message,gcmid);
             return;
         }
     }

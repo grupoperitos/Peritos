@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class MessageList extends ArrayList<InformationMessage> {
 
-    public static int LAST_ID = 0;
+    public int LAST_ID = 0;
 
     public InformationMessage getMessageById(int id) {
         InformationMessage result = null;
@@ -28,8 +28,9 @@ public class MessageList extends ArrayList<InformationMessage> {
             result = this.get(LAST_ID);
         }
         LAST_ID++;
-        if (LAST_ID >= size())
+        if (LAST_ID >= this.size()) {
             LAST_ID = 0;
+        }
         return result;
     }
 

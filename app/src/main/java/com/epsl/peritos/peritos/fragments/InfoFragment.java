@@ -35,7 +35,7 @@ public class InfoFragment extends Fragment {
     public static final String INFO_DETAIL = "infodetail";
 
     public static final String TAG_DETAILS = "details";
-    private static final long MAIN_MESSAGE_TIME = 5000;
+    private static final long MAIN_MESSAGE_TIME = 10000;
 
     private String mTitle = "";
     private String mMessage = "";
@@ -130,7 +130,7 @@ public class InfoFragment extends Fragment {
             }
         });
 
-        mCaptionView.postDelayed(new FlashMessage(mCaptionView, mMessageView, mMessage), MAIN_MESSAGE_TIME);
+        mCaptionView.postDelayed(new FlashMessage(mCaptionView, mMessageView, mMessage), MAIN_MESSAGE_TIME*2);
     }
 
     @Override
@@ -198,7 +198,8 @@ public class InfoFragment extends Fragment {
 
     public void actualize(InformationMessage message) {
         if (message != null) {
-            showMessage(message.getCaption());
+            showCaption(message.getCaption());
+            showMessage(message.getCommentary());
             showTitle(message.getTitle());
 
         }

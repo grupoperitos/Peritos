@@ -102,12 +102,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         super.onCreate(savedInstanceState);
         messageList = InformationManager.loadInformation(this);
         if (messageList != null) {
-            messageTabs[0] = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
-            messageTabs[1] = messageList.getMessagesByType(MessageTypes.INFO_DIETA);
-            messageTabs[2] = messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
-            messageTabs[3] = messageList.getMessagesByType(MessageTypes.INFO_EPOC);
+            messageTabs[MessageTypes.INFO_TRATAMIENTO] = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
+            messageTabs[MessageTypes.INFO_DIETA] = messageList.getMessagesByType(MessageTypes.INFO_DIETA);
+            messageTabs[MessageTypes.INFO_EJERCICIO] = messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
+            messageTabs[MessageTypes.INFO_EPOC] = messageList.getMessagesByType(MessageTypes.INFO_EPOC);
         } else {
-            Toast.makeText(this, "Error al cargar el fichero de recursos", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.error_cargarrecursos), Toast.LENGTH_LONG).show();
             finish();
         }
 
@@ -167,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             @Override
             public void onClick(View view) {
 
-                //902505060
                 Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + 902505060));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
@@ -205,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         miniFAB_Cuidador.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ////////*****CREAR FORMULARIO/agenda PARA ELEGIR NUMERO DEL CUIDADOR!!!!
+                // TODO: CREAR FORMULARIO/agenda PARA ELEGIR NUMERO DEL CUIDADOR!!!!
                 Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:+34000000000"));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling

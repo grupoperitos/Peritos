@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,6 +39,7 @@ import android.widget.TextView;
 
 import com.epsl.peritos.info.InformationMessage;
 import com.epsl.peritos.peritos.R;
+import com.epsl.peritos.peritos.activity.MainActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +59,7 @@ public class InfoFragment extends Fragment {
     public static final String INFO_URL = "infourl";
 
     public static final String TAG_DETAILS = "details";
-    private static final long MAIN_MESSAGE_TIME = 5000;
+
 
     private String mTitle = "";
     private String mMessage = "";
@@ -76,8 +78,7 @@ public class InfoFragment extends Fragment {
     private ScrollView mScrollMessage = null;
 
     private Handler mHandler = null;//Handled to manage tab iteration
-    public static final int HANLDER_MESSAGE_CAPTION = 2;
-    public static final int HANLDER_MESSAGE_COMMENTARY = 3;
+
 
     private long enqueue;
     private DownloadManager mDM;
@@ -114,16 +115,7 @@ public class InfoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState!=null)
-        {
-            mType = savedInstanceState.getInt(INFO_TYPE);
-            mTitle = savedInstanceState.getString(INFO_TITLE);
-            mCaption = savedInstanceState.getString(INFO_CAPTION);
-            mMessage = savedInstanceState.getString(INFO_MESSAGE);
-            mDetail = savedInstanceState.getString(INFO_DETAIL);
-            mURL = savedInstanceState.getString(INFO_URL);
-
-        }else if (getArguments() != null) {
+        if (getArguments() != null) {
             mType = getArguments().getInt(INFO_TYPE);
             mTitle = getArguments().getString(INFO_TITLE);
             mCaption = getArguments().getString(INFO_CAPTION);
@@ -137,7 +129,15 @@ public class InfoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        if (savedInstanceState != null) {
+            mType = savedInstanceState.getInt(INFO_TYPE);
+            mTitle = savedInstanceState.getString(INFO_TITLE);
+            mCaption = savedInstanceState.getString(INFO_CAPTION);
+            mMessage = savedInstanceState.getString(INFO_MESSAGE);
+            mDetail = savedInstanceState.getString(INFO_DETAIL);
+            mURL = savedInstanceState.getString(INFO_URL);
 
+        }
         mFragmentView = inflater.inflate(R.layout.fragment_info, container, false);
 
         mMessageView = (TextView) mFragmentView.findViewById(R.id.txt_message);
@@ -163,7 +163,7 @@ public class InfoFragment extends Fragment {
                             DownloadManager.EXTRA_DOWNLOAD_ID, 0);
                     DownloadManager.Query query = new DownloadManager.Query();
                     query.setFilterById(enqueue);
-                    if(mDM!=null) {
+                    if (mDM != null) {
                         Cursor c = mDM.query(query);
                         if (c.moveToFirst()) {
                             int columnIndex = c
@@ -215,7 +215,6 @@ public class InfoFragment extends Fragment {
         });
 
 
-
         return mFragmentView;
     }
 
@@ -257,6 +256,7 @@ public class InfoFragment extends Fragment {
                 request.setTitle(getString(R.string.app_name) + " " + file.getPath());
                 request.setDestinationUri(Uri.fromFile(file));
                 enqueue = mDM.enqueue(request);
+                Snackbar.make(mFragmentView, getString(R.string.info_fragment_descarga), Snackbar.LENGTH_LONG).show();
             }
 
         } catch (MalformedURLException e) {
@@ -325,9 +325,9 @@ public class InfoFragment extends Fragment {
             public void handleMessage(Message inputMessage) {
 
                 switch (inputMessage.what) {
-                    case HANLDER_MESSAGE_CAPTION:
+                    case MainActivity.HANLDER_MESSAGE_CAPTION:
                         //Cambiar la pestaña activa
-                        mHandler.removeMessages(HANLDER_MESSAGE_CAPTION);
+                        mHandler.removeMessages(MainActivity.HANLDER_MESSAGE_CAPTION);
                         final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
                                 R.animator.fade_out);
                         final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
@@ -355,12 +355,12 @@ public class InfoFragment extends Fragment {
                             }
                         });
                         Message msgObj = mHandler.obtainMessage();
-                        msgObj.what = HANLDER_MESSAGE_COMMENTARY;
-                        mHandler.sendMessageDelayed(msgObj, MAIN_MESSAGE_TIME);
+                        msgObj.what = MainActivity.HANLDER_MESSAGE_COMMENTARY;
+                        mHandler.sendMessageDelayed(msgObj, MainActivity.MAIN_MESSAGE_TIME);
                         break;
-                    case HANLDER_MESSAGE_COMMENTARY:
+                    case MainActivity.HANLDER_MESSAGE_COMMENTARY:
                         //Cambiar la pestaña activa
-                        mHandler.removeMessages(HANLDER_MESSAGE_COMMENTARY);
+                        mHandler.removeMessages(MainActivity.HANLDER_MESSAGE_COMMENTARY);
 
                         final AnimatorSet set_c1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
                                 R.animator.fade_out);
@@ -390,8 +390,8 @@ public class InfoFragment extends Fragment {
                         });
 
                         Message msgObj2 = mHandler.obtainMessage();
-                        msgObj2.what = HANLDER_MESSAGE_CAPTION;
-                        mHandler.sendMessageDelayed(msgObj2, MAIN_MESSAGE_TIME);
+                        msgObj2.what = MainActivity.HANLDER_MESSAGE_CAPTION;
+                        mHandler.sendMessageDelayed(msgObj2, MainActivity.MAIN_MESSAGE_TIME);
                         break;
 
                     default:
@@ -399,11 +399,7 @@ public class InfoFragment extends Fragment {
                         break;
                 }
             }
-
-
         };
-
-
     }
 
     @Override
@@ -419,10 +415,9 @@ public class InfoFragment extends Fragment {
 
         showHideVideoButton();
 
-
         Message msgObj = mHandler.obtainMessage();
-        msgObj.what = HANLDER_MESSAGE_COMMENTARY;
-        mHandler.sendMessageDelayed(msgObj, MAIN_MESSAGE_TIME);
+        msgObj.what = MainActivity.HANLDER_MESSAGE_COMMENTARY;
+        mHandler.sendMessageDelayed(msgObj, MainActivity.MAIN_MESSAGE_TIME);
 
     }
 

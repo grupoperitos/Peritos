@@ -9,6 +9,7 @@
     <string name="info_text_info" >INFO</string>
     <string name="info_fragment_permiso" >Tiene que habilitar el almacenamiento en la memoria externa</string>
     <string name="info_fragment_permisoDenegado" >Permiso denegado. No podrá ver los vídeos de los inhaladores</string>
+    <string name="info_fragment_descarga" >El video se reproducirá cuando se descargue</string>
     <string name="button_back">Volver</string>
     <string name="error_cargarrecursos">Error al cargar el fichero de recursos</string>
 

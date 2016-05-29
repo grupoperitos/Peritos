@@ -75,7 +75,6 @@ public class InfoFragment extends Fragment {
     private TextView mCaptionView = null;
     private TextView mTitleView = null;
     private ImageView mPlayVideo = null;
-    private VideoView mVideoView = null;
 
     private ScrollView mScrollCaption = null;
     private ScrollView mScrollMessage = null;
@@ -227,7 +226,7 @@ public class InfoFragment extends Fragment {
             mPlayVideo.setVisibility(View.VISIBLE);
         } else {
             mPlayVideo.setVisibility(View.INVISIBLE);
-            mVideoView.setVisibility(View.INVISIBLE);
+
         }
     }
 

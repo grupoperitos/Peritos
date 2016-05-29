@@ -73,6 +73,8 @@ public class InfoFragment extends Fragment {
     private TextView mCaptionView = null;
     private TextView mTitleView = null;
     private ImageView mPlayVideo = null;
+    private ImageView mPrevMessage = null;
+    private ImageView mNextMessage = null;
 
     private ScrollView mScrollCaption = null;
     private ScrollView mScrollMessage = null;
@@ -82,6 +84,7 @@ public class InfoFragment extends Fragment {
 
     private long enqueue;
     private DownloadManager mDM;
+    private BroadcastReceiver mReceiver = null;
 
     private final int REQUEST_CODE_ASK_PERMISSIONS_WRITEEXTERNAL = 123;
 
@@ -144,7 +147,8 @@ public class InfoFragment extends Fragment {
         mCaptionView = (TextView) mFragmentView.findViewById(R.id.txt_caption);
         mTitleView = (TextView) mFragmentView.findViewById(R.id.txt_title);
         mPlayVideo = (ImageView) mFragmentView.findViewById(R.id.info_play);
-
+        mPrevMessage = (ImageView) mFragmentView.findViewById(R.id.info_rewind);
+        mNextMessage = (ImageView) mFragmentView.findViewById(R.id.info_fforward);
 
         mScrollCaption = (ScrollView) mFragmentView.findViewById(R.id.scroll_caption);
         mScrollMessage = (ScrollView) mFragmentView.findViewById(R.id.scroll_message);
@@ -154,65 +158,11 @@ public class InfoFragment extends Fragment {
 
         showHideVideoButton();
 
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
-                    long downloadId = intent.getLongExtra(
-                            DownloadManager.EXTRA_DOWNLOAD_ID, 0);
-                    DownloadManager.Query query = new DownloadManager.Query();
-                    query.setFilterById(enqueue);
-                    if (mDM != null) {
-                        Cursor c = mDM.query(query);
-                        if (c.moveToFirst()) {
-                            int columnIndex = c
-                                    .getColumnIndex(DownloadManager.COLUMN_STATUS);
-                            if (DownloadManager.STATUS_SUCCESSFUL == c
-                                    .getInt(columnIndex)) {
-                                String uriString = c
-                                        .getString(c
-                                                .getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                                startVideo();
-                            }
-                        }
-                    }
-                }
-            }
-        };
 
-        getActivity().registerReceiver(receiver, new IntentFilter(
-                DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
-        mPlayVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mURL.equals("-")) {
-                    int hasWriteContactsPermission = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                    if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
-                        if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                            showMessageOKCancel(getString(R.string.info_fragment_permiso),
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            ActivityCompat.requestPermissions(getActivity(),
-                                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                                    REQUEST_CODE_ASK_PERMISSIONS_WRITEEXTERNAL);
-                                        }
-                                    });
-                            return;
-                        }
-                        ActivityCompat.requestPermissions(getActivity(),
-                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                REQUEST_CODE_ASK_PERMISSIONS_WRITEEXTERNAL);
-                        return;
-                    } else {
-                        startVideo();
-                    }
-                }
-            }
-        });
+
+
+
 
 
         return mFragmentView;
@@ -296,6 +246,68 @@ public class InfoFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
+                    long downloadId = intent.getLongExtra(
+                            DownloadManager.EXTRA_DOWNLOAD_ID, 0);
+                    DownloadManager.Query query = new DownloadManager.Query();
+                    query.setFilterById(enqueue);
+                    if (mDM != null) {
+                        Cursor c = mDM.query(query);
+                        if (c.moveToFirst()) {
+                            int columnIndex = c
+                                    .getColumnIndex(DownloadManager.COLUMN_STATUS);
+                            if (DownloadManager.STATUS_SUCCESSFUL == c
+                                    .getInt(columnIndex)) {
+                                String uriString = c
+                                        .getString(c
+                                                .getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                                startVideo();
+                            }
+                        }
+                    }
+                }
+                getActivity().unregisterReceiver(mReceiver);
+            }
+        };
+
+        getActivity().registerReceiver(mReceiver, new IntentFilter(
+                DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+        mPlayVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mURL.equals("-")) {
+                    int hasWriteContactsPermission = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+                        if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                            showMessageOKCancel(getString(R.string.info_fragment_permiso),
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            ActivityCompat.requestPermissions(getActivity(),
+                                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                                    REQUEST_CODE_ASK_PERMISSIONS_WRITEEXTERNAL);
+                                        }
+                                    });
+                            return;
+                        }
+                        ActivityCompat.requestPermissions(getActivity(),
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                REQUEST_CODE_ASK_PERMISSIONS_WRITEEXTERNAL);
+                        return;
+                    } else {
+                        startVideo();
+                    }
+                }
+            }
+        });
+
+
 
         mMessageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -328,9 +340,9 @@ public class InfoFragment extends Fragment {
                     case MainActivity.HANLDER_MESSAGE_CAPTION:
                         //Cambiar la pestaña activa
                         mHandler.removeMessages(MainActivity.HANLDER_MESSAGE_CAPTION);
-                        final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                        final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
                                 R.animator.fade_out);
-                        final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                        final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
                                 R.animator.fade_in);
 
                         set1.setTarget(mScrollCaption);
@@ -362,9 +374,9 @@ public class InfoFragment extends Fragment {
                         //Cambiar la pestaña activa
                         mHandler.removeMessages(MainActivity.HANLDER_MESSAGE_COMMENTARY);
 
-                        final AnimatorSet set_c1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                        final AnimatorSet set_c1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
                                 R.animator.fade_out);
-                        final AnimatorSet set_c2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                        final AnimatorSet set_c2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
                                 R.animator.fade_in);
                         set_c1.setTarget(mScrollMessage);
                         set_c1.start();
@@ -400,11 +412,30 @@ public class InfoFragment extends Fragment {
                 }
             }
         };
+
+        mPrevMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Message msgObj = mHandler.obtainMessage();
+                msgObj.what = MainActivity.HANLDER_MESSAGE_PREV_TEXT;
+                ((MainActivity)getActivity()).mHandler.sendMessage(msgObj);
+            }
+        });
+
+        mNextMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Message msgObj = mHandler.obtainMessage();
+                msgObj.what = MainActivity.HANLDER_MESSAGE_NEXT_TEXT;
+                ((MainActivity)getActivity()).mHandler.sendMessage(msgObj);
+            }
+        });
     }
 
     @Override
     public void onPause() {
         super.onPause();
+
 
     }
 

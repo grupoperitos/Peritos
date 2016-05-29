@@ -29,4 +29,6 @@
     <string name="dialog_aceptar">ACEPTAR</string>
     <string name="dialog_cancelar">CANCELAR</string>
     <string name="content_description_playvideo">Reproducir vídeo</string>
+    <string name="content_description_prevmessage">Mensaje previo</string>
+    <string name="content_description_nextmessage">Siguiente mensaje</string>
 </resources>

@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private Handler mHandler=null;//Handled to manage tab iteration
+    public Handler mHandler=null;//Handled to manage tab iteration
     public static final String CARRUSEL = "carrusel";
 
 
@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     public static final int HANLDER_MESSAGE_CAPTION     = 2;
     public static final int HANLDER_MESSAGE_COMMENTARY  = 3;
     public static final int HANLDER_MESSAGE_CHANGE_TEXT = 4;
+    public static final int HANLDER_MESSAGE_PREV_TEXT   = 5;
+    public static final int HANLDER_MESSAGE_NEXT_TEXT   = 6;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -157,6 +159,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         mHandler.sendMessageDelayed(msgObj,MAXTEXT_WAIT);
 
                         Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_CHANGE_TEXT, Snackbar.LENGTH_SHORT).show();
+                        break;
+                    case HANLDER_MESSAGE_PREV_TEXT:
+                        mHandler.removeMessages(HANLDER_MESSAGE_PREV_TEXT);
+
+                        int posP = tabLayout.getSelectedTabPosition();
+                        mFragmentList.get(posP).actualize(messageTabs[posP].getPrevMessage());
+
+                        Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_PREV_TEXT, Snackbar.LENGTH_SHORT).show();
+                        break;
+                    case HANLDER_MESSAGE_NEXT_TEXT:
+                        mHandler.removeMessages(HANLDER_MESSAGE_NEXT_TEXT);
+
+                        int posN = tabLayout.getSelectedTabPosition();
+                        mFragmentList.get(posN).actualize(messageTabs[posN].getNextMessage());
+
+                        Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_NEXT_TEXT, Snackbar.LENGTH_SHORT).show();
                         break;
                     default:
                         Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();

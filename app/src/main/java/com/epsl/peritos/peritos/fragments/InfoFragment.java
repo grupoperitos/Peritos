@@ -13,9 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -37,8 +35,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.epsl.peritos.info.InformationMessage;
 import com.epsl.peritos.peritos.R;
@@ -85,7 +81,6 @@ public class InfoFragment extends Fragment {
 
     private long enqueue;
     private DownloadManager mDM;
-    private MediaPlayer mMediaPlayer = null;
 
     private final int REQUEST_CODE_ASK_PERMISSIONS_WRITEEXTERNAL = 123;
 
@@ -119,18 +114,29 @@ public class InfoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState!=null)
+        {
+            mType = savedInstanceState.getInt(INFO_TYPE);
+            mTitle = savedInstanceState.getString(INFO_TITLE);
+            mCaption = savedInstanceState.getString(INFO_CAPTION);
+            mMessage = savedInstanceState.getString(INFO_MESSAGE);
+            mDetail = savedInstanceState.getString(INFO_DETAIL);
+            mURL = savedInstanceState.getString(INFO_URL);
 
+        }else if (getArguments() != null) {
+            mType = getArguments().getInt(INFO_TYPE);
+            mTitle = getArguments().getString(INFO_TITLE);
+            mCaption = getArguments().getString(INFO_CAPTION);
+            mMessage = getArguments().getString(INFO_MESSAGE);
+            mDetail = getArguments().getString(INFO_DETAIL);
+            mURL = getArguments().getString(INFO_URL);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mType = getArguments().getInt(INFO_TYPE);
-        mTitle = getArguments().getString(INFO_TITLE);
-        mCaption = getArguments().getString(INFO_CAPTION);
-        mMessage = getArguments().getString(INFO_MESSAGE);
-        mDetail = getArguments().getString(INFO_DETAIL);
-        mURL = getArguments().getString(INFO_URL);
+
 
         mFragmentView = inflater.inflate(R.layout.fragment_info, container, false);
 
@@ -142,6 +148,9 @@ public class InfoFragment extends Fragment {
 
         mScrollCaption = (ScrollView) mFragmentView.findViewById(R.id.scroll_caption);
         mScrollMessage = (ScrollView) mFragmentView.findViewById(R.id.scroll_message);
+        showTitle(mTitle);
+        showCaption(mCaption);
+        showMessage(mMessage);
 
         showHideVideoButton();
 
@@ -164,7 +173,6 @@ public class InfoFragment extends Fragment {
                                 String uriString = c
                                         .getString(c
                                                 .getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                                Snackbar.make(mFragmentView, "Descargado " + uriString, Snackbar.LENGTH_SHORT).show();
                                 startVideo();
                             }
                         }
@@ -205,9 +213,7 @@ public class InfoFragment extends Fragment {
                 }
             }
         });
-        showTitle(mTitle);
-        showCaption(mCaption);
-        showMessage(mMessage);
+
 
 
         return mFragmentView;
@@ -403,23 +409,9 @@ public class InfoFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        if (mMediaPlayer != null) {
-            if (mMediaPlayer.isPlaying())
-                mMediaPlayer.stop();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
+
     }
 
-    @Override
-    public void onDestroy() {
-        if (mMediaPlayer != null) {
-            if (mMediaPlayer.isPlaying())
-                mMediaPlayer.stop();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
-    }
 
     @Override
     public void onResume() {
@@ -483,7 +475,7 @@ public class InfoFragment extends Fragment {
         mCaptionView.invalidate();
     }
 
-    public void actualize(InformationMessage message) {
+    public synchronized void actualize(InformationMessage message) {
         if (message != null) {
             mType = message.getType();
             mTitle = message.getTitle();
@@ -519,108 +511,6 @@ public class InfoFragment extends Fragment {
         DialogFragment newFragment = DetailsFragment.newInstance(mType, mTitle, mDetail);
         newFragment.show(fm, TAG_DETAILS);
     }
-
-
-//    public class FlashMessage implements Runnable {
-//
-//
-//        private TextView mCaptionTextView = null;
-//        private TextView mMessageTextView = null;
-//        private String mMessage1 = "";
-//        protected Context mContext = null;
-//
-//        FlashMessage(/*Context context,*/ TextView captionview, TextView messageview, String message) {
-//            //mContext = context;
-//            mCaptionTextView = captionview;
-//            mMessageTextView = messageview;
-//            mMessage1 = message;
-//        }
-//
-//        @Override
-//        public void run() {
-//
-//            if (mMessage1.equals(mCaption)) {
-//                mMessageTextView.setText(mMessage);
-//                mMessageTextView.postInvalidate();
-//
-//                final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
-//                        R.animator.fade_out);
-//                final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
-//                        R.animator.fade_in);
-//
-//                set1.setTarget(mScrollCaption);
-//                set1.start();
-//                set2.setTarget(mScrollMessage);
-//                set1.addListener(new Animator.AnimatorListener() {
-//
-//                    @Override
-//                    public void onAnimationStart(Animator animation) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onAnimationEnd(Animator animation) {
-//                        set2.start();
-//                    }
-//
-//                    @Override
-//                    public void onAnimationCancel(Animator animation) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onAnimationRepeat(Animator animation) {
-//
-//                    }
-//
-//
-//                });
-//
-//
-//                mMessage1 = mMessage;
-//            } else {
-//                mCaptionTextView.setText(mCaption);
-//                mCaptionTextView.postInvalidate();
-//                final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
-//                        R.animator.fade_out);
-//                final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
-//                        R.animator.fade_in);
-//                set1.setTarget(mScrollMessage);
-//                set1.start();
-//                set2.setTarget(mScrollCaption);
-//                set1.addListener(new Animator.AnimatorListener() {
-//
-//                    @Override
-//                    public void onAnimationStart(Animator animation) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onAnimationEnd(Animator animation) {
-//                        set2.start();
-//                    }
-//
-//                    @Override
-//                    public void onAnimationCancel(Animator animation) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onAnimationRepeat(Animator animation) {
-//
-//                    }
-//
-//
-//                });
-//
-//                mMessage1 = mCaption;
-//
-//            }
-//
-//            //mCaptionTextView.postDelayed(new FlashMessage(mCaptionTextView, mMessageTextView, mMessage1), MAIN_MESSAGE_TIME);
-//
-//        }
-//    }
 
 
 }

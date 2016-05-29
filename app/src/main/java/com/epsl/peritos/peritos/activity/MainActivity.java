@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     public static final String CARRUSEL = "carrusel";
 
     //Control del tiempo que está cada tab activo
-    public final long MAXPAGE_WAIT = 5000;//milisegundos
+    public final long MAXPAGE_WAIT = 15000;//milisegundos
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.

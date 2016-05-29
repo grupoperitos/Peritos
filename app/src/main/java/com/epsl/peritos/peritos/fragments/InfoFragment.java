@@ -38,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.epsl.peritos.info.InformationMessage;
 import com.epsl.peritos.peritos.R;
@@ -74,6 +75,7 @@ public class InfoFragment extends Fragment {
     private TextView mCaptionView = null;
     private TextView mTitleView = null;
     private ImageView mPlayVideo = null;
+    private VideoView mVideoView = null;
 
     private ScrollView mScrollCaption = null;
     private ScrollView mScrollMessage = null;
@@ -138,6 +140,7 @@ public class InfoFragment extends Fragment {
         mTitleView = (TextView) mFragmentView.findViewById(R.id.txt_title);
         mPlayVideo = (ImageView) mFragmentView.findViewById(R.id.info_play);
 
+
         mScrollCaption = (ScrollView) mFragmentView.findViewById(R.id.scroll_caption);
         mScrollMessage = (ScrollView) mFragmentView.findViewById(R.id.scroll_message);
 
@@ -152,20 +155,19 @@ public class InfoFragment extends Fragment {
                             DownloadManager.EXTRA_DOWNLOAD_ID, 0);
                     DownloadManager.Query query = new DownloadManager.Query();
                     query.setFilterById(enqueue);
-                    Cursor c = mDM.query(query);
-                    if (c.moveToFirst()) {
-                        int columnIndex = c
-                                .getColumnIndex(DownloadManager.COLUMN_STATUS);
-                        if (DownloadManager.STATUS_SUCCESSFUL == c
-                                .getInt(columnIndex)) {
-
-
-                            String uriString = c
-                                    .getString(c
-                                            .getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-
-                            Snackbar.make(mFragmentView, "Descargado " + uriString, Snackbar.LENGTH_SHORT).show();
-                            startVideo();
+                    if(mDM!=null) {
+                        Cursor c = mDM.query(query);
+                        if (c.moveToFirst()) {
+                            int columnIndex = c
+                                    .getColumnIndex(DownloadManager.COLUMN_STATUS);
+                            if (DownloadManager.STATUS_SUCCESSFUL == c
+                                    .getInt(columnIndex)) {
+                                String uriString = c
+                                        .getString(c
+                                                .getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                                Snackbar.make(mFragmentView, "Descargado " + uriString, Snackbar.LENGTH_SHORT).show();
+                                startVideo();
+                            }
                         }
                     }
                 }
@@ -221,10 +223,11 @@ public class InfoFragment extends Fragment {
     }
 
     private void showHideVideoButton() {
-        if (isExternalStorageWritable() && !mURL.isEmpty() && mURL.equals("-")) {
+        if (isExternalStorageWritable() && !mURL.isEmpty() && !mURL.equals("-")) {
             mPlayVideo.setVisibility(View.VISIBLE);
         } else {
             mPlayVideo.setVisibility(View.INVISIBLE);
+            mVideoView.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -239,27 +242,14 @@ public class InfoFragment extends Fragment {
 
             if (file.exists()) {//The file was already created
                 String videoUrl = "file://" + file.getPath(); // your URL here
-                mMediaPlayer = new MediaPlayer();
-                mMediaPlayer.setDataSource(file.getPath());
-                mMediaPlayer.prepare(); // might take long! (for buffering, etc)
-                mMediaPlayer.start();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl));
+                intent.setDataAndType(Uri.parse(videoUrl), "video/mp4");
+                startActivity(intent);
             } else {//The file does not exists, mainly due to a first run
                 mDM = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
                 DownloadManager.Request request = new DownloadManager.Request(
                         Uri.parse(mURL));
-
-
-//                            //Restrict the types of networks over which this download may proceed.
-//                            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-//                            //Set whether this download may proceed over a roaming connection.
-//                            request.setAllowedOverRoaming(false);
-//                            //Set the title of this download, to be displayed in notifications (if enabled).
                 request.setTitle(getString(R.string.app_name) + " " + file.getPath());
-//                            //Set a description of this download, to be displayed in notifications (if enabled)
-//                            request.setDescription("Android Data download using DownloadManager.");
-//                            //Set the local destination for the downloaded file to a path within the application's external files directory
-//                            //request.setDestinationInExternalFilesDir(this,Environment.DIRECTORY_DOWNLOADS,"CountryList.json");
-//
                 request.setDestinationUri(Uri.fromFile(file));
                 enqueue = mDM.enqueue(request);
             }
@@ -333,8 +323,32 @@ public class InfoFragment extends Fragment {
                     case HANLDER_MESSAGE_CAPTION:
                         //Cambiar la pestaña activa
                         mHandler.removeMessages(HANLDER_MESSAGE_CAPTION);
-                        mCaptionView.post(new FlashMessage(mCaptionView, mMessageView, mCaption));
+                        final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                                R.animator.fade_out);
+                        final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                                R.animator.fade_in);
 
+                        set1.setTarget(mScrollCaption);
+                        set1.start();
+                        set2.setTarget(mScrollMessage);
+                        set1.addListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                set2.start();
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+                            }
+                        });
                         Message msgObj = mHandler.obtainMessage();
                         msgObj.what = HANLDER_MESSAGE_COMMENTARY;
                         mHandler.sendMessageDelayed(msgObj, MAIN_MESSAGE_TIME);
@@ -342,7 +356,33 @@ public class InfoFragment extends Fragment {
                     case HANLDER_MESSAGE_COMMENTARY:
                         //Cambiar la pestaña activa
                         mHandler.removeMessages(HANLDER_MESSAGE_COMMENTARY);
-                        mCaptionView.post(new FlashMessage(mCaptionView, mMessageView, mMessage));
+
+                        final AnimatorSet set_c1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                                R.animator.fade_out);
+                        final AnimatorSet set_c2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+                                R.animator.fade_in);
+                        set_c1.setTarget(mScrollMessage);
+                        set_c1.start();
+                        set_c2.setTarget(mScrollCaption);
+                        set_c1.addListener(new Animator.AnimatorListener() {
+
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                set_c2.start();
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+                            }
+                        });
 
                         Message msgObj2 = mHandler.obtainMessage();
                         msgObj2.what = HANLDER_MESSAGE_CAPTION;
@@ -365,17 +405,30 @@ public class InfoFragment extends Fragment {
     public void onPause() {
         super.onPause();
         if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
+            if (mMediaPlayer.isPlaying())
+                mMediaPlayer.stop();
             mMediaPlayer.release();
+            mMediaPlayer = null;
         }
     }
 
+    @Override
+    public void onDestroy() {
+        if (mMediaPlayer != null) {
+            if (mMediaPlayer.isPlaying())
+                mMediaPlayer.stop();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+    }
 
     @Override
     public void onResume() {
         super.onResume();
 
         showHideVideoButton();
+
+
         Message msgObj = mHandler.obtainMessage();
         msgObj.what = HANLDER_MESSAGE_COMMENTARY;
         mHandler.sendMessageDelayed(msgObj, MAIN_MESSAGE_TIME);
@@ -439,16 +492,11 @@ public class InfoFragment extends Fragment {
             mMessage = message.getCommentary();
             mDetail = message.getDetail();
             mURL = message.getURL();
+
             showCaption(mCaption);
             showMessage(mMessage);
             showTitle(mTitle);
-
-            if (mURL.equals("-"))
-                mPlayVideo.setVisibility(View.INVISIBLE);
-            else
-                mPlayVideo.setVisibility(View.VISIBLE);
-
-
+            showHideVideoButton();
         }
     }
 
@@ -474,106 +522,106 @@ public class InfoFragment extends Fragment {
     }
 
 
-public class FlashMessage implements Runnable {
-
-
-    private TextView mCaptionTextView = null;
-    private TextView mMessageTextView = null;
-    private String mMessage1 = "";
-    protected Context mContext = null;
-
-    FlashMessage(/*Context context,*/ TextView captionview, TextView messageview, String message) {
-        //mContext = context;
-        mCaptionTextView = captionview;
-        mMessageTextView = messageview;
-        mMessage1 = message;
-    }
-
-    @Override
-    public void run() {
-
-        if (mMessage1.equals(mCaption)) {
-            mMessageTextView.setText(mMessage);
-            mMessageTextView.postInvalidate();
-
-            final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
-                    R.animator.fade_out);
-            final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
-                    R.animator.fade_in);
-
-            set1.setTarget(mScrollCaption);
-            set1.start();
-            set2.setTarget(mScrollMessage);
-            set1.addListener(new Animator.AnimatorListener() {
-
-                @Override
-                public void onAnimationStart(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    set2.start();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-
-
-            });
-
-
-            mMessage1 = mMessage;
-        } else {
-            mCaptionTextView.setText(mCaption);
-            mCaptionTextView.postInvalidate();
-            final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
-                    R.animator.fade_out);
-            final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
-                    R.animator.fade_in);
-            set1.setTarget(mScrollMessage);
-            set1.start();
-            set2.setTarget(mScrollCaption);
-            set1.addListener(new Animator.AnimatorListener() {
-
-                @Override
-                public void onAnimationStart(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    set2.start();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-
-
-            });
-
-            mMessage1 = mCaption;
-
-        }
-
-        //mCaptionTextView.postDelayed(new FlashMessage(mCaptionTextView, mMessageTextView, mMessage1), MAIN_MESSAGE_TIME);
-
-    }
-}
+//    public class FlashMessage implements Runnable {
+//
+//
+//        private TextView mCaptionTextView = null;
+//        private TextView mMessageTextView = null;
+//        private String mMessage1 = "";
+//        protected Context mContext = null;
+//
+//        FlashMessage(/*Context context,*/ TextView captionview, TextView messageview, String message) {
+//            //mContext = context;
+//            mCaptionTextView = captionview;
+//            mMessageTextView = messageview;
+//            mMessage1 = message;
+//        }
+//
+//        @Override
+//        public void run() {
+//
+//            if (mMessage1.equals(mCaption)) {
+//                mMessageTextView.setText(mMessage);
+//                mMessageTextView.postInvalidate();
+//
+//                final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+//                        R.animator.fade_out);
+//                final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+//                        R.animator.fade_in);
+//
+//                set1.setTarget(mScrollCaption);
+//                set1.start();
+//                set2.setTarget(mScrollMessage);
+//                set1.addListener(new Animator.AnimatorListener() {
+//
+//                    @Override
+//                    public void onAnimationStart(Animator animation) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        set2.start();
+//                    }
+//
+//                    @Override
+//                    public void onAnimationCancel(Animator animation) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animator animation) {
+//
+//                    }
+//
+//
+//                });
+//
+//
+//                mMessage1 = mMessage;
+//            } else {
+//                mCaptionTextView.setText(mCaption);
+//                mCaptionTextView.postInvalidate();
+//                final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+//                        R.animator.fade_out);
+//                final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(),
+//                        R.animator.fade_in);
+//                set1.setTarget(mScrollMessage);
+//                set1.start();
+//                set2.setTarget(mScrollCaption);
+//                set1.addListener(new Animator.AnimatorListener() {
+//
+//                    @Override
+//                    public void onAnimationStart(Animator animation) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        set2.start();
+//                    }
+//
+//                    @Override
+//                    public void onAnimationCancel(Animator animation) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animator animation) {
+//
+//                    }
+//
+//
+//                });
+//
+//                mMessage1 = mCaption;
+//
+//            }
+//
+//            //mCaptionTextView.postDelayed(new FlashMessage(mCaptionTextView, mMessageTextView, mMessage1), MAIN_MESSAGE_TIME);
+//
+//        }
+//    }
 
 
 }

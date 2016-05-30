@@ -93,6 +93,7 @@
         android:id="@+id/info_inhalador"
         android:src="@drawable/ic_inhalador"
         android:layout_margin="@dimen/info_play_margin"
+
         android:contentDescription="@string/content_description_medicine"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"

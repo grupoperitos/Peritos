@@ -150,11 +150,11 @@ public class Fragment_Hour extends Fragment {
                 }
 
 
-                Intent i = new Intent(getContext(),MyserviceTwo.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                i.setFlags(Intent.FLAG_FROM_BACKGROUND);
-                i.setAction(Constants.INSTALLAPP);
-                getActivity().startService(i);
+//                Intent i = new Intent(getContext(),MyserviceTwo.class);
+//                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                i.setFlags(Intent.FLAG_FROM_BACKGROUND);
+//                i.setAction(Constants.INSTALLAPP);
+//                getActivity().startService(i);
 
                 Intent in = new Intent(getContext(),MainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

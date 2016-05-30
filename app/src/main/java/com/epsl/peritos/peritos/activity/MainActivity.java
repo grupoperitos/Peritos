@@ -39,6 +39,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.epsl.peritos.Constants;
+import com.epsl.peritos.MyserviceTwo;
 import com.epsl.peritos.info.InformationManager;
 
 import com.epsl.peritos.info.InformationMessage;
@@ -318,6 +320,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         String fecha = sdf.format(new Date());
         ed.putString("LAST_USE", fecha);
         ed.apply();
+
+        //Servicio de control de medicación
+        Intent i = new Intent(this,MyserviceTwo.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.setFlags(Intent.FLAG_FROM_BACKGROUND);
+        i.setAction(Constants.INSTALLAPP);
+        startService(i);
     }
 
 
@@ -407,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             return mFragmentList.size();
         }
 
-        public void addFrag(Fragment fragment, String title) {
+        public void addFrag(InfoFragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }
@@ -715,7 +724,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         //ALMACENAMIENTO EN FICHERO
                         FileOutputStream fos = null;
                         try {
-                            fos = MainActivity.this.openFileOutput("registro_sintomas",MODE_PRIVATE);
+                            fos = MainActivity.this.openFileOutput("registro_sintomas",MODE_APPEND);
                         } catch (FileNotFoundException e1) {
                             e1.printStackTrace();
                         }

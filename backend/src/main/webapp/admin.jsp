@@ -30,7 +30,7 @@ License: You must have a valid license purchased only from themeforest(the above
 
     <head>
         <meta charset="utf-8" />
-        <title>EPOCAPP | Panel de Administraci&oacuten</title>
+        <title>RESPIRAPP | Panel de Administraci&oacuten</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <meta content="" name="description" />
@@ -68,7 +68,7 @@ License: You must have a valid license purchased only from themeforest(the above
             <div class="page-header-inner ">
                 <!-- BEGIN LOGO -->
                 <div class="page-logo">
-                    <h4 style="color:white;">EPOCAPP</h4>
+                    <h4 style="color:white;">RESPIRAPP</h4>
                     <!--<a href="index.html">
                         <img src="logo.png" alt="logo" class="logo-default" /> </a>
                     <div class="menu-toggler sidebar-toggler"> </div>-->
@@ -291,7 +291,7 @@ License: You must have a valid license purchased only from themeforest(the above
         <!-- END CONTAINER -->
         <!-- BEGIN FOOTER -->
         <div class="page-footer">
-            <div class="page-footer-inner"> 2016 &copy; EPOCAPP
+            <div class="page-footer-inner"> 2016 &copy; RESPIRAPP
             </div>
             <div class="scroll-to-top">
                 <i class="icon-arrow-up"></i>

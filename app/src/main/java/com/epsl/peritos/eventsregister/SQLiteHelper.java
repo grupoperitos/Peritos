@@ -19,7 +19,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
  
     //Sentencia SQL para crear las tablas
     //Añadir tantos String como tablas tenga la base de datos
-    String sqlCreate1 = "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, event_type TEXT, event_info TEXT);";
+    String sqlCreate1 = "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, event_type TEXT, event_info TEXT, object_id TEXT, date TEXT);";
 
 
     public SQLiteHelper(Context con) {

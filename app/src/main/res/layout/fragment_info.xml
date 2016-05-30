@@ -58,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/info_play"
-        android:src="@drawable/button_play"
+        android:src="@drawable/ic_play_circle"
         android:layout_marginLeft="@dimen/info_play_margin"
         android:layout_marginRight="@dimen/info_play_margin"
         android:contentDescription="@string/content_description_playvideo"

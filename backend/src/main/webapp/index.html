@@ -20,7 +20,7 @@ License: You must have a valid license purchased only from themeforest(the above
 
 <head>
     <meta charset="utf-8" />
-    <title>EPOCAPP | Generador código QR tratamiento</title>
+    <title>RESPIRAPP | Generador código QR tratamiento</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <meta content="" name="description" />
@@ -54,7 +54,7 @@ License: You must have a valid license purchased only from themeforest(the above
             <!-- BEGIN LOGO -->
             <div class="page-logo">
                 <a href="index.html">
-                    <img src="logo.png" alt="logo" class="logo-default" />
+                    <img src="logo2.png" alt="logo" class="logo-default" />
                 </a>
             </div>
             <!-- END LOGO -->
@@ -262,14 +262,14 @@ License: You must have a valid license purchased only from themeforest(the above
 </div>-->
 <!-- END PRE-FOOTER -->
 
-<form action="imprimir.php" method=post" name="formulario_pdf">
-    <input id="htmvalue" type="hidden" name="html" value="">
+<form action="imprimir.php" method="get" name="formulario_pdf">
+    <input id="htmvl" type="hidden" name="html" value="">
 </form>
 
 
 <!-- BEGIN INNER FOOTER -->
 <div class="page-footer">
-    <div class="container"> 2016 &copy; EPOCAPP
+    <div class="container"> 2016 &copy; RESPIRAPP
     </div>
 </div>
 <div class="scroll-to-top">
@@ -327,7 +327,7 @@ function hideimage(){
 
                       $("#imageqr").attr("src", data);
                       $("#divimageqr").show();
-                      $("#generar").show();
+                      //$("#generar").show();
                   });
               }
           })
@@ -392,8 +392,8 @@ function removeElementPa(parentDiv, childDiv){
 }
 
 function generarpdf(){
-    document.getElementById('htmvalue').value=htm;
-    document.formulario_pdf.submit()
+    document.getElementById('htmvl').value=htm;
+    document.formulario_pdf.submit();
 }
 
 </script>

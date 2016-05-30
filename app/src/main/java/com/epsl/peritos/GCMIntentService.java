@@ -105,9 +105,8 @@ public class GCMIntentService extends IntentService {
             direct.mkdirs();
         }
 
-        File file = new File(direct, "messages.txt");
-        if(file.exists()){
-            file.delete();
+        for(File tempFile : direct.listFiles()) {
+            tempFile.delete();
         }
 
 

@@ -6,6 +6,7 @@ import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -55,6 +56,8 @@ public class Messaging {
                 log.warning("Error when sending message : " + error);
             }
         }
+
+        checkDuplicate();
     }
 
 
@@ -72,6 +75,21 @@ public class Messaging {
         }
         return null;
 
+    }
+
+
+    public void checkDuplicate(){
+       List<String> lista = new ArrayList<String>();
+
+       List<Usuarios> records = ofy().load().type(Usuarios.class).list();
+       for (Usuarios record : records) {
+           String rgid = record.getRegId();
+           if(lista.contains(rgid)){
+               ofy().delete().entity(record).now();
+           }else{
+               lista.add(rgid);
+           }
+       }
     }
 }
 

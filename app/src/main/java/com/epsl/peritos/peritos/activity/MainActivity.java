@@ -6,48 +6,68 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.util.Pools;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.LayoutParams;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentManager;
+
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.epsl.peritos.info.InformationManager;
+
+import com.epsl.peritos.info.InformationMessage;
 import com.epsl.peritos.info.MessageList;
 import com.epsl.peritos.info.MessageTypes;
 import com.epsl.peritos.peritos.R;
 import com.epsl.peritos.peritos.fragments.InfoFragment;
 
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
 
 import android.content.Intent;
 import android.net.Uri;
 
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -55,23 +75,10 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import net.colindodd.toggleimagebutton.ToggleImageButton;
 
 
-public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, TabLayout.OnTabSelectedListener {
-    private final List<InfoFragment> mFragmentList = new ArrayList<>();
-    private final List<String> mFragmentTitleList = new ArrayList<>();
+public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private Handler mHandler=null;//Handled to manage tab iteration
-    public static final String CARRUSEL = "carrusel";
-
-    //Control del tiempo que está cada tab activo
-    public final long MAXPAGE_WAIT = 5000;//5 segundos
-    private long tabchangeInstant = 0L;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
 
     @Override
     public Context getApplicationContext() {
@@ -79,17 +86,31 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-    private FloatingActionButton miniFAB_SR;
-    private FloatingActionButton miniFAB_Sintomas;
-    private FloatingActionButton miniFAB_Cuidador;
+    private com.getbase.floatingactionbutton.FloatingActionsMenu FAB_emergencia;
+    private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_SR;
+    private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Sintomas;
+    private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Cuidador;
 
 
     //Variables para Seekbars Control sintomas.
     //Control de estados inicial, si acaban en 1000, tras darle a aceptar, el valor es
     //el central del seekbar. (Valor inicial).
-    int valor_esputo_estado_inicial = 1000;
-    int valor_pacientes_estado_inicial = 1000;
-    int valor_fatiga_estado_inicial = 1000;
+    int valor_esputo_estado_inicial=1000;
+    int valor_pacientes_estado_inicial=1000;
+    int valor_fatiga_estado_inicial=1000;
+    int estados_seekbar[]=new int[4];
+    String str_fichero="";
+
+
+    //Numero del cuidador que recojemos mas adelante del sharedpreferences
+    String tlf_cuidador=null;
+    String nom_cuidador=null;
+
+    //CITAS
+    String dia_cita="";
+    String hora_cita="";
+
+
 
     //Mensajes
     public static MessageList messageList = null;
@@ -105,13 +126,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         messageList = InformationManager.loadInformation(this);
-        if (messageList != null) {
+        if(messageList!=null){
             tratamientoList = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
-            dietaList = messageList.getMessagesByType(MessageTypes.INFO_DIETA);
-            ejercicioList = messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
-            epocList = messageList.getMessagesByType(MessageTypes.INFO_EPOC);
-        } else {
-            Toast.makeText(this, "Error al cargar el fichero de recursos", Toast.LENGTH_LONG).show();
+            dietaList =  messageList.getMessagesByType(MessageTypes.INFO_DIETA);
+            ejercicioList =  messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
+            epocList=  messageList.getMessagesByType(MessageTypes.INFO_EPOC);
+        }else
+        {
+            Toast.makeText(this,"Error al cargar el fichero de recursos",Toast.LENGTH_LONG).show();
             finish();
         }
 
@@ -124,18 +146,19 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setOnTabSelectedListener(this);
         setupTabIcons();
 
 
+
+
         //MiniFAB salud Responde
-        miniFAB_SR = (FloatingActionButton) findViewById(R.id.fab_llamar_SR);
+        miniFAB_SR = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_SR);
         miniFAB_SR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //953018799
                 //902505060
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + 902505060));
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+902505060));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -156,24 +179,44 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
         //MiniFAB Control Sintomas
-        miniFAB_Sintomas = (FloatingActionButton) findViewById(R.id.fab_control_sintomas);
+        miniFAB_Sintomas = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_control_sintomas);
         miniFAB_Sintomas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog dialogo_sintomas = createSintomasDialog();
                 //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
                 dialogo_sintomas.show();
+
+
             }
         });
 
 
         //MiniFAB llamar cuidador
-        miniFAB_Cuidador = (FloatingActionButton) findViewById(R.id.fab_llamar_cuidador);
+        miniFAB_Cuidador = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_cuidador);
+        SharedPreferences pr = getSharedPreferences("PRFS", MODE_PRIVATE);
+        nom_cuidador = pr.getString("CARER_NAME", "NO HAY CUIDADOR REGISTRADO");
+        if(nom_cuidador.equals("NO HAY CUIDADOR REGISTRADO")){
+
+        }else{
+            miniFAB_Cuidador.setTitle("LLamar a "+nom_cuidador);
+        }
         miniFAB_Cuidador.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ////////*****CREAR FORMULARIO/agenda PARA ELEGIR NUMERO DEL CUIDADOR!!!!
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:+34000000000"));
+                SharedPreferences pr = getSharedPreferences("PRFS", MODE_PRIVATE);
+                nom_cuidador = pr.getString("CARER_NAME", "NO HAY CUIDADOR REGISTRADO");
+                tlf_cuidador = pr.getString("CARER_PHONE", "NO HAY CUIDADOR REGISTRADO");
+                if(tlf_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
+                    tlf_cuidador = "000000000";
+                }
+                if(nom_cuidador.equals("NO HAY CUIDADOR REGISTRADO")){
+
+                }else{
+                    miniFAB_Cuidador.setTitle("LLamar a "+nom_cuidador);
+                }
+                //Indicamos el telefono para llamar
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+tlf_cuidador));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -185,11 +228,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     return;
                 }
                 startActivity(intent);
-
-                Snackbar.make(view, getString(R.string.interfaz_cuidador) + "OBTENER NOMBRE DE AGENDA", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
             }
         });
+
+
 
 
         //Registro del día y hora de último uso de la app
@@ -199,9 +241,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         String fecha = sdf.format(new Date());
         ed.putString("LAST_USE", fecha);
         ed.apply();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        //When BACK BUTTON is pressed, the activity on the stack is restarted
+        //Do what you want on the refresh procedure here
     }
 
 
@@ -218,43 +265,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
         tabLayout.getTabAt(2).setIcon(tabIcons[2]);
         tabLayout.getTabAt(3).setIcon(tabIcons[3]);
-
-        //tabLayout.post(new Carrusel());
-
-        mHandler = new Handler(Looper.getMainLooper()) {
-            /*
-                     * handleMessage() defines the operations to perform when
-                     * the Handler receives a new Message to process.
-                     */
-            @Override
-            public void handleMessage(Message inputMessage) {
-
-                switch(inputMessage.what){
-                    case 1:
-                        tabLayout.post(new Carrusel());
-                        mHandler.removeMessages(1);
-                        Snackbar.make(viewPager, "Handler 1", Snackbar.LENGTH_SHORT).show();
-                        break;
-                    case 2:
-                        Snackbar.make(viewPager, "Handler 2", Snackbar.LENGTH_SHORT).show();
-                        break;
-                    default:
-                        Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-
-
-        };
-
-        Message msgObj = mHandler.obtainMessage();
-        msgObj.what=1;
-        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
     }
 
     private void setupViewPager(ViewPager viewPager) {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+//        adapter.addFrag(InfoFragment.newInstance(0,"Tratamiento","¡Toma tu medicación!","Tomar la medicación es importante para su enfermedad","<html><body><H1>&iexcl;Toma tu medicaci&oacute;n!</h1></body></html>"), "Tab_Tratamiento");
+//        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¡Come sano siempre!","Hay alimentos que le sentarán mejor","<html><body><h1>Come muy sano</h1></body></html>"), "Tab_Dieta");
+//        adapter.addFrag(InfoFragment.newInstance(0,"Ejercicio","¡Haga ejercicio!","Haga ejercicio con regularidad y adaptado a su nivel de ahogo","<html><body><h1>Haga ejercicio con regularidad y adaptado a su nivel de ahogo</h1></body></html>"), "Tab_Ejercicio");
+//        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¿Qué es la EPOC?","Es una enfermedad que provoca la obstrucción de los bronquios","<html><body><h1>Es una enfermedad que provoca la obstrucción de los bronquios</h1></body></html>"), "Tab_Epoc");
         adapter.addFrag(InfoFragment.newInstance(tratamientoList.getNextMessage()), "Tab_Tratamiento");
         adapter.addFrag(InfoFragment.newInstance(dietaList.getNextMessage()), "Tab_Dieta");
         adapter.addFrag(InfoFragment.newInstance(ejercicioList.getNextMessage()), "Tab_Ejercicio");
@@ -262,84 +281,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
         viewPager.setAdapter(adapter);
-
-
-        tabchangeInstant = System.currentTimeMillis();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-//        // ATTENTION: This was auto-generated to implement the App Indexing API.
-//        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        client.connect();
-//        Action viewAction = Action.newAction(
-//                Action.TYPE_VIEW, // TODO: choose an action type.
-//                "Main Page", // TODO: Define a title for the content shown.
-//                // TODO: If you have web page content that matches this app activity's content,
-//                // make sure this auto-generated web page URL is correct.
-//                // Otherwise, set the URL to null.
-//                Uri.parse("http://host/path"),
-//                // TODO: Make sure this auto-generated app URL is correct.
-//                Uri.parse("android-app://com.epsl.peritos.peritos.activity/http/host/path")
-//        );
-//        AppIndex.AppIndexApi.start(client, viewAction);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        Action viewAction = Action.newAction(
-//                Action.TYPE_VIEW, // TODO: choose an action type.
-//                "Main Page", // TODO: Define a title for the content shown.
-//                // TODO: If you have web page content that matches this app activity's content,
-//                // make sure this auto-generated web page URL is correct.
-//                // Otherwise, set the URL to null.
-//                Uri.parse("http://host/path"),
-//                // TODO: Make sure this auto-generated app URL is correct.
-//                Uri.parse("android-app://com.epsl.peritos.peritos.activity/http/host/path")
-//        );
-//        AppIndex.AppIndexApi.end(client, viewAction);
-//        client.disconnect();
     }
 
 
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-
-        Message msgObj = mHandler.obtainMessage();
-        msgObj.what=1;
-        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
-
-        //Snackbar.make(viewPager, "tab tocada 1", Snackbar.LENGTH_SHORT).show();
-
-
-    }
-
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-
-        Message msgObj = mHandler.obtainMessage();
-        msgObj.what=1;
-        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
-        //Snackbar.make(viewPager, "tab unselected", Snackbar.LENGTH_SHORT).show();
-
-    }
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {
-
-       // Snackbar.make(viewPager, "tab reselected", Snackbar.LENGTH_SHORT).show();
-
-    }
 
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
-
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
 
         public ViewPagerAdapter(FragmentManager manager) {
             super(manager);
@@ -355,16 +304,19 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             return mFragmentList.size();
         }
 
-        public void addFrag(InfoFragment fragment, String title) {
+        public void addFrag(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            mFragmentTitleList.get(position);
+
+
             return null;
         }
+
+
     }
 
 
@@ -376,7 +328,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         TextView txtCalendar = (TextView) view.findViewById(R.id.txt_calendar);
         TextView txtInforme = (TextView) view.findViewById(R.id.txt_informe);
         TextView txtLogros = (TextView) view.findViewById(R.id.txt_logros);
-        TextView txtSettings = (TextView) view.findViewById(R.id.txt_settings);
+        TextView txtPreferencias = (TextView) view.findViewById(R.id.txt_preferencias);
+
 
 
         final Dialog bottomDialogMenu = new Dialog(MainActivity.this,
@@ -389,20 +342,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         bottomDialogMenu.show();
 
 
-        //BOTON LLAMADAS CALENDARIO CITAS
+
+        //BOTON MENU CITAS
         txtCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //DIA
-                Calendar fecha_actual = Calendar.getInstance();
-                DatePickerDialog dpd = DatePickerDialog.newInstance(
-                        MainActivity.this,
-                        fecha_actual.get(Calendar.YEAR),
-                        fecha_actual.get(Calendar.MONTH),
-                        fecha_actual.get(Calendar.DAY_OF_MONTH)
-                );
-                dpd.setAccentColor("#4FC3F7");
-                dpd.show(getFragmentManager(), "Selector Fecha");
+                AlertDialog dialogo_menuCitas = createMenuCitasDialog();
+                dialogo_menuCitas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 600);
+                dialogo_menuCitas.show();
 
             }
         });
@@ -411,8 +358,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         txtInforme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "INFORME MEDICO", Toast.LENGTH_SHORT).show();
-                bottomDialogMenu.dismiss();
+                AlertDialog dialogo_InformesMedicos = createInformesDialog();
+                //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
+                dialogo_InformesMedicos.show();
             }
         });
 
@@ -420,51 +368,51 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "LOGROS", Toast.LENGTH_SHORT).show();
-                bottomDialogMenu.dismiss();
+                AlertDialog dialogo_Ejercicios = createEjericiosDialog();
+                //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
+                dialogo_Ejercicios.show();
             }
         });
 
-        txtSettings.setOnClickListener(new View.OnClickListener() {
+        txtPreferencias.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "CONFIGURACION", Toast.LENGTH_SHORT).show();
+                //AlertDialog dialogo_preferencias = createPreferenciasDialog();
+                //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
+                //dialogo_preferencias.show();
+                startActivity(new Intent (MainActivity.this,PreferenciasActivity.class));
                 bottomDialogMenu.dismiss();
+
+
             }
         });
 
-    }
-
-    //obtener el dia seleccionado y demás de dentro del metodo onDataSet
-    String var = "";
-
-    private String obtenerDia(String hola) {
-        return hola;
     }
 
 
     @Override
     public void onDateSet(DatePickerDialog v, int ano, int mes_ano, int dia_mes) {
         //POR DEFECTO EN JAVA LOS MESES VAN DE 0 A 11, POR ESO SUMAMOS 1, PARA MOSTRARLO BIEN
-        mes_ano = mes_ano + 1;
-        String mes = "";
-        String dia = "";
+        mes_ano=mes_ano+1;
+        String mes="";
+        String dia="";
         //Añadir 0 delante si mes es menor que 10
-        if (mes_ano < 10) {
-            mes = "0" + mes_ano;
-        } else {
-            mes = String.valueOf(mes_ano);
+        if(mes_ano<10){
+            mes="0"+mes_ano;
+        }else{
+            mes=String.valueOf(mes_ano);
         }
         //Aádir 0 delante si dia es menor que 10
-        if (dia_mes < 10) {
-            dia = "" + "0" + dia_mes;
-        } else {
-            dia = String.valueOf(dia_mes);
+        if(dia_mes<10){
+            dia=""+"0"+dia_mes;
+        }else{
+            dia=String.valueOf(dia_mes);
         }
-        Toast.makeText(
+        dia_cita=dia+"-"+mes+"-"+ano;
+        /*Toast.makeText(
                 this, "El dia de la cita es: " + dia + "-" + mes + "-" + ano,
-                Toast.LENGTH_LONG).show();
+                Toast.LENGTH_LONG).show();*/
 
 
         //Una vez se introduce el dia, aparece al hora
@@ -477,9 +425,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         );
         tpd.setAccentColor("#4FC3F7");
         tpd.show(getFragmentManager(), "Selector Hora");
-        var = this.obtenerDia(dia);
+        //var=this.obtenerDia(dia);
 
     }
+
 
 
     public void onResume() {
@@ -488,35 +437,60 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         DatePickerDialog dpd = (DatePickerDialog) getFragmentManager().findFragmentByTag("Datepickerdialog");
         TimePickerDialog tpd = (TimePickerDialog) getFragmentManager().findFragmentByTag("TimepickerDialog");
 
-        if (dpd != null) dpd.setOnDateSetListener(this);
-        if (tpd != null) tpd.setOnTimeSetListener(this);
+        if(dpd != null) dpd.setOnDateSetListener(this);
+        if(tpd != null) tpd.setOnTimeSetListener(this);
     }
 
 
     @Override
     public void onTimeSet(RadialPickerLayout v, int hora_dia, int min, int sec) {
-        String h = "";
-        String m = "";
+        String h="";
+        String m="";
         //Añadir 0 delante si hora es menor que 10
-        if (hora_dia < 10) {
-            h = "0" + hora_dia;
-        } else {
-            h = String.valueOf(hora_dia);
+        if(hora_dia<10){
+            h="0"+hora_dia;
+        }else{
+            h=String.valueOf(hora_dia);
         }
         //Añadir 0 delante si minuto es menor que 10
-        if (min < 10) {
-            m = "0" + min;
-        } else {
-            m = String.valueOf(min);
+        if(min<10){
+            m="0"+min;
+        }else{
+            m=String.valueOf(min);
         }
-        Toast.makeText(
-                this, "La hora de la cita es: " + h + ":" + m, Toast.LENGTH_LONG).show();
+        hora_cita=h+":"+m;
+       /* Toast.makeText(
+                this, "La hora de la cita es: " + h + ":" + m, Toast.LENGTH_LONG).show();*/
+
+        //Almacenar dia y hora en un fichero
+        //ALMACENAMIENTO EN FICHERO
+        FileOutputStream fos = null;
+        try {
+            fos = MainActivity.this.openFileOutput("registro_citas",MODE_PRIVATE);
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+
+        OutputStreamWriter os = new OutputStreamWriter(fos);
+
+        BufferedWriter bw = new BufferedWriter(os);
+
+        try {
+            bw.write(dia_cita+" | "+hora_cita);
+            bw.newLine();
+            Toast.makeText(MainActivity.this,"Cita Almacenada Correctamente",Toast.LENGTH_SHORT).show();
+            bw.close();
+            os.close();
+            fos.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
     }
 
 
     /**
-     * Crea un diálogo con personalizado para comportarse
-     * como formulario de login
+     * Crea un diálogo personalizado para Control de Sintomas
      *
      * @return Diálogo
      */
@@ -536,21 +510,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         final AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(true);
 
-
-        //Array de 4 numeros, que va a almacenar el estado de cada una de las 3
-        //seekbars, asi como el de la fiebre para luego almacenarlos en el fichero de texto.
-        final int[] estados_seekbar = new int[4];
-
-
         //Barra de Color de Esputo
-        SeekBar seekBarColorEsputo = (SeekBar) v.findViewById(R.id.seekBar_estado_esputo);
+        SeekBar seekBarColorEsputo = (SeekBar)v.findViewById(R.id.seekBar_estado_esputo);
         seekBarColorEsputo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int seekBarProgress = 0;
 
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarProgress = progress;
-                valor_esputo_estado_inicial = progress;
+                valor_esputo_estado_inicial=progress;
 
             }
 
@@ -558,22 +526,23 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                estados_seekbar[0] = seekBarProgress;
-                valor_esputo_estado_inicial = seekBarProgress;
+                estados_seekbar[0]=seekBarProgress;
+                valor_esputo_estado_inicial=seekBarProgress;
             }
 
 
         });
 
 
+
         //Barra de estado de paciente
-        SeekBar seekBarEstadoPaciente = (SeekBar) v.findViewById(R.id.seekBar_estado_paciente);
+        SeekBar seekBarEstadoPaciente = (SeekBar)v.findViewById(R.id.seekBar_estado_paciente);
         seekBarEstadoPaciente.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int seekBarProgress = 0;
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarProgress = progress;
-                valor_pacientes_estado_inicial = progress;
+                valor_pacientes_estado_inicial=progress;
 
             }
 
@@ -582,20 +551,20 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                estados_seekbar[1] = seekBarProgress;
-                valor_pacientes_estado_inicial = seekBarProgress;
+                estados_seekbar[1]=seekBarProgress;
+                valor_pacientes_estado_inicial=seekBarProgress;
             }
         });
 
 
         //Barra de estado Fatiga
-        SeekBar seekBarEstadoFatiga = (SeekBar) v.findViewById(R.id.seekBar_estado_fatiga);
+        SeekBar seekBarEstadoFatiga = (SeekBar)v.findViewById(R.id.seekBar_estado_fatiga);
         seekBarEstadoFatiga.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int seekBarProgress = 0;
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarProgress = progress;
-                valor_fatiga_estado_inicial = progress;
+                valor_fatiga_estado_inicial=progress;
 
             }
 
@@ -604,41 +573,72 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                estados_seekbar[2] = seekBarProgress;
-                valor_fatiga_estado_inicial = seekBarProgress;
+                estados_seekbar[2]=seekBarProgress;
+                valor_fatiga_estado_inicial=seekBarProgress;
             }
         });
 
-        final ToggleImageButton toggleFiebre = (ToggleImageButton) v.findViewById(R.id.tb_fiebre);
+        final ToggleImageButton toggleFiebre = (ToggleImageButton)v.findViewById(R.id.tb_fiebre);
 
         aceptar.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy HH:mm");
                         String fecha_actual = sdf.format(new Date());
-                        if (valor_esputo_estado_inicial == 1000) {
-                            estados_seekbar[0] = 1;
+                        if(valor_esputo_estado_inicial==1000){
+                            estados_seekbar[0]=1;
                         }
-                        if (valor_pacientes_estado_inicial == 1000) {
-                            estados_seekbar[1] = 3;
+                        if(valor_pacientes_estado_inicial==1000){
+                            estados_seekbar[1]=2;
                         }
-                        if (valor_fatiga_estado_inicial == 1000) {
-                            estados_seekbar[2] = 3;
+                        if(valor_fatiga_estado_inicial==1000){
+                            estados_seekbar[2]=3;
                         }
                         int chek;
-                        if (toggleFiebre.isChecked()) {
-                            estados_seekbar[3] = 1;
-                        } else {
-                            estados_seekbar[3] = 0;
+                        if(toggleFiebre.isChecked()){
+                            estados_seekbar[3]=1;
+                        }else{
+                            estados_seekbar[3]=0;
                         }
 
-                        Toast.makeText(MainActivity.this, "La fecha actual es: " + fecha_actual + "Estado" +
-                                "Esputo: " + estados_seekbar[0] + " Estado Paciente: " + estados_seekbar[1] + "" +
-                                "Fatiga: " + estados_seekbar[2] + "Fiebre: " + estados_seekbar[3], Toast.LENGTH_SHORT).show();
 
+                        /////Datos a almacenar en el fichero
+                        //Fecha Actual, en la que realiza el control de sintomas
+                        //0--> Estado esputo
+                        //1--> Nivel de Ejercicio
+                        //2--> Nivel de Fatiga
+                        //3--> Fiebre (Si o No)
+
+
+                        //ALMACENAMIENTO EN FICHERO
+                        FileOutputStream fos = null;
+                        try {
+                            fos = MainActivity.this.openFileOutput("registro_sintomas",MODE_PRIVATE);
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
+
+                        OutputStreamWriter os = new OutputStreamWriter(fos);
+
+                        BufferedWriter bw = new BufferedWriter(os);
+
+                            try {
+                                bw.write(fecha_actual+"\t"+estados_seekbar[0]+"\t"+estados_seekbar[1]+"\t"+estados_seekbar[2]+"\t"+estados_seekbar[3]);
+                                bw.newLine();
+                                Toast.makeText(MainActivity.this,"Registro almacenado correctamente",Toast.LENGTH_SHORT).show();
+                                bw.close();
+                                os.close();
+                                fos.close();
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        dialog.dismiss();
                     }
+
                 }
+
+
         );
 
         cancelar.setOnClickListener(
@@ -648,29 +648,530 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         dialog.dismiss();
                     }
                 }
+
+        );
+
+
+
+
+        return dialog;
+    }
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Crea Dialogo Perzonalizado para los informes Medicos del paciente
+     */
+
+    public AlertDialog createInformesDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.informes_medicos_dialog, null);
+
+        builder.setView(v);
+
+        Button aceptar = (Button) v.findViewById(R.id.btn_aceptar_Informes);
+
+        TableLayout tabladatos=(TableLayout) v.findViewById(R.id.tabla_informes);
+
+        TableRow.LayoutParams layoutFila=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFecha=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutEsputo=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutNivelEjercicio=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFatiga=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFiebre=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow fila;
+        TextView txtFecha;
+        TextView txtEsputo;
+        TextView txtNIvelEjercicio;
+        TextView txtFatiga;
+        TextView txtFiebre;
+
+        //Reseteamos la tabla al entrar
+        tabladatos.removeAllViews();
+
+        //Formateo Cabecera
+        String cabeceras[] = { "Fecha", "Esputo", "Tipo Ej.", "Fatiga", "Fiebre" };
+        TableRow cabecera = new TableRow(this);
+        cabecera.setLayoutParams(new TableLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        tabladatos.addView(cabecera);
+        // Textos de la cabecera
+        for (int i = 0; i < 5; i++)
+        {
+            TextView columna = new TextView(this);
+            columna.setLayoutParams(new TableRow.LayoutParams(
+                    LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+            columna.setText(cabeceras[i]);
+            columna.setTextColor(Color.parseColor("#4FC3F7"));
+            columna.setGravity(Gravity.CENTER_HORIZONTAL);
+            columna.setTypeface(null, Typeface.BOLD_ITALIC);
+            columna.setPadding(5, 5, 5, 5);
+            cabecera.addView(columna);
+        }
+        // Línea que separa la cabecera de los datos
+        TableRow separador_cabecera = new TableRow(this);
+        separador_cabecera.setLayoutParams(new TableLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        FrameLayout linea_cabecera = new FrameLayout(this);
+        TableRow.LayoutParams linea_cabecera_params =
+                new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
+        linea_cabecera_params.span = 6;
+        linea_cabecera.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        separador_cabecera.addView(linea_cabecera, linea_cabecera_params);
+        tabladatos.addView(separador_cabecera);
+
+
+
+        try {
+
+            FileInputStream fin = MainActivity.this.openFileInput("registro_sintomas");
+
+            InputStreamReader is = new InputStreamReader(fin);
+
+            BufferedReader b = new BufferedReader(is);
+            String line = "";
+            do {
+                line = b.readLine();
+                if (line != null) {
+
+
+                    fila=new TableRow(MainActivity.this);
+                    fila.setLayoutParams(layoutFila);
+
+                    txtFecha=new TextView(this);
+                    txtEsputo=new TextView(this);
+                    txtNIvelEjercicio=new TextView(this);
+                    txtFatiga=new TextView(this);
+                    txtFiebre=new TextView(this);
+
+                    txtFecha.setText(line.subSequence(0,14));
+                    txtFecha.setGravity(Gravity.CENTER);
+                    txtFecha.setPadding(0, 0, 5, 0);
+                    txtFecha.setTextSize(12);
+                    txtFecha.setTypeface(null, Typeface.ITALIC);
+                    txtFecha.setLayoutParams(layoutFecha);
+
+                    //Transformar codigo numerico del control esputo
+                    String esputo="";
+                    if(line.charAt(15)=='0'){
+                        esputo="Blanco";
+                    }else if(line.charAt(15)=='1'){
+                        esputo="Amarillo";
+                    }else if(line.charAt(15)=='2'){
+                        esputo="Verde";
+                    }
+
+                    txtEsputo.setText(esputo);
+                    txtEsputo.setGravity(Gravity.CENTER);
+                    txtEsputo.setPadding(0, 0, 5, 0);
+                    txtEsputo.setTextSize(12);
+                    txtEsputo.setTypeface(null, Typeface.ITALIC);
+                    txtEsputo.setLayoutParams(layoutEsputo);
+
+
+                    String tipo_actividad="";
+
+                    if(line.charAt(17)=='0'){
+                        tipo_actividad="Nada";
+                    }else if(line.charAt(17)=='1'){
+                        tipo_actividad="Ligera";
+                    }else if(line.charAt(17)=='2'){
+                        tipo_actividad="Medio";
+                    }else if(line.charAt(17)=='3'){
+                        tipo_actividad="Alta";
+                    }else if(line.charAt(17)=='4'){
+                        tipo_actividad="Intensa";
+                    }
+                    txtNIvelEjercicio.setText(tipo_actividad);
+                    txtNIvelEjercicio.setGravity(Gravity.CENTER);
+                    txtNIvelEjercicio.setPadding(0, 0, 5, 0);
+                    txtNIvelEjercicio.setTextSize(12);
+                    txtNIvelEjercicio.setTypeface(null, Typeface.ITALIC);
+                    txtNIvelEjercicio.setLayoutParams(layoutNivelEjercicio);
+
+
+                    String fatiga="";
+
+                    if(line.charAt(19)=='0'){
+                        fatiga="Nada";
+                    }else if(line.charAt(19)=='1'){
+                        fatiga="Leve";
+                    }else if(line.charAt(19)=='2'){
+                        fatiga="Ligera";
+                    }else if(line.charAt(19)=='3'){
+                        fatiga="Media";
+                    }else if(line.charAt(19)=='4'){
+                        fatiga="Alta";
+                    }else if(line.charAt(19)=='5'){
+                        fatiga="Severa";
+                    }else if(line.charAt(19)=='6'){
+                        fatiga="Exacer.";
+                    }
+
+                    txtFatiga.setText(fatiga);
+                    txtFatiga.setGravity(Gravity.CENTER);
+                    txtFatiga.setPadding(0, 0, 5, 0);
+                    txtFatiga.setTextSize(12);
+                    txtFatiga.setTypeface(null, Typeface.ITALIC);
+                    txtFatiga.setLayoutParams(layoutFatiga);
+
+                    String fiebre="";
+                    if(line.charAt(21)=='0'){
+                        fiebre="No";
+                    }else if(line.charAt(21)=='1'){
+                        fiebre="Si";
+                    }
+
+                    txtFiebre.setText(fiebre);
+                    txtFiebre.setGravity(Gravity.CENTER);
+                    txtFiebre.setPadding(0, 0, 5, 0);
+                    txtFiebre.setTextSize(12);
+                    txtFiebre.setTypeface(null, Typeface.ITALIC);
+                    txtFiebre.setLayoutParams(layoutFiebre);
+
+                    fila.addView(txtFecha);
+                    fila.addView(txtEsputo);
+                    fila.addView(txtNIvelEjercicio);
+                    fila.addView(txtFatiga);
+                    fila.addView(txtFiebre);
+
+
+                    tabladatos.addView(fila);
+
+                    // Línea que separa cada fila de datos
+                    TableRow separador_filas = new TableRow(this);
+                    separador_filas.setLayoutParams(new TableLayout.LayoutParams(
+                            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    FrameLayout linea = new FrameLayout(this);
+                    TableRow.LayoutParams linea_totales_params =
+                            new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
+                    linea_totales_params.span = 6;
+                    linea.setBackgroundColor(Color.parseColor("#4FC3F7"));
+                    linea.setPadding(0,5,0,0);
+                    separador_filas.addView(linea, linea_totales_params);
+                    tabladatos.addView(separador_filas);
+
+                }
+            } while (line != null);
+            b.close();
+            is.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+
+
+       aceptar.setOnClickListener(
+               new View.OnClickListener(){
+                   @Override
+                   public void onClick(View v){
+                        dialog.dismiss();
+                   }
+               }
+       );
+
+
+
+        return dialog;
+    }
+
+
+
+
+
+    /**
+     * Crea Dialogo Perzonalizado para seleccionar el tipo de ejercicio
+     */
+
+    public AlertDialog createEjericiosDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.ejercicios_fisicos_dialog, null);
+
+        builder.setView(v);
+
+        Button iniciar = (Button) v.findViewById(R.id.btn_iniciar_ejercicios);
+        Button pausar = (Button) v.findViewById(R.id.btn_pausar_ejercicios);
+        Button cancelar = (Button) v.findViewById(R.id.btn_cancelar_ejercicios);
+
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+
+
+        iniciar.setOnClickListener(
+                new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+
+                    }
+                }
+        );
+
+
+        pausar.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                }
+
+        );
+
+        cancelar.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                }
+
         );
 
 
         return dialog;
     }
 
-    public class Carrusel implements Runnable {
-        @Override
-        public void run() {
-            int pos = tabLayout.getSelectedTabPosition();
-            int ntabs= tabLayout.getTabCount();
-            int newPos = (pos+1) % ntabs;
-            TabLayout.Tab tab = tabLayout.getTabAt(newPos);
-
-            tab.select();
-            tabLayout.setScrollPosition(newPos,0f,true);
-            tabLayout.invalidate();
-            viewPager.setCurrentItem(newPos,true);
-            viewPager.invalidate();
 
 
-        }
+
+
+    /**
+     * Crea Dialogo Perzonalizado para seleccionar el tipo de ejercicio
+     */
+
+    public AlertDialog createMenuCitasDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.citas_menu_dialog, null);
+
+        builder.setView(v);
+
+        Button agregar_cita = (Button) v.findViewById(R.id.btn_agregar_cita);
+        Button mostrar_citas = (Button) v.findViewById(R.id.btn_mostrar_citas);
+
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+
+
+        agregar_cita.setOnClickListener(
+                new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        //DIA
+                        Calendar fecha_actual = Calendar.getInstance();
+                        DatePickerDialog dpd = DatePickerDialog.newInstance(
+                                MainActivity.this,
+                                fecha_actual.get(Calendar.YEAR),
+                                fecha_actual.get(Calendar.MONTH),
+                                fecha_actual.get(Calendar.DAY_OF_MONTH)
+                        );
+                        dpd.setAccentColor("#4FC3F7");
+                        dpd.show(getFragmentManager(), "Selector Fecha");
+
+                        dialog.dismiss();
+                    }
+                }
+        );
+
+        mostrar_citas.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog dialogo_mostrar_citas = createmostrarCitasDialog();
+                        //dialogo_menuCitas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 600);
+                        dialogo_mostrar_citas.show();
+                    }
+                }
+
+        );
+
+
+
+        return dialog;
     }
+
+
+
+
+
+    /**
+     * Crea Dialogo Perzonalizado para los informes Medicos del paciente
+     */
+
+    public AlertDialog createmostrarCitasDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.mostrar_citas_dialog, null);
+
+        builder.setView(v);
+
+        Button aceptar = (Button) v.findViewById(R.id.btn_aceptar_citas);
+
+        TableLayout tablacitas=(TableLayout) v.findViewById(R.id.tabla_citas);
+
+        TableRow.LayoutParams layoutFila=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFecha_completa=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+
+        TableRow fila;
+        TextView txtFecha_completa;
+
+
+        //Reseteamos la tabla al entrar
+        tablacitas.removeAllViews();
+
+        //Formateo Cabecera
+        String cabeceras[] = { "Fecha y Hora" };
+        TableRow cabecera = new TableRow(this);
+        cabecera.setLayoutParams(new TableLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        tablacitas.addView(cabecera);
+        // Textos de la cabecera
+        for (int i = 0; i < 1; i++)
+        {
+            TextView columna = new TextView(this);
+            columna.setLayoutParams(new TableRow.LayoutParams(
+                    LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+            columna.setText(cabeceras[i]);
+            columna.setTextColor(Color.parseColor("#4FC3F7"));
+            columna.setGravity(Gravity.CENTER_HORIZONTAL);
+            columna.setTypeface(null, Typeface.BOLD_ITALIC);
+            columna.setPadding(5, 5, 5, 5);
+            cabecera.addView(columna);
+        }
+        // Línea que separa la cabecera de los datos
+        TableRow separador_cabecera = new TableRow(this);
+        separador_cabecera.setLayoutParams(new TableLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        FrameLayout linea_cabecera = new FrameLayout(this);
+        TableRow.LayoutParams linea_cabecera_params =
+                new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
+        linea_cabecera_params.span = 6;
+        linea_cabecera.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        separador_cabecera.addView(linea_cabecera, linea_cabecera_params);
+        tablacitas.addView(separador_cabecera);
+
+
+
+        try {
+
+            FileInputStream fin = MainActivity.this.openFileInput("registro_citas");
+
+            InputStreamReader is = new InputStreamReader(fin);
+
+            BufferedReader b = new BufferedReader(is);
+            String line = "";
+            do {
+                line = b.readLine();
+                if (line != null) {
+
+
+                    fila=new TableRow(MainActivity.this);
+                    fila.setLayoutParams(layoutFila);
+
+                    txtFecha_completa=new TextView(this);
+
+
+                    txtFecha_completa.setText(line);
+                    txtFecha_completa.setGravity(Gravity.CENTER);
+                    txtFecha_completa.setPadding(0, 0, 5, 0);
+                    txtFecha_completa.setTextSize(12);
+                    txtFecha_completa.setTypeface(null, Typeface.ITALIC);
+                    txtFecha_completa.setLayoutParams(layoutFecha_completa);
+
+
+                    fila.addView(txtFecha_completa);
+
+
+                    tablacitas.addView(fila);
+
+                    // Línea que separa cada fila de datos
+                    TableRow separador_filas = new TableRow(this);
+                    separador_filas.setLayoutParams(new TableLayout.LayoutParams(
+                            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    FrameLayout linea = new FrameLayout(this);
+                    TableRow.LayoutParams linea_totales_params =
+                            new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
+                    linea_totales_params.span = 6;
+                    linea.setBackgroundColor(Color.parseColor("#4FC3F7"));
+                    linea.setPadding(0,5,0,0);
+                    separador_filas.addView(linea, linea_totales_params);
+                    tablacitas.addView(separador_filas);
+
+                }
+            } while (line != null);
+            b.close();
+            is.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+
+
+        aceptar.setOnClickListener(
+                new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        dialog.dismiss();
+                    }
+                }
+        );
+
+
+
+        return dialog;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 

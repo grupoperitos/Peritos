@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:paddingTop="@dimen/dialog_body"
+    android:gravity="center_horizontal">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Menú Citas"
+            android:paddingLeft="@dimen/dialog_body"
+            android:textColor="#4FC3F7"
+            android:textAppearance="?android:attr/textAppearanceSearchResultTitle"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:gravity="center|top"
+        android:paddingTop="24dp"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/pregunta3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="¿Qué desea realizar?"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/dialog_body"
+            android:layout_marginBottom="20dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+            android:id="@+id/btn_agregar_cita"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/altura_button"
+            android:textColor="@color/colorPrimary"
+            android:padding="@dimen/button_padding"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Añadir nueva Cita"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+        <Button
+            android:id="@+id/btn_mostrar_citas"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/altura_button"
+            android:textColor="@color/colorPrimary"
+            android:padding="@dimen/button_padding"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Mostrar Citas "
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+
+
+
+
+    </LinearLayout>
+
+
+
+
+
+
+</RelativeLayout>

@@ -1,0 +1,123 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main_frame"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.MainActivity">
+
+
+    <!--Layout Superior (Consejos) 65% pantalla-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <!--Tabs-->
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#4FC3F7">
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:tabMode="fixed"
+                app:tabIndicatorColor="#000"
+                app:tabGravity="fill"/>
+
+        </android.support.design.widget.AppBarLayout>
+
+
+        <!--ViewPager cambiante con cada Tab-->
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.60"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:padding="@dimen/info_text_padding"/>
+
+
+        <!--Layout inferior 35% pantalla-->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.35"
+            android:background="#4FC3F7"
+            android:orientation="vertical">
+        </FrameLayout>
+
+
+    </LinearLayout> <!--Cierre Layout Superior, incluye dentro el inferior-->
+
+    <!--Imagen Bocadillo doctor-->
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="105dp"
+        android:src="@drawable/bocadillo_doctor"
+        android:scaleType="fitCenter"
+        android:layout_marginLeft="25dp"
+        android:layout_marginBottom="100dp"
+        android:layout_gravity="center|bottom"/>
+
+    <!--Botón Imagen izquierda-->
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="215dp"
+        android:src="@drawable/doctor"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:layout_gravity="left|bottom"
+        android:onClick="openBottomSheet"
+        android:background="@null"
+        android:layout_marginBottom="10dp"/>
+
+    <!--FAB emergencias-->
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/fab_emergencia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/margen_fab"
+        fab:fab_addButtonColorNormal="#d50000"
+        fab:fab_addButtonSize="normal"
+        fab:fab_labelStyle="@style/submenu_fab"
+        fab:fab_labelsPosition="left">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_llamar_SR"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#ff4336"
+            fab:fab_icon="@drawable/phone"
+            fab:fab_size="mini"
+            fab:fab_title="@string/btn_saludResponde" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_llamar_cuidador"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#ffc107"
+            fab:fab_icon="@drawable/phone"
+            fab:fab_size="mini"
+            fab:fab_title="@string/btn_cuidador" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_control_sintomas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#4caf50"
+            fab:fab_icon="@drawable/write"
+            fab:fab_size="mini"
+            fab:fab_title="@string/btn_sintomas" />
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+
+</FrameLayout>
+
+

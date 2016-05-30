@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:paddingTop="@dimen/dialog_body"
+    android:paddingLeft="@dimen/dialog_body"
+    android:gravity="center_horizontal">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/control_de_sintomas"
+            android:textColor="#4FC3F7"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:gravity="center|top"
+        android:paddingTop="24dp"
+        android:paddingRight="@dimen/dialog_body">
+
+        <!--Apartado color Esputo-->
+        <TextView
+            android:id="@+id/pregunta2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="Color de Esputo: "
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/dialog_body"
+            android:layout_marginBottom="@dimen/button_padding"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <SeekBar
+            android:layout_marginLeft="28dp"
+            android:layout_marginRight="28dp"
+            android:id="@+id/seekBar_estado_esputo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progressDrawable="@drawable/seekbar_progressbar_esputo"
+            android:progress="1"
+            android:thumbTintMode="multiply"
+            android:thumb="@drawable/seekbar"
+            android:max="2"
+            android:layout_alignEnd="@+id/count"
+            android:layout_toEndOf="@+id/imageView2" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="25dp"
+            android:paddingLeft="25dp">
+            <TextView
+                android:text="Blanco"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+            <TextView
+                android:text="Verde"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+        </FrameLayout>
+
+
+
+
+        <!--Apartado Estado Paciente-->
+        <TextView
+            android:id="@+id/pregunta1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="¿Qué tipo de actividad estaba realizando?"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/dialog_body"
+            android:layout_marginBottom="@dimen/button_padding"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="left"
+                android:src="@drawable/seated"/>
+
+            <SeekBar
+                android:layout_marginLeft="28dp"
+                android:layout_marginRight="28dp"
+                android:id="@+id/seekBar_estado_paciente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressDrawable="@drawable/seekbar_progressbar_paciente"
+                android:progress="2"
+                android:thumbTintMode="multiply"
+                android:thumb="@drawable/seekbar"
+                android:max="4"
+                android:layout_gravity="center"
+                android:layout_alignEnd="@+id/count"
+                android:layout_toEndOf="@+id/imageView2" />
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="right"
+                android:src="@drawable/lifting"/>
+        </FrameLayout>
+
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="25dp"
+            android:paddingLeft="25dp">
+            <TextView
+                android:text="Ninguna"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:text="Intensa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+        </FrameLayout>
+
+
+        <!--Apartado Fatiga-->
+        <TextView
+            android:id="@+id/pregunta3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="Indique su grado de fatiga:"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/dialog_body"
+            android:layout_marginBottom="@dimen/button_padding"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:src="@drawable/resting"/>
+
+            <SeekBar
+                android:layout_marginLeft="28dp"
+                android:layout_marginRight="28dp"
+                android:id="@+id/seekBar_estado_fatiga"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressDrawable="@drawable/seekbar_progressbar_paciente"
+                android:progress="3"
+                android:thumbTintMode="multiply"
+                android:thumb="@drawable/seekbar"
+                android:max="6"
+                android:layout_gravity="center"
+                android:layout_alignEnd="@+id/count"
+                android:layout_toEndOf="@+id/imageView2" />
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="right"
+                android:src="@drawable/tired"/>
+        </FrameLayout>
+
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="25dp"
+            android:paddingLeft="25dp">
+            <TextView
+                android:text="Nada"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:text="Mucho"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+        </FrameLayout>
+
+        <!--Apartado Fiebre-->
+        <TextView
+            android:id="@+id/pregunta4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="¿Tiene Fiebre?"
+            android:layout_marginTop="@dimen/dialog_body"
+            android:layout_marginBottom="@dimen/button_padding"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center|top">
+
+            <net.colindodd.toggleimagebutton.ToggleImageButton
+                xmlns:tib="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/tb_fiebre"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                tib:tib_drawable_on="@drawable/term_fiebre"
+                tib:tib_drawable_off="@drawable/term_no_fiebre" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/altura_cuadro_buttons"
+        android:gravity="bottom|right"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:paddingBottom="10dp"
+        android:paddingRight="@dimen/button_padding"
+        android:id="@+id/linearLayout">
+
+        <Button
+            android:id="@+id/btn_cancelar"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/altura_button"
+            android:textColor="@color/colorPrimary"
+            android:padding="@dimen/button_padding"
+            android:textStyle="bold"
+            android:text="@string/dialog_cancelar"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+
+        <Button
+            android:id="@+id/btn_aceptar"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/altura_button"
+            android:textColor="@color/colorPrimary"
+            android:padding="@dimen/button_padding"
+            android:textStyle="bold"
+            android:text="@string/dialog_aceptar"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -38,4 +38,14 @@ dependencies {
     compile 'com.google.android.gms:play-services-gcm:8.3.0'
     compile project(path: ':backend', configuration: 'android-endpoints')
     compile 'com.google.android.gms:play-services-appindexing:8.3.0'
+
+    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'me.dm7.barcodescanner:zbar:1.8.4'
+    compile 'me.dm7.barcodescanner:zxing:1.8.4'
+    compile 'com.android.support:design:23.2.1'
+
+    compile "com.android.support:support-v4:+"
+    compile 'com.squareup.picasso:picasso:2.3.2'
+    compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.daimajia.slider:library:1.1.5@aar'
 }

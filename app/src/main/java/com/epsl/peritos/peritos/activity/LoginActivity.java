@@ -1,17 +1,23 @@
 package com.epsl.peritos.peritos.activity;
 
-import android.content.ContentResolver;
+
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import com.epsl.peritos.CustomViewPager;
+import com.epsl.peritos.Fragment_Hour;
+import com.epsl.peritos.Fragment_Name;
+import com.epsl.peritos.Fragment_Qr;
+import com.epsl.peritos.StructureParametersBBDD;
 import com.epsl.peritos.communications.CommunicationAsynctask;
 import com.epsl.peritos.peritos.R;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -23,17 +29,31 @@ import java.util.Date;
 import java.util.List;
 
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends AppCompatActivity {
 
-    private Button btnLogin;
+    android.support.v4.app.FragmentManager fm;
 
+    List<Fragment> fragments;
+    Button btn;
+    StructureParametersBBDD.Treatment treatment;
+    CustomViewPager viewPager;
+    SampleFragmentPagerAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.login_act_layout);
 
-        btnLogin = (Button) findViewById(R.id.btnLogin);
-        btnLogin.setOnClickListener(this);
+//        Intent i = new Intent(this,MyserviceTwo.class);
+//        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        i.setFlags(Intent.FLAG_FROM_BACKGROUND);
+//        i.setAction(Constants.INSTALLAPP);
+//        startService(i);
+//
+//        Intent in = new Intent(this,MainActivity.class);
+//        in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        in.setFlags(Intent.FLAG_FROM_BACKGROUND);
+//        startActivity(in);
+
 
         //Código para obtener el GCM_ID y registrarse en el servidor en GAE
         //En caso de que no haya conexión, decirle al usuario que active el WiFi y vuelva a inicar la app cuando tenga conexión
@@ -42,20 +62,108 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (registrationId.isEmpty()) {
             new GcmRegistrationAsyncTask(LoginActivity.this).execute();
         }
+
+        viewPager = (CustomViewPager) findViewById(R.id.myViewPager);
+        adapter = new SampleFragmentPagerAdapter(getSupportFragmentManager());
+        adapter.addFrag(Fragment_Name.newInstance());
+
+
+        viewPager.setAdapter(adapter);
+
+        viewPager.setPagingEnabled(false);
+
+
+        btn = (Button) findViewById(R.id.button);
+        btn.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+
+                System.out.println(viewPager.getCurrentItem());
+
+
+                adapter.addFrag(Fragment_Qr.newInstance());
+                adapter.addFrag(Fragment_Hour.newInstance());
+                adapter.notifyDataSetChanged();
+                viewPager.setCurrentItem(viewPager.getCurrentItem()+1);
+                System.out.println("tumtumpak");
+            }
+        });
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+            public void onPageSelected(int position) {
+
+                switch (position){
+
+                    case 0:
+
+
+
+                        break;
+
+                    case 1:
+
+
+                        break;
+
+                    case 2:
+                        Fragment_Qr f = (Fragment_Qr ) fragments.get(1);
+
+
+                        Fragment_Hour h = (Fragment_Hour ) fragments.get(2);
+                        h.setListTreatment(f.getListTreatment());
+                        break;
+
+
+
+                }
+
+
+
+
+                // Check if this is the page you want.
+            }
+        });
+
     }
 
-    @Override
-    public void onClick(View view){
-        switch (view.getId()) {
-            case R.id.btnLogin:
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                break;
+    class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
+
+
+
+        private Context context;
+        private int position;
+
+        public SampleFragmentPagerAdapter(FragmentManager fm) {
+            super(fm);
+            fragments = new ArrayList<Fragment>();
+
         }
+
+        public void addFrag(Fragment fragment) {
+            fragments.add(fragment);
+
+        }
+
+        public void deleteFrags() {
+            fragments.clear();
+
+        }
+
+        @Override
+        public Fragment getItem(int arg0) {
+            return fragments.get(arg0);
+        }
+
+        @Override
+        public int getCount() {
+            return fragments.size();
+        }
+
+
     }
-
-
-
-
 
 
 

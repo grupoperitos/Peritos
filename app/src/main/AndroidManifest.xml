@@ -4,6 +4,8 @@
     package="com.epsl.peritos.peritos">
 
     <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -23,6 +25,13 @@
             android:screenOrientation="portrait"
             android:name=".activity.MainActivity"
             android:label="Activity Main"
+            android:parentActivityName=".activity.LoginActivity" >
+        </activity>
+
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".activity.PreferenciasActivity"
+            android:label="Activity Preferencias"
             android:parentActivityName=".activity.LoginActivity" >
         </activity>
 

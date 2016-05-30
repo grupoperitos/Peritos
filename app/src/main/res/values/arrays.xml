@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Array con los valores de la cabecera de la tabla de informes medicos-->
+    <string-array name="cabecera_tabla">
+        <item>Fecha</item>
+        <item>Esputo</item>
+        <item>Intensidad Ej.</item>
+        <item>Fatiga</item>
+        <item>Fiebre</item>
+    </string-array>
+</resources>

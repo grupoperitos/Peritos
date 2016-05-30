@@ -11,10 +11,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Control de Síntomas"
+            android:text="@string/control_de_sintomas"
             android:textColor="#4FC3F7"
             android:textAppearance="?android:attr/textAppearanceSearchResultTitle"
-            android:textSize="22dp"
+            android:textSize="20sp"
             android:textStyle="bold"/>
 
     <LinearLayout
@@ -35,11 +35,14 @@
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:text="Color de Esputo: "
+            android:textStyle="bold"
             android:layout_marginTop="@dimen/dialog_body"
             android:layout_marginBottom="@dimen/button_padding"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <SeekBar
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:id="@+id/seekBar_estado_esputo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:text="Amarillo"
+                android:text="Blanco"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
@@ -79,36 +82,57 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:gravity="center"
-            android:text="¿Cómo se encuentra?"
+            android:text="¿Qué tipo de actividad estaba realizando?"
+            android:textStyle="bold"
             android:layout_marginTop="@dimen/dialog_body"
             android:layout_marginBottom="@dimen/button_padding"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="left"
+                android:src="@drawable/seated"/>
 
             <SeekBar
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:id="@+id/seekBar_estado_paciente"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:progressDrawable="@drawable/seekbar_progressbar_paciente"
-                android:progress="3"
+                android:progress="2"
                 android:thumbTintMode="multiply"
                 android:thumb="@drawable/seekbar"
-                android:max="6"
+                android:max="4"
+                android:layout_gravity="center"
                 android:layout_alignEnd="@+id/count"
                 android:layout_toEndOf="@+id/imageView2" />
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="right"
+                android:src="@drawable/lifting"/>
+        </FrameLayout>
+
+
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:text="Muy Bien"
+                android:text="Ninguna"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:textStyle="italic"/>
             <TextView
-                android:text="Muy Mal"
+                android:text="Escaleras"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
@@ -125,23 +149,43 @@
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:text="Indique su grado de fatiga:"
+            android:textStyle="bold"
             android:layout_marginTop="@dimen/dialog_body"
             android:layout_marginBottom="@dimen/button_padding"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-
-
-        <SeekBar
-            android:id="@+id/seekBar_estado_fatiga"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:progressDrawable="@drawable/seekbar_progressbar_paciente"
-            android:progress="3"
-            android:thumbTintMode="multiply"
-            android:thumb="@drawable/seekbar"
-            android:max="6"
-            android:layout_alignEnd="@+id/count"
-            android:layout_toEndOf="@+id/imageView2" />
+            android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="left"
+            android:src="@drawable/resting"/>
+
+            <SeekBar
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:id="@+id/seekBar_estado_fatiga"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressDrawable="@drawable/seekbar_progressbar_paciente"
+                android:progress="3"
+                android:thumbTintMode="multiply"
+                android:thumb="@drawable/seekbar"
+                android:max="6"
+                android:layout_gravity="center"
+                android:layout_alignEnd="@+id/count"
+                android:layout_toEndOf="@+id/imageView2" />
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="right"
+                android:src="@drawable/tired"/>
+        </FrameLayout>
+
+
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -169,6 +213,7 @@
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:text="¿Tiene Fiebre?"
+            android:textStyle="bold"
             android:layout_marginTop="@dimen/dialog_body"
             android:layout_marginBottom="@dimen/button_padding"
             android:textAppearance="?android:attr/textAppearanceMedium" />

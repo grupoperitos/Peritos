@@ -26,4 +26,7 @@
 
     <string name="dialog_aceptar">ACEPTAR</string>
     <string name="dialog_cancelar">CANCELAR</string>
+
+
+    <string name="control_de_sintomas">Control de Síntomas</string>
 </resources>

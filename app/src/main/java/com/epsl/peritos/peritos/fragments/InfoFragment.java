@@ -159,12 +159,6 @@ public class InfoFragment extends Fragment {
         showHideVideoButton();
 
 
-
-
-
-
-
-
         return mFragmentView;
     }
 
@@ -177,12 +171,13 @@ public class InfoFragment extends Fragment {
     }
 
     private void showHideVideoButton() {
-        if (isExternalStorageWritable() && !mURL.isEmpty() && !mURL.equals("-")) {
-            mPlayVideo.setVisibility(View.VISIBLE);
-        } else {
-            mPlayVideo.setVisibility(View.INVISIBLE);
+        if (mPlayVideo != null)
+            if (isExternalStorageWritable() && !mURL.isEmpty() && !mURL.equals("-")) {
+                mPlayVideo.setVisibility(View.VISIBLE);
+            } else {
+                mPlayVideo.setVisibility(View.INVISIBLE);
 
-        }
+            }
     }
 
 
@@ -210,8 +205,6 @@ public class InfoFragment extends Fragment {
             }
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -306,7 +299,6 @@ public class InfoFragment extends Fragment {
                 }
             }
         });
-
 
 
         mMessageView.setOnClickListener(new View.OnClickListener() {
@@ -418,7 +410,7 @@ public class InfoFragment extends Fragment {
             public void onClick(View v) {
                 Message msgObj = mHandler.obtainMessage();
                 msgObj.what = MainActivity.HANLDER_MESSAGE_PREV_TEXT;
-                ((MainActivity)getActivity()).mHandler.sendMessage(msgObj);
+                ((MainActivity) getActivity()).mHandler.sendMessage(msgObj);
             }
         });
 
@@ -427,7 +419,7 @@ public class InfoFragment extends Fragment {
             public void onClick(View v) {
                 Message msgObj = mHandler.obtainMessage();
                 msgObj.what = MainActivity.HANLDER_MESSAGE_NEXT_TEXT;
-                ((MainActivity)getActivity()).mHandler.sendMessage(msgObj);
+                ((MainActivity) getActivity()).mHandler.sendMessage(msgObj);
             }
         });
     }
@@ -487,18 +479,24 @@ public class InfoFragment extends Fragment {
     }
 
     protected void showTitle(String message) {
-        mTitleView.setText(message);
-        mTitleView.invalidate();
+        if (mTitleView != null) {
+            mTitleView.setText(message);
+            mTitleView.invalidate();
+        }
     }
 
     protected void showMessage(String message) {
-        mMessageView.setText(message);
-        mMessageView.invalidate();
+        if (mCaptionView != null) {
+            mMessageView.setText(message);
+            mMessageView.invalidate();
+        }
     }
 
     protected void showCaption(String message) {
-        mCaptionView.setText(message);
-        mCaptionView.invalidate();
+        if (mMessageView != null) {
+            mCaptionView.setText(message);
+            mCaptionView.invalidate();
+        }
     }
 
     public synchronized void actualize(InformationMessage message) {

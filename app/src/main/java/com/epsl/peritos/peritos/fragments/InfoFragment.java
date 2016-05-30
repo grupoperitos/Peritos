@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -43,7 +42,6 @@ import com.epsl.peritos.peritos.R;
 import com.epsl.peritos.peritos.activity.MainActivity;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -58,6 +56,8 @@ public class InfoFragment extends Fragment {
     public static final String INFO_MESSAGE = "infomessage";
     public static final String INFO_DETAIL = "infodetail";
     public static final String INFO_URL = "infourl";
+    public static final String INFO_CAPSULE = "infocapsule";
+    public static final String INFO_INHALADOR = "ininh";
 
     public static final String TAG_DETAILS = "details";
 
@@ -76,12 +76,16 @@ public class InfoFragment extends Fragment {
     private ImageView mPlayVideo = null;
     private ImageView mPrevMessage = null;
     private ImageView mNextMessage = null;
+    private ImageView mCapsule = null;
+    private ImageView mInhalador = null;
 
     private ScrollView mScrollCaption = null;
     private ScrollView mScrollMessage = null;
 
     private Handler mHandler = null;//Handled to manage tab iteration
 
+    private boolean mShowCapsule=false;
+    private boolean mShowInhalador=false;
 
     private long enqueue;
     private DownloadManager mDM;
@@ -142,6 +146,8 @@ public class InfoFragment extends Fragment {
             mMessage = savedInstanceState.getString(INFO_MESSAGE);
             mDetail = savedInstanceState.getString(INFO_DETAIL);
             mURL = savedInstanceState.getString(INFO_URL);
+            mShowCapsule = savedInstanceState.getBoolean(INFO_CAPSULE);
+            mShowInhalador = savedInstanceState.getBoolean(INFO_INHALADOR);
 
         }
         mFragmentView = inflater.inflate(R.layout.fragment_info, container, false);
@@ -152,6 +158,8 @@ public class InfoFragment extends Fragment {
         mPlayVideo = (ImageView) mFragmentView.findViewById(R.id.info_play);
         mPrevMessage = (ImageView) mFragmentView.findViewById(R.id.info_rewind);
         mNextMessage = (ImageView) mFragmentView.findViewById(R.id.info_fforward);
+        mCapsule = (ImageView)mFragmentView.findViewById(R.id.info_capsule);
+        mInhalador = (ImageView)mFragmentView.findViewById(R.id.info_inhalador);
 
         mScrollCaption = (ScrollView) mFragmentView.findViewById(R.id.scroll_caption);
         mScrollMessage = (ScrollView) mFragmentView.findViewById(R.id.scroll_message);
@@ -159,8 +167,7 @@ public class InfoFragment extends Fragment {
         showCaption(mCaption);
         showMessage(mMessage);
 
-        showHideVideoButton();
-
+        actualizeInterfaceButtons();
 
         return mFragmentView;
     }
@@ -173,7 +180,7 @@ public class InfoFragment extends Fragment {
         return false;
     }
 
-    private void showHideVideoButton() {
+    private void actualizeInterfaceButtons() {
         if (mPlayVideo != null)
             if (isExternalStorageWritable() && !mURL.isEmpty() && !mURL.equals("-")) {
                 mPlayVideo.setVisibility(View.VISIBLE);
@@ -181,8 +188,42 @@ public class InfoFragment extends Fragment {
                 mPlayVideo.setVisibility(View.INVISIBLE);
 
             }
+        if(mCapsule!=null) {
+            if (mShowCapsule)
+                mCapsule.setVisibility(View.VISIBLE);
+            else
+                mCapsule.setVisibility(View.INVISIBLE);
+        }
+
+        if(mInhalador!=null) {
+            if (mShowInhalador)
+                mInhalador.setVisibility(View.VISIBLE);
+            else
+                mInhalador.setVisibility(View.INVISIBLE);
+        }
     }
 
+    /**
+     *
+     * @param show true to show
+     */
+    public void showCapsule(boolean show)
+    {
+        mShowCapsule=show;
+        actualizeInterfaceButtons();
+
+    }
+
+    /**
+     *
+     * @param show true to show
+     */
+    public void showInhalador(boolean show)
+    {
+        mShowInhalador=show;
+        actualizeInterfaceButtons();
+
+    }
 
     protected void startVideo() {
         try {
@@ -202,7 +243,7 @@ public class InfoFragment extends Fragment {
                 Message msgObj = mActivity.mHandler.obtainMessage();
                 msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
                 Bundle b = new Bundle();
-                b.putInt(MainActivity.HANLDER_MESSAGE_WHAT7_PUNTOS, AchievementManager.ACHIEVE_VIDEO);
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_VIDEO);
                 msgObj.setData(b);
                 mActivity.mHandler.sendMessage(msgObj);
 
@@ -461,7 +502,7 @@ public class InfoFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        showHideVideoButton();
+        actualizeInterfaceButtons();
 
         Message msgObj = mHandler.obtainMessage();
         msgObj.what = MainActivity.HANLDER_MESSAGE_COMMENTARY;
@@ -536,7 +577,7 @@ public class InfoFragment extends Fragment {
             showCaption(mCaption);
             showMessage(mMessage);
             showTitle(mTitle);
-            showHideVideoButton();
+            actualizeInterfaceButtons();
         }
     }
 
@@ -551,12 +592,13 @@ public class InfoFragment extends Fragment {
         outState.putString(INFO_MESSAGE, mMessage);
         outState.putString(INFO_DETAIL, mDetail);
         outState.putString(INFO_URL, mURL);
+        outState.putBoolean(INFO_CAPSULE,mShowCapsule);
+        outState.putBoolean(INFO_INHALADOR,mShowInhalador);
 
     }
 
     void showDetailsDialog() {
         FragmentManager fm = getActivity().getSupportFragmentManager();
-
         DialogFragment newFragment = DetailsFragment.newInstance(mType, mTitle, mDetail);
         newFragment.show(fm, TAG_DETAILS);
     }

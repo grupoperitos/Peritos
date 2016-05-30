@@ -23,13 +23,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentManager;
 
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -41,9 +39,9 @@ import android.widget.Toast;
 
 import com.epsl.peritos.Constants;
 import com.epsl.peritos.MyserviceTwo;
+import com.epsl.peritos.achievements.AchievementManager;
 import com.epsl.peritos.info.InformationManager;
 
-import com.epsl.peritos.info.InformationMessage;
 import com.epsl.peritos.info.MessageList;
 import com.epsl.peritos.info.MessageTypes;
 import com.epsl.peritos.peritos.R;
@@ -52,7 +50,6 @@ import com.epsl.peritos.peritos.fragments.InfoFragment;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -61,21 +58,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 
 import android.content.Intent;
 import android.net.Uri;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -107,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     public static final int HANLDER_MESSAGE_STOPCARRUSEL = 8;
     public static final int HANLDER_MESSAGE_STARTCARRUSEL = 9;
 
-    public static final String HANLDER_MESSAGE_WHAT7_PUNTOS = "puntos";
+    public static final String HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA = "puntos";
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -248,6 +239,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         mFragmentList.get(posN).actualize(messageTabs[posN].getNextMessage());
 
                         //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_NEXT_TEXT, Snackbar.LENGTH_SHORT).show();
+                        break;
+
+                    case HANLDER_MESSAGE_ACHIEVEMENT_POINTS:
+                        Bundle data = inputMessage.getData();
+                        if(data!=null) {
+                            int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
+                            AchievementManager.modifyAchievementPoints(MainActivity.this,points);
+                            Snackbar.make(viewPager, getString(R.string.achv_haganado) +" "+ points +" "+ getString(R.string.achv_puntos), Snackbar.LENGTH_SHORT).show();
+                        }
                         break;
                     default:
                         //Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();

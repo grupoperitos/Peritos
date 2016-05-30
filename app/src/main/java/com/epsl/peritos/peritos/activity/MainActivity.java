@@ -103,6 +103,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     public static final int HANLDER_MESSAGE_CHANGE_TEXT = 4;
     public static final int HANLDER_MESSAGE_PREV_TEXT   = 5;
     public static final int HANLDER_MESSAGE_NEXT_TEXT   = 6;
+    public static final int HANLDER_MESSAGE_ACHIEVEMENT_POINTS   = 7;
+    public static final int HANLDER_MESSAGE_STOPCARRUSEL = 8;
+    public static final int HANLDER_MESSAGE_STARTCARRUSEL = 9;
+
+    public static final String HANLDER_MESSAGE_WHAT7_PUNTOS = "puntos";
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -188,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         mHandler.removeMessages(HANDLER_MESSAGE_CHANGETAB);
                         tabLayout.post(new Carrusel());
 
-                        Snackbar.make(viewPager, "Handler 1", Snackbar.LENGTH_SHORT).show();
+                        //Snackbar.make(viewPager, "Handler 1", Snackbar.LENGTH_SHORT).show();
                         break;
                     case HANLDER_MESSAGE_CHANGE_TEXT:
                         mHandler.removeMessages(HANLDER_MESSAGE_CHANGE_TEXT);
@@ -201,7 +207,31 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         msgObj.what=MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
                         mHandler.sendMessageDelayed(msgObj,MAXTEXT_WAIT);
 
-                        Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_CHANGE_TEXT, Snackbar.LENGTH_SHORT).show();
+                        //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_CHANGE_TEXT, Snackbar.LENGTH_SHORT).show();
+                        break;
+                    case HANLDER_MESSAGE_STOPCARRUSEL:
+                        //Mensaje enviado cuando se inicia la descarga de un video hasta que este empieza a reproducirse
+                        //Se deben parar los mensajes pendientes:
+                        // - HANDLER_MESSAGE_CHANGETAB
+                        // - HANLDER_MESSAGE_CHANGE_TEXT
+                        mHandler.removeMessages(HANLDER_MESSAGE_CHANGE_TEXT);
+                        mHandler.removeMessages(HANDLER_MESSAGE_CHANGETAB);
+                        //Estos mensajes no se reactivarán hasta que se descargue el vídeo o el usuario toque en la interfaz porque quiere ver otra cosa
+                        break;
+                    case HANLDER_MESSAGE_STARTCARRUSEL:
+                        //Mensaje enviado cuando se ha descargado el vídeo para reiniciar el carrusel
+                        //Se iniciar  parar los mensajes pendientes:
+                        // - HANDLER_MESSAGE_CHANGETAB
+                        // - HANLDER_MESSAGE_CHANGE_TEXT
+
+                        Message msgCarrusel = mHandler.obtainMessage();
+                        msgCarrusel.what=MainActivity.HANDLER_MESSAGE_CHANGETAB;
+                        mHandler.sendMessageDelayed(msgCarrusel,MAXPAGE_WAIT);
+
+                        Message msgText = mHandler.obtainMessage();
+                        msgText.what=MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
+                        mHandler.sendMessageDelayed(msgText,MAXTEXT_WAIT);
+
                         break;
                     case HANLDER_MESSAGE_PREV_TEXT:
                         mHandler.removeMessages(HANLDER_MESSAGE_PREV_TEXT);
@@ -209,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         int posP = tabLayout.getSelectedTabPosition();
                         mFragmentList.get(posP).actualize(messageTabs[posP].getPrevMessage());
 
-                        Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_PREV_TEXT, Snackbar.LENGTH_SHORT).show();
+                        //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_PREV_TEXT, Snackbar.LENGTH_SHORT).show();
                         break;
                     case HANLDER_MESSAGE_NEXT_TEXT:
                         mHandler.removeMessages(HANLDER_MESSAGE_NEXT_TEXT);
@@ -217,15 +247,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         int posN = tabLayout.getSelectedTabPosition();
                         mFragmentList.get(posN).actualize(messageTabs[posN].getNextMessage());
 
-                        Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_NEXT_TEXT, Snackbar.LENGTH_SHORT).show();
+                        //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_NEXT_TEXT, Snackbar.LENGTH_SHORT).show();
                         break;
                     default:
-                        Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
+                        //Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
                         break;
                 }
             }
-
-
         };
 
         setupTabControl();

@@ -17,7 +17,13 @@ public class AchievementManager {
     public static final String ACHIEVEMENT_POINTS = "achievementpoints";
     public static final String PATIET_LEVEL = "patientlevel";
 
-
+    //Puntos de logro
+    public static final int ACHIEVE_VIDEO = 2;
+    public static final int ACHIEVE_MESSAGE = 1;
+    public static final int ACHIEVE_EXCERCISE = 5;
+    public static final int ACHIEVE_MEDICINE = 2;
+    public static final int ACHIEVE_NOENTER = -25;
+    public static final int ACHIEVE_NOMEDICINE = -10;
     /**
      * Establece en punto inicial de la aplicación para el control de logros
      * @param context

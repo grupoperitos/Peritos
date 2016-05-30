@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.epsl.peritos.achievements.AchievementManager;
 import com.epsl.peritos.info.InformationMessage;
 import com.epsl.peritos.peritos.R;
 import com.epsl.peritos.peritos.activity.MainActivity;
@@ -87,6 +88,8 @@ public class InfoFragment extends Fragment {
     private BroadcastReceiver mReceiver = null;
 
     private final int REQUEST_CODE_ASK_PERMISSIONS_WRITEEXTERNAL = 123;
+
+    private MainActivity mActivity=null;
 
 
     public static InfoFragment newInstance(int type, String title, String caption, String message, String detail, String url) {
@@ -194,7 +197,17 @@ public class InfoFragment extends Fragment {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl));
                 intent.setDataAndType(Uri.parse(videoUrl), "video/mp4");
                 startActivity(intent);
+
+                //Control de logros
+                Message msgObj = mActivity.mHandler.obtainMessage();
+                msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_WHAT7_PUNTOS, AchievementManager.ACHIEVE_VIDEO);
+                msgObj.setData(b);
+                mActivity.mHandler.sendMessage(msgObj);
+
             } else {//The file does not exists, mainly due to a first run
+                //TODO: Parar el carrusel para cuando se recibe el video para que se reproduzca
                 mDM = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
                 DownloadManager.Request request = new DownloadManager.Request(
                         Uri.parse(mURL));
@@ -202,6 +215,11 @@ public class InfoFragment extends Fragment {
                 request.setDestinationUri(Uri.fromFile(file));
                 enqueue = mDM.enqueue(request);
                 Snackbar.make(mFragmentView, getString(R.string.info_fragment_descarga), Snackbar.LENGTH_LONG).show();
+
+                //Parar el carrusel
+                Message msgObj = mActivity.mHandler.obtainMessage();
+                msgObj.what=MainActivity.HANLDER_MESSAGE_STOPCARRUSEL;
+                mActivity.mHandler.sendMessageAtFrontOfQueue(msgObj);
             }
 
         } catch (MalformedURLException e) {
@@ -239,6 +257,8 @@ public class InfoFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mActivity = (MainActivity)getActivity();
+
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -258,6 +278,11 @@ public class InfoFragment extends Fragment {
                                 String uriString = c
                                         .getString(c
                                                 .getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+
+                                //Iniciar el carrusel
+                                Message msgObj = mActivity.mHandler.obtainMessage();
+                                msgObj.what=MainActivity.HANLDER_MESSAGE_STARTCARRUSEL;
+                                mActivity.mHandler.sendMessage(msgObj);
                                 startVideo();
                             }
                         }

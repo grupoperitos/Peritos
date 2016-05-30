@@ -7,9 +7,11 @@
     <string name="info_text_infoepoc">INFORMACIÓN SOBRE LA EPOC</string>
     <string name="info_text_tratamiento">TRATAMIENTO</string>
     <string name="info_text_info" >INFO</string>
+    <string name="info_fragment_permiso" >Tiene que habilitar el almacenamiento en la memoria externa</string>
+    <string name="info_fragment_permisoDenegado" >Permiso denegado. No podrá ver los vídeos de los inhaladores</string>
+    <string name="info_fragment_descarga" >El video se reproducirá cuando se descargue</string>
     <string name="button_back">Volver</string>
-
-
+    <string name="error_cargarrecursos">Error al cargar el fichero de recursos</string>
 
     <string name="btn_saludResponde">Salud Responde</string>
     <string name="btn_cuidador">Cuidador o Familiar</string>
@@ -29,4 +31,7 @@
 
 
     <string name="control_de_sintomas">Control de Síntomas</string>
+    <string name="content_description_playvideo">Reproducir vídeo</string>
+    <string name="content_description_prevmessage">Mensaje previo</string>
+    <string name="content_description_nextmessage">Siguiente mensaje</string>
 </resources>

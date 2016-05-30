@@ -44,7 +44,7 @@ public class Endpoint {
 
     private static final Logger log = Logger.getLogger(Endpoint.class.getName());
     private static final String API_KEY = System.getProperty("gcm.api.key");
-
+    private static final String servingUrl = "http://storage.googleapis.com/peritosapp.appspot.com/contenidos.txt";
 
     /**
      * Punto de entrada de las comunicaciones
@@ -57,37 +57,41 @@ public class Endpoint {
         String msgcontent=mss[1];
 
         //Mensaje para registrarse en el servidor
-        if(msgtype.equals("REG")){
-            String[] regdata=msgcontent.split("%");
-            String regId=regdata[0];
-            String regFc=regdata[1];
+        if(msgtype.equals("REG")) {
+            String[] regdata = msgcontent.split("%");
+            String regId = regdata[0];
+            String regFc = regdata[1];
 
-            if(findRecord(regId) != null) {
+            if (findRecord(regId) == null) {
+                Usuarios record = new Usuarios();
+                record.setRegId(regId);
+                record.setRegFc(regFc);
+                ofy().save().entity(record).now();
+
+                Sender sender = new Sender(API_KEY);
+                Message msg = new Message.Builder().addData("message", "OK").build();
+                Result result = sender.send(msg, regId, 5);
+                if (result.getMessageId() != null) {
+                    log.warning("Message sent to " + record.getRegId());
+                    String canonicalRegId = result.getCanonicalRegistrationId();
+                    if (canonicalRegId != null) {
+                        // if the regId changed, we have to update the datastore
+                        record.setRegId(canonicalRegId);
+                        ofy().save().entity(record).now();
+                    }
+                }
+            }else{
                 return;
             }
 
-            Usuarios record = new Usuarios();
-            record.setRegId(regId);
-            record.setRegFc(regFc);
-            ofy().save().entity(record).now();
-
-
-            Sender sender = new Sender(API_KEY);
-            Message msg = new Message.Builder().addData("message", "OK").build();
-            Result result = sender.send(msg, regId, 5);
-            if (result.getMessageId() != null) {
-                log.warning("Message sent to " + record.getRegId());
-                String canonicalRegId = result.getCanonicalRegistrationId();
-                if (canonicalRegId != null) {
-                    // if the regId changed, we have to update the datastore
-                    record.setRegId(canonicalRegId);
-                    ofy().save().entity(record).now();
-                }
-            }
         }
 
-        //Mensaje para comprobar si existe alguna nueva actualización
+        //Mensaje para comprobar si descargar última versión del archivo de contenidos
         if(msgtype.equals("UPD")){
+            String gcmid=msgcontent;
+            Messaging wm = new Messaging();
+            String message = "UPDATE#"+servingUrl;
+            wm.sendMessage(message,gcmid);
             return;
         }
     }
@@ -125,7 +129,8 @@ public class Endpoint {
         //return ofy().load().type(Usuarios.class).filter("regId", regId).first().now();
         List<Usuarios> records = ofy().load().type(Usuarios.class).list();
         for (Usuarios record : records) {
-            if (record.getRegId().toString().equals(regId)) {
+            String rgid = record.getRegId();
+            if (rgid.equals(regId)) {
                 return record;
             }
         }

@@ -36,6 +36,16 @@
         <item name="android:windowExitAnimation">@anim/popup_hide</item>
     </style>
 
+    <style name="InfoFragment" parent="@android:style/TextAppearance.DeviceDefault.Large">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textStyle">italic</item>
+    </style>
 
+    <style name="InfoFragment.Message" parent="InfoFragment">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
 </resources>

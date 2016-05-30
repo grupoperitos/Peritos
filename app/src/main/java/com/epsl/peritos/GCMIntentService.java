@@ -1,16 +1,26 @@
 package com.epsl.peritos;
 
+import android.annotation.TargetApi;
+import android.app.DownloadManager;
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.epsl.peritos.peritos.R;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import java.io.File;
 
 
 /**
@@ -27,6 +37,7 @@ public class GCMIntentService extends IntentService {
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
     private int counter;
+    public static final String MESSAGESFILENAME = "messages";
 
 	public GCMIntentService() {
 		super("GcmIntentService");
@@ -69,70 +80,36 @@ public class GCMIntentService extends IntentService {
     private void processIncomingMessage(String message) throws Exception {
         Log.e("GCMRECEIVED",message);
         showToast(message);
-    }
 
+        String[] ms = message.split("#");
+        String type = ms[0];
 
-
-
-
-    /**
-     * Este metodo lo que hace es visualizar una notificación en la barra de
-     * notificaciones con el mensaje pasado por parametro
-     *
-     * @param msg mensaje que se muestra en la notificación
-     */
-    /*private void sendNotification(String title, String msg, String id, int c) {
-        mNotificationManager = (NotificationManager) this
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-
-        Intent j = new Intent(getApplicationContext(), MainActivity.class);
-        j.putExtra("chatID",id);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, j, 0);
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                .setCategory(Notification.CATEGORY_MESSAGE)
-                .setSmallIcon(R.drawable.ic_stat_icon)
-                .setColor(getResources().getColor(R.color.colorPrimary))
-                .setDefaults(Notification.DEFAULT_SOUND)
-                .setContentTitle(title)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-                .setContentText(msg);
-
-        if(c!=1 && c!=0){
-            mBuilder.setNumber(c);
-            mBuilder.setContentText(c+" mensajes nuevos");
+        if(type.equals("UPDATE")){
+            String url = ms[1];
+            downloadFile(url);
         }
 
-        mBuilder.setAutoCancel(true);
-        mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-    }
-
-    public boolean checkChat(String _c) {
-        SQLiteHelper sqlh = new SQLiteHelper(getApplicationContext());
-        SQLiteDatabase rdb = sqlh.getReadableDatabase();
-        Cursor c = rdb.rawQuery("SELECT * FROM chats WHERE id=?", new String[]{_c});
-        boolean exists = c.moveToFirst();
-        c.close();
-        rdb.close();
-        sqlh.close();
-        return exists;
+        if(type.equals("NEW_PHONE_SALUD")){
+            String tel = ms[1];
+        }
     }
 
 
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void downloadFile(String uRl, String namefile, String path) {
-        File direct = new File(Environment.getExternalStorageDirectory() + path);
-            if (!direct.exists()) {
-                direct.mkdirs();
-            }
+    public void downloadFile(String uRl) {
+        String path = "/"+getApplicationContext().getResources().getString(R.string.app_name);
 
-        File imageFile = new File(direct, namefile);
-        if(imageFile.exists()){
-            imageFile.delete();
+        File direct = new File(Environment.getExternalStorageDirectory() + path);
+        if (!direct.exists()) {
+            direct.mkdirs();
         }
+
+        File file = new File(direct, "messages.txt");
+        if(file.exists()){
+            file.delete();
+        }
+
 
         DownloadManager mgr = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
@@ -141,13 +118,20 @@ public class GCMIntentService extends IntentService {
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
 
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
-                .setAllowedOverRoaming(false).setTitle("Descarga")
-                .setDescription("Descargando archivo...")
-                .setDestinationInExternalPublicDir(path, namefile);
+                .setAllowedOverRoaming(false).setTitle("Actualización de contenidos")
+                .setDescription("Descargando archivo de actualización ...")
+                .setDestinationInExternalPublicDir(path, "messages.txt");
 
-        Long a = mgr.enqueue(request);
 
-    }*/
+        long downloadReference = mgr.enqueue(request);
+        String ref = downloadReference+"";
+
+        SharedPreferences prefs = getApplicationContext().getSharedPreferences("PRFS", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("DOWNREF", ref);
+        editor.commit();
+
+    }
 
 
 }

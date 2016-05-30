@@ -20,7 +20,7 @@ License: You must have a valid license purchased only from themeforest(the above
 
 <head>
     <meta charset="utf-8" />
-    <title>PRTSAPP | Generador código QR tratamiento</title>
+    <title>RESPIRAPP | Generador código QR tratamiento</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <meta content="" name="description" />
@@ -54,7 +54,7 @@ License: You must have a valid license purchased only from themeforest(the above
             <!-- BEGIN LOGO -->
             <div class="page-logo">
                 <a href="index.html">
-                    <img src="assets/prtsapplogo.png" alt="logo" class="logo-default" />
+                    <img src="logo2.png" alt="logo" class="logo-default" />
                 </a>
             </div>
             <!-- END LOGO -->
@@ -138,108 +138,44 @@ License: You must have a valid license purchased only from themeforest(the above
                             <form role="form" id="form1" name="form1">
                                 <div class="form-body">
                                     <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="form-group form-md-line-input form-md-floating-label has-info">
-                                                <input type="text" name="in1" class="form-control" id="in1">
-                                                <label for="in1">Inhalador</label>
-                                                <span class="help-block">Nombre del medicamento</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group form-md-line-input has-info">
-                                                <select name="ti1" class="form-control" id="ti1">
-                                                    <option value=""></option>
-                                                    <option value="1">Option 1</option>
-                                                    <option value="2">Option 2</option>
-                                                    <option value="3">Option 3</option>
-                                                    <option value="4">Option 4</option>
-                                                </select>
-                                                <label for="ti1">Tipo de inhalador</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group form-md-line-input has-info">
-                                                <select name="ni1" class="form-control" id="ni1">
-                                                    <option value=""></option>
-                                                    <option value="1">1</option>
-                                                    <option value="2">2</option>
-                                                    <option value="3">3</option>
-                                                    <option value="4">4</option>
-                                                </select>
-                                                <label for="ni1">Número de inhalaciones</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group form-md-line-input has-info">
-                                                <select name="pi1" class="form-control" id="pi1">
-                                                    <option value=""></option>
-                                                    <option value="1">1 hora</option>
-                                                    <option value="2">2 horas</option>
-                                                    <option value="4">4 horas</option>
-                                                    <option value="6">6 horas</option>
-                                                    <option value="8">8 horas</option>
-                                                    <option value="10">10 horas</option>
-                                                    <option value="12">12 horas</option>
-                                                    <option value="24">24 horas</option>
-                                                </select>
-                                                <label for="pi1">Tiempo entre inhalaciones</label>
-                                            </div>
+                                        <div class="col-md-12">
+                                            <h3>Nombre del paciente</h3>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <input type='text' name='nombre' class='form-control' id='np'>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                        <h3>Inhaladores</h3>
+                                        <a href="javascript:;" class="btn btn-icon-only blue" onClick="addInputIn();">
+                                            <i class="fa fa-plus"></i>
+                                        </a>
+                                        <a href="javascript:;" class="btn btn-icon-only red" onClick="removeElementIn();">
+                                            <i class="fa fa-minus"></i>
+                                        </a>
+                                        </div>
+                                    </div>
+                                    <div id="inhaladores"></div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h3>Pastillas</h3>
+                                            <a href="javascript:;" class="btn btn-icon-only blue" onClick="addInputPa();">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                            <a href="javascript:;" class="btn btn-icon-only red" onClick="removeElementPa();">
+                                                <i class="fa fa-minus"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div id="pastillas"></div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <div class="form-group form-md-line-input form-md-floating-label has-info">
-                                            <input type="text" name="in2" class="form-control" id="in2">
-                                            <label for="in2">Inhalador</label>
-                                            <span class="help-block">Nombre del medicamento</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group form-md-line-input has-info">
-                                            <select name="ti2" class="form-control" id="ti2">
-                                                <option value=""></option>
-                                                <option value="1">Option 1</option>
-                                                <option value="2">Option 2</option>
-                                                <option value="3">Option 3</option>
-                                                <option value="4">Option 4</option>
-                                            </select>
-                                            <label for="ti2">Tipo de inhalador</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group form-md-line-input has-info">
-                                            <select name="ni2" class="form-control" id="ni2">
-                                                <option value=""></option>
-                                                <option value="1">1</option>
-                                                <option value="2">2</option>
-                                                <option value="3">3</option>
-                                                <option value="4">4</option>
-                                            </select>
-                                            <label for="ni2">Número de inhalaciones</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group form-md-line-input has-info">
-                                            <select name="pi2" class="form-control" id="pi2">
-                                                <option value=""></option>
-                                                <option value="1">1 hora</option>
-                                                <option value="2">2 horas</option>
-                                                <option value="4">4 horas</option>
-                                                <option value="6">6 horas</option>
-                                                <option value="8">8 horas</option>
-                                                <option value="10">10 horas</option>
-                                                <option value="12">12 horas</option>
-                                                <option value="24">24 horas</option>
-                                            </select>
-                                            <label for="pi2">Tiempo entre inhalaciones</label>
-                                        </div>
-                                    </div>
-                                </div>
-
+                                <br>
                                 <button type="submit" class="btn blue">Generar QR</button>
                                 <button type="reset" onclick="hideimage();" class="btn default">Limpiar formulario</button>
-
+                                <button id="generar" onclick="generarpdf();" class="btn green">Generar PDF</button>
                             </form>
                         </div>
 
@@ -247,7 +183,7 @@ License: You must have a valid license purchased only from themeforest(the above
                             <div class="col-md-4"></div>
                             <div class="col-md-4">
                                 <div id='divimageqr'>
-                                    <img id="imageqr" src=''/>
+                                   <img id="imageqr" src=''/>
                                 </div>
                             </div>
                             <div class="col-md-4"></div>
@@ -325,9 +261,15 @@ License: You must have a valid license purchased only from themeforest(the above
     </div>
 </div>-->
 <!-- END PRE-FOOTER -->
+
+<form action="imprimir.php" method="get" name="formulario_pdf">
+    <input id="htmvl" type="hidden" name="html" value="">
+</form>
+
+
 <!-- BEGIN INNER FOOTER -->
 <div class="page-footer">
-    <div class="container"> 2016 &copy; PRTSAPP
+    <div class="container"> 2016 &copy; RESPIRAPP
     </div>
 </div>
 <div class="scroll-to-top">
@@ -360,12 +302,16 @@ License: You must have a valid license purchased only from themeforest(the above
 <script type="text/javascript">
 function hideimage(){
   $("#divimageqr").hide();
+  $("#generar").hide();
 }
 
 </script>
 
 <script type="text/javascript">
+  var url = "";
+  var htm = "";
   $("#divimageqr").hide();
+  $("#generar").hide();
 
   $(document).ready(function() {
       $('#form, #fat, #form1').submit(function() {
@@ -375,11 +321,13 @@ function hideimage(){
               data: $(this).serialize(),
               success: function(data) {
                   $(function () {
-                      //$('#form1')[0].reset();
-                      //alert(data);
+                      var rr = data.split('#');
+                      url = rr[0];
+                      htm = rr[1];
+
                       $("#imageqr").attr("src", data);
                       $("#divimageqr").show();
-
+                      //$("#generar").show();
                   });
               }
           })
@@ -389,23 +337,66 @@ function hideimage(){
 </script>
 
 <script type="text/javascript">
-function generaqr() {
-    var in1 = document.getElementById('in1').value;
-    var ti1 = document.getElementById('ti1').value;
-    var ni1 = document.getElementById('ni1').value;
-    var pi1 = document.getElementById('pi1').value;
+var counterIn = 1;
+var counterPa = 1;
 
-    var in2 = document.getElementById('in2').value;
-    var ti2 = document.getElementById('ti2').value;
-    var ni2 = document.getElementById('ni2').value;
-    var pi2 = document.getElementById('pi2').value;
-
-
-    alert(in1);
+function addInputIn(){
+     var newdiv = document.createElement('div');
+     var divid = "divin"+counterIn;
+     newdiv.setAttribute("id", divid);
+     newdiv.innerHTML = "<div class='row'><div class='col-md-3'><div class='form-group form-md-line-input form-md-floating-label has-info'><input type='text' name='in"+counterIn+"' class='form-control' id='in"+counterIn+"'>        <label for='in"+counterIn+"'>Inhalador</label>        <span class='help-block'>Nombre del medicamento</span>    </div></div><div class='col-md-3'>    <div class='form-group form-md-line-input has-info'><select name='ti"+counterIn+"' class='form-control' id='ti"+counterIn+"'><option value=''></option><option value='1'>Accuhaler</option><option value='2'>Breezhaler</option><option value='3'>Cartucho presurizado con Camara</option><option value='4'>Cartucho presurizado</option><option value='5'>Ellipta</option><option value='6'>Genuari</option><option value='7'>Handihaler</option><option value='8'>Nexthaler</option><option value='9'>Respimat</option><option value='10'>Spiromax</option><option value='11'>Turbuhaler</option></select><label for='ti"+counterIn+"'>Tipo de inhalador</label></div></div><div class='col-md-3'><div class='form-group form-md-line-input has-info'><select name='ni"+counterIn+"' class='form-control' id='ni"+counterIn+"'><option value=''></option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select><label for='ni"+counterIn+"'>Número de inhalaciones</label></div></div><div class='col-md-3'><div class='form-group form-md-line-input has-info'><select name='pi"+counterIn+"' class='form-control' id='pi"+counterIn+"'><option value=''></option><option value='1'>1 hora</option><option value='2'>2 horas</option><option value='4'>4 horas</option><option value='6'>6 horas</option><option value='8'>8 horas</option><option value='10'>10 horas</option><option value='12'>12 horas</option><option value='24'>24 horas</option></select><label for='pi"+counterIn+"'>Tiempo entre inhalaciones</label></div></div></div></div>";
+     document.getElementById('inhaladores').appendChild(newdiv);
+     counterIn++;
 }
+
+function addInputPa(divName){
+     var newdiv = document.createElement('div');
+     var divid = "divpa"+counterPa;
+     newdiv.setAttribute("id", divid);
+     newdiv.innerHTML = "<div class='row'><div class='col-md-4'><div class='form-group form-md-line-input form-md-floating-label has-info'><input type='text' name='pa"+counterPa+"' class='form-control' id='pa"+counterPa+"'>        <label for='in"+counterIn+"'>Pastilla</label>        <span class='help-block'>Nombre del medicamento</span>    </div></div><div class='col-md-4'><div class='form-group form-md-line-input has-info'><select name='np"+counterPa+"' class='form-control' id='np"+counterPa+"'><option value=''></option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select><label for='ni"+counterIn+"'>Número de pastillas</label></div></div><div class='col-md-4'><div class='form-group form-md-line-input has-info'><select name='tt"+counterPa+"' class='form-control' id='tt"+counterPa+"'><option value=''></option><option value='1'>1 hora</option><option value='2'>2 horas</option><option value='4'>4 horas</option><option value='6'>6 horas</option><option value='8'>8 horas</option><option value='10'>10 horas</option><option value='12'>12 horas</option><option value='24'>24 horas</option></select><label for='pi"+counterIn+"'>Tiempo entre tomas</label></div></div></div></div>";
+     document.getElementById('pastillas').appendChild(newdiv);
+     counterPa++;
+}
+
+function removeElementIn(){
+     var c = counterIn-1;
+     var childDiv = 'divin'+c;
+     var parentDiv = 'inhaladores';
+
+     if (document.getElementById(childDiv)) {
+          var child = document.getElementById(childDiv);
+          var parent = document.getElementById(parentDiv);
+          parent.removeChild(child);
+          counterIn--;
+     }
+     else {
+          //alert("El elemento ya ha sido eliminado o no existe");
+          return false;
+     }
+}
+function removeElementPa(parentDiv, childDiv){
+     var c = counterPa-1;
+     var childDiv = 'divpa'+c;
+     var parentDiv = 'pastillas';
+
+     if (document.getElementById(childDiv)) {
+          var child = document.getElementById(childDiv);
+          var parent = document.getElementById(parentDiv);
+          parent.removeChild(child);
+          counterPa--;
+     }
+     else {
+          //alert("El elemento ya ha sido eliminado o no existe");
+          return false;
+     }
+}
+
+function generarpdf(){
+    document.getElementById('htmvl').value=htm;
+    document.formulario_pdf.submit();
+}
+
 </script>
-
-
 
 
 </body>

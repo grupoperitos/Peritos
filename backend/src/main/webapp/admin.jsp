@@ -30,7 +30,7 @@ License: You must have a valid license purchased only from themeforest(the above
 
     <head>
         <meta charset="utf-8" />
-        <title>PERTSAPP | Panel de Administración</title>
+        <title>RESPIRAPP | Panel de Administraci&oacuten</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <meta content="" name="description" />
@@ -68,9 +68,10 @@ License: You must have a valid license purchased only from themeforest(the above
             <div class="page-header-inner ">
                 <!-- BEGIN LOGO -->
                 <div class="page-logo">
-                    <a href="index.html">
-                        <img src="assets/prtsapplogo.png" alt="logo" class="logo-default" /> </a>
-                    <div class="menu-toggler sidebar-toggler"> </div>
+                    <h4 style="color:white;">RESPIRAPP</h4>
+                    <!--<a href="index.html">
+                        <img src="logo.png" alt="logo" class="logo-default" /> </a>
+                    <div class="menu-toggler sidebar-toggler"> </div>-->
                 </div>
                 <!-- END LOGO -->
                 <!-- BEGIN RESPONSIVE MENU TOGGLER -->
@@ -83,31 +84,23 @@ License: You must have a valid license purchased only from themeforest(the above
                         <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
                         <li class="dropdown dropdown-user">
                             <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                                <img alt="" class="img-circle" src="assets/layouts/layout/img/avatar3_small.jpg" />
-                                <span class="username username-hide-on-mobile"> Nick </span>
+                                <!--<img alt="" class="img-circle" src="assets/layouts/layout/img/avatar3_small.jpg" />-->
+                                <span class="username username-hide-on-mobile"> Admin </span>
                                 <i class="fa fa-angle-down"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-default">
-                                <li>
+                                <!--<li>
                                     <a href="page_user_profile_1.html">
                                         <i class="icon-user"></i> Mi Perfil </a>
                                 </li>
-                                <li class="divider"> </li>
+                                <li class="divider"> </li>-->
                                <li>
                                     <a href="page_user_login_1.html">
-                                        <i class="icon-key"></i> Cerrar sesión </a>
+                                        <i class="icon-key"></i> Cerrar sesi&oacuten </a>
                                 </li>
                             </ul>
                         </li>
                         <!-- END USER LOGIN DROPDOWN -->
-                        <!-- BEGIN QUICK SIDEBAR TOGGLER -->
-                        <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
-                        <li class="dropdown dropdown-quick-sidebar-toggler">
-                            <a href="javascript:;" class="dropdown-toggle">
-                                <i class="icon-logout"></i>
-                            </a>
-                        </li>
-                        <!-- END QUICK SIDEBAR TOGGLER -->
                     </ul>
                 </div>
                 <!-- END TOP NAVIGATION MENU -->
@@ -163,7 +156,7 @@ License: You must have a valid license purchased only from themeforest(the above
                     <!-- BEGIN PAGE HEADER-->
                     <!-- BEGIN PAGE TITLE-->
                     <h3 class="page-title"> Inicio
-                        <small>Formulario de actualización de contenidos</small>
+                        <small>Formulario de actualizaci&oacuten de contenidos</small>
                     </h3>
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
@@ -298,7 +291,7 @@ License: You must have a valid license purchased only from themeforest(the above
         <!-- END CONTAINER -->
         <!-- BEGIN FOOTER -->
         <div class="page-footer">
-            <div class="page-footer-inner"> 2016 &copy; PERTSAPP
+            <div class="page-footer-inner"> 2016 &copy; RESPIRAPP
             </div>
             <div class="scroll-to-top">
                 <i class="icon-arrow-up"></i>

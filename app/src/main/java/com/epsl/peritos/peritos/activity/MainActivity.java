@@ -9,6 +9,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -68,6 +71,10 @@ import java.util.Set;
 import android.content.Intent;
 import android.net.Uri;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -75,10 +82,30 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import net.colindodd.toggleimagebutton.ToggleImageButton;
 
 
-public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, TabLayout.OnTabSelectedListener {
+    private final List<InfoFragment> mFragmentList = new ArrayList<>();
+    private final List<String> mFragmentTitleList = new ArrayList<>();
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    public Handler mHandler=null;//Handled to manage tab iteration
+    public static final String CARRUSEL = "carrusel";
+
+
+    public static final long MAXPAGE_WAIT = 65000;//milisegundos Control del tiempo que está cada tab activa
+    public static final long MAXTEXT_WAIT = 30000;//milisegundos Control del tiempo que está cada tab activo
+    public static final long MAIN_MESSAGE_TIME = 5700;
+    public static final int HANDLER_MESSAGE_CHANGETAB   = 1;
+    public static final int HANLDER_MESSAGE_CAPTION     = 2;
+    public static final int HANLDER_MESSAGE_COMMENTARY  = 3;
+    public static final int HANLDER_MESSAGE_CHANGE_TEXT = 4;
+    public static final int HANLDER_MESSAGE_PREV_TEXT   = 5;
+    public static final int HANLDER_MESSAGE_NEXT_TEXT   = 6;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     public Context getApplicationContext() {
@@ -86,10 +113,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-    private com.getbase.floatingactionbutton.FloatingActionsMenu FAB_emergencia;
-    private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_SR;
-    private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Sintomas;
-    private com.getbase.floatingactionbutton.FloatingActionButton miniFAB_Cuidador;
+    private FloatingActionButton miniFAB_SR;
+    private FloatingActionButton miniFAB_Sintomas;
+    private FloatingActionButton miniFAB_Cuidador;
 
 
     //Variables para Seekbars Control sintomas.
@@ -114,10 +140,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     //Mensajes
     public static MessageList messageList = null;
-    public static MessageList tratamientoList = null;
-    public static MessageList dietaList = null;
-    public static MessageList ejercicioList = null;
-    public static MessageList epocList = null;
+    public static MessageList[] messageTabs = new MessageList[4];
+
 
 
     static final int DIALOG_ID = 0;
@@ -126,14 +150,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         messageList = InformationManager.loadInformation(this);
-        if(messageList!=null){
-            tratamientoList = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
-            dietaList =  messageList.getMessagesByType(MessageTypes.INFO_DIETA);
-            ejercicioList =  messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
-            epocList=  messageList.getMessagesByType(MessageTypes.INFO_EPOC);
-        }else
-        {
-            Toast.makeText(this,"Error al cargar el fichero de recursos",Toast.LENGTH_LONG).show();
+        if (messageList != null) {
+            messageTabs[MessageTypes.INFO_TRATAMIENTO] = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
+            messageTabs[MessageTypes.INFO_DIETA] = messageList.getMessagesByType(MessageTypes.INFO_DIETA);
+            messageTabs[MessageTypes.INFO_EJERCICIO] = messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
+            messageTabs[MessageTypes.INFO_EPOC] = messageList.getMessagesByType(MessageTypes.INFO_EPOC);
+        } else {
+            Toast.makeText(this, getString(R.string.error_cargarrecursos), Toast.LENGTH_LONG).show();
             finish();
         }
 
@@ -146,19 +169,77 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        setupTabIcons();
+        tabLayout.setOnTabSelectedListener(this);
 
 
+        mHandler = new Handler(Looper.getMainLooper()) {
+            /*
+                     * handleMessage() defines the operations to perform when
+                     * the Handler receives a new Message to process.
+                     */
+            @Override
+            public void handleMessage(Message inputMessage) {
 
+                switch(inputMessage.what){
+                    case HANDLER_MESSAGE_CHANGETAB:
+                        //Cambiar la pestaña activa
+                        mHandler.removeMessages(HANDLER_MESSAGE_CHANGETAB);
+                        tabLayout.post(new Carrusel());
+
+                        Snackbar.make(viewPager, "Handler 1", Snackbar.LENGTH_SHORT).show();
+                        break;
+                    case HANLDER_MESSAGE_CHANGE_TEXT:
+                        mHandler.removeMessages(HANLDER_MESSAGE_CHANGE_TEXT);
+
+                        int pos = tabLayout.getSelectedTabPosition();
+                        mFragmentList.get(pos).actualize(messageTabs[pos].getNextMessage());
+
+                        //Send the message to change the text
+                        Message msgObj = mHandler.obtainMessage();
+                        msgObj.what=MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
+                        mHandler.sendMessageDelayed(msgObj,MAXTEXT_WAIT);
+
+                        Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_CHANGE_TEXT, Snackbar.LENGTH_SHORT).show();
+                        break;
+                    case HANLDER_MESSAGE_PREV_TEXT:
+                        mHandler.removeMessages(HANLDER_MESSAGE_PREV_TEXT);
+
+                        int posP = tabLayout.getSelectedTabPosition();
+                        mFragmentList.get(posP).actualize(messageTabs[posP].getPrevMessage());
+
+                        Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_PREV_TEXT, Snackbar.LENGTH_SHORT).show();
+                        break;
+                    case HANLDER_MESSAGE_NEXT_TEXT:
+                        mHandler.removeMessages(HANLDER_MESSAGE_NEXT_TEXT);
+
+                        int posN = tabLayout.getSelectedTabPosition();
+                        mFragmentList.get(posN).actualize(messageTabs[posN].getNextMessage());
+
+                        Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_NEXT_TEXT, Snackbar.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+
+
+        };
+
+        setupTabControl();
+
+        //Send the message to change the text
+        Message msgObj = mHandler.obtainMessage();
+        msgObj.what=MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
+        mHandler.sendMessageDelayed(msgObj,MAXTEXT_WAIT);
 
         //MiniFAB salud Responde
         miniFAB_SR = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_SR);
         miniFAB_SR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //953018799
-                //902505060
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+902505060));
+
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + 902505060));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -186,8 +267,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 AlertDialog dialogo_sintomas = createSintomasDialog();
                 //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
                 dialogo_sintomas.show();
-
-
             }
         });
 
@@ -232,8 +311,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         });
 
 
-
-
         //Registro del día y hora de último uso de la app
         SharedPreferences p = getSharedPreferences("PRFS", MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();
@@ -244,16 +321,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-    @Override
-    public void onRestart() {
-        super.onRestart();
-        //When BACK BUTTON is pressed, the activity on the stack is restarted
-        //Do what you want on the refresh procedure here
-    }
-
 
     //CONFIGURACION TABS Y SUS FRAGMENTS CON VIEWPAGER
-    private void setupTabIcons() {
+    private void setupTabControl() {
         int[] tabIcons = {
                 R.drawable.pills,
                 R.drawable.food,
@@ -265,30 +335,63 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
         tabLayout.getTabAt(2).setIcon(tabIcons[2]);
         tabLayout.getTabAt(3).setIcon(tabIcons[3]);
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-//        adapter.addFrag(InfoFragment.newInstance(0,"Tratamiento","¡Toma tu medicación!","Tomar la medicación es importante para su enfermedad","<html><body><H1>&iexcl;Toma tu medicaci&oacute;n!</h1></body></html>"), "Tab_Tratamiento");
-//        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¡Come sano siempre!","Hay alimentos que le sentarán mejor","<html><body><h1>Come muy sano</h1></body></html>"), "Tab_Dieta");
-//        adapter.addFrag(InfoFragment.newInstance(0,"Ejercicio","¡Haga ejercicio!","Haga ejercicio con regularidad y adaptado a su nivel de ahogo","<html><body><h1>Haga ejercicio con regularidad y adaptado a su nivel de ahogo</h1></body></html>"), "Tab_Ejercicio");
-//        adapter.addFrag(InfoFragment.newInstance(0,"Dieta","¿Qué es la EPOC?","Es una enfermedad que provoca la obstrucción de los bronquios","<html><body><h1>Es una enfermedad que provoca la obstrucción de los bronquios</h1></body></html>"), "Tab_Epoc");
-        adapter.addFrag(InfoFragment.newInstance(tratamientoList.getNextMessage()), "Tab_Tratamiento");
-        adapter.addFrag(InfoFragment.newInstance(dietaList.getNextMessage()), "Tab_Dieta");
-        adapter.addFrag(InfoFragment.newInstance(ejercicioList.getNextMessage()), "Tab_Ejercicio");
-        adapter.addFrag(InfoFragment.newInstance(epocList.getNextMessage()), "Tab_Epoc");
-
+        adapter.addFrag(InfoFragment.newInstance(messageTabs[0].getNextMessage()), "Tab_Tratamiento");
+        adapter.addFrag(InfoFragment.newInstance(messageTabs[1].getNextMessage()), "Tab_Dieta");
+        adapter.addFrag(InfoFragment.newInstance(messageTabs[2].getNextMessage()), "Tab_Ejercicio");
+        adapter.addFrag(InfoFragment.newInstance(messageTabs[3].getNextMessage()), "Tab_Epoc");
 
         viewPager.setAdapter(adapter);
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
     }
 
 
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+        int pos = tabLayout.getSelectedTabPosition();
+
+        tab.select();
+        tabLayout.setScrollPosition(pos,0f,true);
+
+        viewPager.setCurrentItem(pos,true);
+        tabLayout.invalidate();
+        viewPager.invalidate();
+
+        Message msgObj = mHandler.obtainMessage();
+        msgObj.what=MainActivity.HANDLER_MESSAGE_CHANGETAB;
+        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
+    }
+
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {
+        //Snackbar.make(viewPager, "tab unselected", Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
+       // Snackbar.make(viewPager, "tab reselected", Snackbar.LENGTH_SHORT).show();
+    }
 
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
 
         public ViewPagerAdapter(FragmentManager manager) {
             super(manager);
@@ -311,12 +414,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         @Override
         public CharSequence getPageTitle(int position) {
-
-
+            mFragmentTitleList.get(position);
             return null;
         }
-
-
     }
 
 
@@ -383,8 +483,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 //dialogo_preferencias.show();
                 startActivity(new Intent (MainActivity.this,PreferenciasActivity.class));
                 bottomDialogMenu.dismiss();
-
-
             }
         });
 
@@ -404,10 +502,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             mes=String.valueOf(mes_ano);
         }
         //Aádir 0 delante si dia es menor que 10
-        if(dia_mes<10){
-            dia=""+"0"+dia_mes;
-        }else{
-            dia=String.valueOf(dia_mes);
+        if (dia_mes < 10) {
+            dia = "" + "0" + dia_mes;
+        } else {
+            dia = String.valueOf(dia_mes);
         }
         dia_cita=dia+"-"+mes+"-"+ano;
         /*Toast.makeText(
@@ -430,15 +528,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-
     public void onResume() {
         super.onResume();
 
         DatePickerDialog dpd = (DatePickerDialog) getFragmentManager().findFragmentByTag("Datepickerdialog");
         TimePickerDialog tpd = (TimePickerDialog) getFragmentManager().findFragmentByTag("TimepickerDialog");
 
-        if(dpd != null) dpd.setOnDateSetListener(this);
-        if(tpd != null) tpd.setOnTimeSetListener(this);
+        if (dpd != null) dpd.setOnDateSetListener(this);
+        if (tpd != null) tpd.setOnTimeSetListener(this);
+
+        Message msgObj = mHandler.obtainMessage();
+        msgObj.what=1;
+        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
     }
 
 
@@ -635,10 +736,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             }
                         dialog.dismiss();
                     }
-
                 }
-
-
         );
 
         cancelar.setOnClickListener(
@@ -648,10 +746,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         dialog.dismiss();
                     }
                 }
-
         );
-
-
 
 
         return dialog;
@@ -659,7 +754,23 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
 
+    public class Carrusel implements Runnable {
+        @Override
+        public void run() {
+            int pos = tabLayout.getSelectedTabPosition();
+            int ntabs= tabLayout.getTabCount();
+            int newPos = (pos+1) % ntabs;
+            mFragmentList.get(newPos).actualize(messageTabs[newPos].getNextMessage());
+            TabLayout.Tab tab = tabLayout.getTabAt(newPos);
+            tab.select();
+            tabLayout.setScrollPosition(newPos,0f,true);
+            tabLayout.invalidate();
+            viewPager.setCurrentItem(newPos,true);
+            viewPager.invalidate();
 
+
+        }
+    }
 
 
 

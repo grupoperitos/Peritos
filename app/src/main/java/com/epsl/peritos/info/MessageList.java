@@ -8,12 +8,12 @@ import java.util.ArrayList;
 
 public class MessageList extends ArrayList<InformationMessage> {
 
-    public static int LAST_ID = 0;
+    public int LAST_ID = 0;
 
     public InformationMessage getMessageById(int id) {
         InformationMessage result = null;
 
-        if(id<this.size()) {
+        if (id < this.size()) {
             result = this.get(id);
             LAST_ID = id;
         }
@@ -24,12 +24,26 @@ public class MessageList extends ArrayList<InformationMessage> {
     public InformationMessage getNextMessage() {
         InformationMessage result = null;
 
-        if (LAST_ID < this.size()) {
-            result = this.get(LAST_ID);
-        }
         LAST_ID++;
-        if (LAST_ID >= size())
+        if (LAST_ID >= this.size()) {
             LAST_ID = 0;
+        }
+
+        result = this.get(LAST_ID);
+
+        return result;
+    }
+
+    public InformationMessage getPrevMessage() {
+        InformationMessage result = null;
+
+        LAST_ID--;
+        if (LAST_ID < 0) {
+            LAST_ID = this.size()-1;
+        }
+
+        result = this.get(LAST_ID);
+
         return result;
     }
 

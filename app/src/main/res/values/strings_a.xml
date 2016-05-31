@@ -18,4 +18,11 @@
     <string name="achv_maximo_0">Muy bien, es un paciente excelente.</string>
     <string name="achv_maximo_1">No baje la guardia, la EPOC no lo hará.</string>
     <string name="achv_maximo_2">¡Estupendo, siga así!.</string>
+
+    <string name="achv_gretings_bad0">Bienvenido, pero haace más de cuatro semanas que no entra.</string>
+    <string name="achv_gretings_bad1">Bienvenido, pero haace más de una semana que no entra.</string>
+    <string name="achv_gretings_bad2">Bienvenido, pero haace más de un día que no entra.</string>
+
+    <string name="achv_consequence">Lo sentimos pero ha perdido su progreso, deberá empezar de nuevo.</string>
+
 </resources>

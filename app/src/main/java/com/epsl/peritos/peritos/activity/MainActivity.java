@@ -183,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         medalla3 = (ImageView) findViewById(R.id.medalla3);
         medalla4 = (ImageView) findViewById(R.id.medalla4);
 
-        cambiarMedalla(1, 1);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
@@ -268,9 +267,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         if (data != null) {
                             int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
                             AchievementManager.modifyAchievementPoints(MainActivity.this, points);
+                            long week = AchievementManager.getCurrentCycle(MainActivity.this);
                             int total = AchievementManager.getAchievementPoints(MainActivity.this);
-                            String nivelPaciente="Nivel de paciente "+AchievementManager.PATIENT_LEVEL_TEXT[AchievementManager.getPatientLevel(MainActivity.this)];
-                            insertarLogro(nivelPaciente,AchievementManager.getAchievementPoints(MainActivity.this),0);
+                            AchievementManager.setPointsToWeek(MainActivity.this, (int) week, total);
+                            String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[AchievementManager.getPatientLevel(MainActivity.this)];
+
+                            insertarLogro(nivelPaciente, AchievementManager.getAchievementPoints(MainActivity.this), 0);
+
                             Snackbar.make(viewPager, getString(R.string.achv_haganado) + " " + points + " " + getString(R.string.achv_puntos) + " Total: " + total, Snackbar.LENGTH_SHORT).show();
                         }
                         break;
@@ -385,6 +388,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         i.setFlags(Intent.FLAG_FROM_BACKGROUND);
         i.setAction(Constants.INSTALLAPP);
         startService(i);
+
+
     }
 
 
@@ -425,6 +430,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     @Override
     public void onStop() {
+        AchievementManager.setLastDate(this);
         super.onStop();
 
     }
@@ -604,6 +610,57 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         Message msgObj = mHandler.obtainMessage();
         msgObj.what = 1;
         mHandler.sendMessageDelayed(msgObj, MAXPAGE_WAIT);
+
+
+        if (AchievementManager.isFirstRun(this)) {
+            AchievementManager.setFirstRun(this);
+        } else {
+            long ciclo = AchievementManager.getCurrentCycle(this);
+            long currenttime = System.currentTimeMillis();
+            long lastdate = AchievementManager.getLastDate(this);
+            if ((currenttime - lastdate) > 4 * AchievementManager.WEEK) {
+                Toast.makeText(this,getString(R.string.achv_gretings_bad0), Toast.LENGTH_LONG).show();
+                //Control de logros
+                Message msgbad = mHandler.obtainMessage();
+                msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_NOENTERWEEK);
+                msgbad.setData(b);
+                mHandler.sendMessage(msgbad);
+                AchievementManager.resetPatientLevel(this);
+                AchievementManager.resetWeeks(this);
+
+            } else if ((currenttime - lastdate) > AchievementManager.WEEK) {
+                Toast.makeText(this,getString(R.string.achv_gretings_bad1), Toast.LENGTH_LONG).show();
+                //Control de logros
+                Message msgbad = mHandler.obtainMessage();
+                msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_NOENTERWEEK);
+                msgbad.setData(b);
+                mHandler.sendMessage(msgbad);
+
+                AchievementManager.resetPatientLevel(this);
+                AchievementManager.resetWeeks(this);
+            } else if ((currenttime - lastdate) > AchievementManager.DAY) {
+                Toast.makeText(this,getString(R.string.achv_gretings_bad2), Toast.LENGTH_LONG).show();
+                //Control de logros
+                Message msgbad = mHandler.obtainMessage();
+                msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_NOENTERWEEK);
+                msgbad.setData(b);
+                mHandler.sendMessage(msgbad);
+            }
+
+            resetMedallas();
+
+            for(int n=0;n<ciclo;n++) {
+                cambiarMedalla(n,AchievementManager.getWeeklyAchievement(this,n));
+            }
+
+
+        }
     }
 
 
@@ -801,7 +858,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                         //Control de logros
                         Message msgObj = mHandler.obtainMessage();
-                        msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                        msgObj.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
                         Bundle b = new Bundle();
                         b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_SINTOMAS);
                         msgObj.setData(b);
@@ -1324,8 +1381,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
     /**
-     *
      * Método para cambiar el color de la medalla para los logros
+     *
      * @param pos
      * @param color
      */
@@ -1407,14 +1464,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-    public void insertarLogro(String causa, int puntos,int medalla){
+    public void insertarLogro(String causa, int puntos, int medalla) {
 
         //Fecha actual
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
         String fecha_act = sdf.format(new Date());
 
         //Causas
-        String c="";
+        String c = "";
 //        if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F-")){
 //            c="00";
 //        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F")){
@@ -1449,7 +1506,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 //            c="15";
 //        }
 
-        String imagen="-1";
+        String imagen = "-1";
         //IMAGEN MEDALLA
 //        if(c.equals("12")){
 //            imagen="0";
@@ -1491,8 +1548,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-
-
     public AlertDialog createLogrosDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
@@ -1504,13 +1559,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         Button aceptar = (Button) v.findViewById(R.id.btn_aceptar_logros);
 
-        TableLayout tablalogros=(TableLayout) v.findViewById(R.id.tabla_logros);
+        TableLayout tablalogros = (TableLayout) v.findViewById(R.id.tabla_logros);
 
-        TableRow.LayoutParams layoutFila=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams layoutFecha_completa=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams layoutCausa=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams layoutPuntos=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams layoutIMG=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFila = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFecha_completa = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutCausa = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutPuntos = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutIMG = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
 
         TableRow fila;
         TextView txtFecha_completa;
@@ -1523,14 +1578,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tablalogros.removeAllViews();
 
         //Formateo Cabecera
-        String cabeceras[] = { "Fecha", "Motivo", "Ptos", "Obs."};
+        String cabeceras[] = {"Fecha", "Motivo", "Ptos", "Obs."};
         TableRow cabecera = new TableRow(this);
         cabecera.setLayoutParams(new TableLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         tablalogros.addView(cabecera);
         // Textos de la cabecera
-        for (int i = 0; i < 4; i++)
-        {
+        for (int i = 0; i < 4; i++) {
             TextView columna = new TextView(this);
             columna.setLayoutParams(new TableRow.LayoutParams(
                     LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -1555,7 +1609,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tablalogros.addView(separador_cabecera);
 
 
-
         try {
 
             FileInputStream fin = MainActivity.this.openFileInput("registro_logros");
@@ -1569,16 +1622,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 if (line != null) {
 
 
-                    String[]partes = line.split("\t");
-                    String fecha= partes[0];
+                    String[] partes = line.split("\t");
+                    String fecha = partes[0];
                     String causa = partes[1];
                     String puntos = partes[2];
-                    String imagen = partes [3];
+                    String imagen = partes[3];
 
-                    fila=new TableRow(MainActivity.this);
+                    fila = new TableRow(MainActivity.this);
                     fila.setLayoutParams(layoutFila);
 
-                    txtFecha_completa=new TextView(this);
+                    txtFecha_completa = new TextView(this);
                     txtCausa = new TextView(this);
                     txtPuntos = new TextView(this);
                     img = new ImageView(this);
@@ -1607,28 +1660,33 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     txtPuntos.setTextSize(14);
                     txtPuntos.setTypeface(null, Typeface.ITALIC);
                     txtPuntos.setLayoutParams(layoutPuntos);
-                    int imagenn=0;
+                    int imagenn = 0;
                     try {
                         imagenn = Integer.parseInt(imagen);
-                    }catch(NumberFormatException ex){}
-                    int ires=0;
-                    switch(imagenn) {
-                        case 0:ires=R.drawable.ic_medallagris;
+                    } catch (NumberFormatException ex) {
+                    }
+                    int ires = 0;
+                    switch (imagenn) {
+                        case 0:
+                            ires = R.drawable.ic_medallagris;
                             break;
-                        case 1: ires=R.drawable.ic_medallabronce;
+                        case 1:
+                            ires = R.drawable.ic_medallabronce;
                             break;
-                        case 2: ires=R.drawable.ic_medallaplata;
+                        case 2:
+                            ires = R.drawable.ic_medallaplata;
                             break;
-                        case 3: ires=R.drawable.ic_medallaoro;
+                        case 3:
+                            ires = R.drawable.ic_medallaoro;
                             break;
                         default:
-                            ires=-1;
+                            ires = -1;
                     }
 
                     fila.addView(txtFecha_completa);
                     fila.addView(txtCausa);
                     fila.addView(txtPuntos);
-                    if(ires!=-1) {
+                    if (ires != -1) {
                         img.setImageResource(ires);
                         img.setPadding(0, 0, 5, 0);
                         img.setLayoutParams(layoutIMG);
@@ -1648,7 +1706,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
                     linea_totales_params.span = 6;
                     linea.setBackgroundColor(Color.parseColor("#4FC3F7"));
-                    linea.setPadding(0,5,0,0);
+                    linea.setPadding(0, 5, 0, 0);
                     separador_filas.addView(linea, linea_totales_params);
                     tablalogros.addView(separador_filas);
 
@@ -1664,21 +1722,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
 
 
-
-
         final AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(true);
 
 
         aceptar.setOnClickListener(
-                new View.OnClickListener(){
+                new View.OnClickListener() {
                     @Override
-                    public void onClick(View v){
+                    public void onClick(View v) {
                         dialog.dismiss();
                     }
                 }
         );
-
 
 
         return dialog;

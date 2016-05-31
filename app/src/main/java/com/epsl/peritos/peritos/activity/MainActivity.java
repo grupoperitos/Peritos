@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
@@ -136,6 +137,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     String dia_cita="";
     String hora_cita="";
 
+    ImageView medalla1;
+    ImageView medalla2;
+    ImageView medalla3;
+    ImageView medalla4;
+
 
 
     //Mensajes
@@ -171,6 +177,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         setContentView(R.layout.activity_main);
 
+
+        medalla1 = (ImageView)findViewById(R.id.medalla1);
+        medalla2 = (ImageView)findViewById(R.id.medalla2);
+        medalla3 = (ImageView)findViewById(R.id.medalla3);
+        medalla4 = (ImageView)findViewById(R.id.medalla4);
+
+        cambiarMedalla(1,1);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
@@ -1320,9 +1333,73 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-    /*public void cambiarMedalla(int pos, int color){
-        ImageView medalla1 = (ImageView)findViewById(R.id.)
-    }*/
+
+
+
+
+    public void  cambiarMedalla(int pos, int color){
+
+
+
+
+
+
+        //Medalla 1
+        if(pos==1){
+            //medalla1 = (ImageView)findViewById(R.id.medalla1);
+            if(color==0){
+                medalla1.setImageResource(R.drawable.ic_medallagris);
+            }else if(color==1){
+                medalla1.setImageResource(R.drawable.ic_medallabronce);
+            }else if(color==2){
+                medalla1.setImageResource(R.drawable.ic_medallaplata);
+            }else if(color==3){
+                medalla1.setImageResource(R.drawable.ic_medallaoro);
+            }
+        }
+
+        //Medalla 2
+        if(pos==2){
+            //medalla2 = (ImageView)findViewById(R.id.medalla2);
+            if(color==0){
+                medalla2.setImageResource(R.drawable.ic_medallagris);
+            }else if(color==1){
+                medalla2.setImageResource(R.drawable.ic_medallabronce);
+            }else if(color==2){
+                medalla2.setImageResource(R.drawable.ic_medallaplata);
+            }else if(color==3){
+                medalla2.setImageResource(R.drawable.ic_medallaoro);
+            }
+        }
+
+        //Medalla
+        //medalla3 = (ImageView)findViewById(R.id.medalla3);
+        if(pos==3){
+            if(color==0){
+                medalla3.setImageResource(R.drawable.ic_medallagris);
+            }else if(color==1){
+                medalla3.setImageResource(R.drawable.ic_medallabronce);
+            }else if(color==2){
+                medalla3.setImageResource(R.drawable.ic_medallaplata);
+            }else if(color==3){
+                medalla3.setImageResource(R.drawable.ic_medallaoro);
+            }
+        }
+
+        //Medalla 4
+        if(pos==4){
+            //medalla4 = (ImageView)findViewById(R.id.medalla4);
+            if(color==0){
+                medalla4.setImageResource(R.drawable.ic_medallagris);
+            }else if(color==1){
+                medalla4.setImageResource(R.drawable.ic_medallabronce);
+            }else if(color==2){
+                medalla4.setImageResource(R.drawable.ic_medallaplata);
+            }else if(color==3){
+                medalla4.setImageResource(R.drawable.ic_medallaoro);
+            }
+        }
+    }
 
 
 

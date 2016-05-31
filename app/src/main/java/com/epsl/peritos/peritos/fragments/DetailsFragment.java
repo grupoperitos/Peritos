@@ -82,7 +82,7 @@ public class DetailsFragment extends android.support.v4.app.DialogFragment {
         }
         ).start();
 
-        Button volver = (Button)view.findViewById(R.id.btn_aceptar);
+        Button volver = (Button)view.findViewById(R.id.button_back);
         volver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

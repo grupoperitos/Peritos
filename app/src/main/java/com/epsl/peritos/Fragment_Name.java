@@ -1,6 +1,7 @@
 package com.epsl.peritos;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -18,6 +19,8 @@ import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.epsl.peritos.peritos.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -192,6 +195,14 @@ public class Fragment_Name extends Fragment implements BaseSliderView.OnSliderCl
 
             bt.setEnabled(true);
 
+            SharedPreferences p = getActivity().getSharedPreferences("PRFS", getContext().MODE_PRIVATE);
+            final SharedPreferences.Editor ed = p.edit();
+            String nom_usuario = nombre.getText().toString();
+            String ap1_usuario = apellido1.getText().toString();
+            String ap2_usuario = apellido2.getText().toString();
+            ed.putString("NOM_USUARIO", nom_usuario);
+            ed.putString("APE_USUARIO",ap1_usuario+" "+ap2_usuario);
+            ed.apply();
 
         }
 

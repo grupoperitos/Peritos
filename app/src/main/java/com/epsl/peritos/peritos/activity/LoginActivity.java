@@ -55,6 +55,8 @@ public class LoginActivity extends AppCompatActivity {
 //        startActivity(in);
 
 
+
+
         //Código para obtener el GCM_ID y registrarse en el servidor en GAE
         //En caso de que no haya conexión, decirle al usuario que active el WiFi y vuelva a inicar la app cuando tenga conexión
         final SharedPreferences prefs = getSharedPreferences("PRFS", Context.MODE_PRIVATE);
@@ -71,6 +73,8 @@ public class LoginActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
 
         viewPager.setPagingEnabled(false);
+
+
 
 
         btn = (Button) findViewById(R.id.button);
@@ -163,6 +167,11 @@ public class LoginActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    public void onBackPressed(){
+        super.onBackPressed();
+        LoginActivity.this.finish();
     }
 
 

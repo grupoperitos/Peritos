@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -151,6 +152,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final SharedPreferences prefs = getSharedPreferences("PRFS", Context.MODE_PRIVATE);
+        String isFirstTime = prefs.getString("FIRST_TIME","0");
+        if(isFirstTime.equals("0")){
+            Intent in = new Intent(this,LoginActivity.class);
+            MainActivity.this.finish();
+            startActivity(in);
+        }
         messageList = InformationManager.loadInformation(this);
         if (messageList != null) {
             messageTabs[MessageTypes.INFO_TRATAMIENTO] = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
@@ -297,6 +306,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     miniFAB_Cuidador.setTitle("LLamar a "+nom_cuidador);
                 }
                 //Indicamos el telefono para llamar
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M   && checkSelfPermission(Manifest.permission.CALL_PHONE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
+                            0);
+                }
                 Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+tlf_cuidador));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
@@ -576,7 +590,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         //ALMACENAMIENTO EN FICHERO
         FileOutputStream fos = null;
         try {
-            fos = MainActivity.this.openFileOutput("registro_citas",MODE_PRIVATE);
+            fos = MainActivity.this.openFileOutput("registro_citas",MODE_APPEND);
         } catch (FileNotFoundException e1) {
             e1.printStackTrace();
         }
@@ -1179,6 +1193,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             columna.setLayoutParams(new TableRow.LayoutParams(
                     LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
             columna.setText(cabeceras[i]);
+            columna.setTextSize(20);
             columna.setTextColor(Color.parseColor("#4FC3F7"));
             columna.setGravity(Gravity.CENTER_HORIZONTAL);
             columna.setTypeface(null, Typeface.BOLD_ITALIC);
@@ -1221,7 +1236,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     txtFecha_completa.setText(line);
                     txtFecha_completa.setGravity(Gravity.CENTER);
                     txtFecha_completa.setPadding(0, 0, 5, 0);
-                    txtFecha_completa.setTextSize(12);
+                    txtFecha_completa.setTextSize(22);
                     txtFecha_completa.setTypeface(null, Typeface.ITALIC);
                     txtFecha_completa.setLayoutParams(layoutFecha_completa);
 
@@ -1275,6 +1290,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         return dialog;
     }
+
+
+    /*public void cambiarMedalla(int pos, int color){
+        ImageView medalla1 = (ImageView)findViewById(R.id.)
+    }*/
 
 
 

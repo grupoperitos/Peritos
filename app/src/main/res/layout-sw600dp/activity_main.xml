@@ -60,8 +60,8 @@
         android:layout_height="170dp"
         android:src="@drawable/bocadillo_doctor"
         android:scaleType="fitCenter"
-        android:layout_marginLeft="30dp"
-        android:layout_marginBottom="160dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="20dp"
         android:layout_gravity="center|bottom"/>
 
     <!--Botón Imagen izquierda-->

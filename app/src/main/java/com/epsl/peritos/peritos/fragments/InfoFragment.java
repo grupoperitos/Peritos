@@ -305,7 +305,7 @@ public class InfoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 AlertDialog details = createDetailsDialog();
-                details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
+                //details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
                 details.show();
                 //Llamar al método de la interfaz con la actividad para que añada los puntos de logro
             }
@@ -316,6 +316,7 @@ public class InfoFragment extends Fragment {
                 AlertDialog details = createDetailsDialog();
                 details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
                 details.show();
+
                 //Llamar al método de la interfaz con la actividad para que añada los puntos de logro
             }
         });
@@ -332,70 +333,79 @@ public class InfoFragment extends Fragment {
                     case MainActivity.HANLDER_MESSAGE_CAPTION:
                         //Cambiar la pestaña activa
                         mHandler.removeMessages(MainActivity.HANLDER_MESSAGE_CAPTION);
-                        final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.fade_out);
-                        final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.fade_in);
 
-                        set1.setTarget(mScrollCaption);
-                        set1.start();
-                        set2.setTarget(mScrollMessage);
-                        set1.addListener(new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-                            }
 
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                set2.start();
-                            }
+                        if(getActivity()!=null){
+                            final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                    R.animator.fade_out);
+                            final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                    R.animator.fade_in);
+                            set1.setTarget(mScrollCaption);
+                            set1.start();
+                            set2.setTarget(mScrollMessage);
+                            set1.addListener(new Animator.AnimatorListener() {
+                                @Override
+                                public void onAnimationStart(Animator animation) {
+                                }
 
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-                            }
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    set2.start();
+                                }
 
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {
-                            }
-                        });
-                        Message msgObj = mHandler.obtainMessage();
-                        msgObj.what = MainActivity.HANLDER_MESSAGE_COMMENTARY;
-                        mHandler.sendMessageDelayed(msgObj, MainActivity.MAIN_MESSAGE_TIME);
+                                @Override
+                                public void onAnimationCancel(Animator animation) {
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(Animator animation) {
+                                }
+                            });
+                            Message msgObj = mHandler.obtainMessage();
+                            msgObj.what = MainActivity.HANLDER_MESSAGE_COMMENTARY;
+                            mHandler.sendMessageDelayed(msgObj, MainActivity.MAIN_MESSAGE_TIME);
+                        }
+
+
+
                         break;
                     case MainActivity.HANLDER_MESSAGE_COMMENTARY:
                         //Cambiar la pestaña activa
                         mHandler.removeMessages(MainActivity.HANLDER_MESSAGE_COMMENTARY);
 
-                        final AnimatorSet set_c1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.fade_out);
-                        final AnimatorSet set_c2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.fade_in);
-                        set_c1.setTarget(mScrollMessage);
-                        set_c1.start();
-                        set_c2.setTarget(mScrollCaption);
-                        set_c1.addListener(new Animator.AnimatorListener() {
+                        if(getActivity()!=null){
+                            final AnimatorSet set_c1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                    R.animator.fade_out);
+                            final AnimatorSet set_c2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                    R.animator.fade_in);
+                            set_c1.setTarget(mScrollMessage);
+                            set_c1.start();
+                            set_c2.setTarget(mScrollCaption);
+                            set_c1.addListener(new Animator.AnimatorListener() {
 
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-                            }
+                                @Override
+                                public void onAnimationStart(Animator animation) {
+                                }
 
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                set_c2.start();
-                            }
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    set_c2.start();
+                                }
 
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-                            }
+                                @Override
+                                public void onAnimationCancel(Animator animation) {
+                                }
 
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {
-                            }
-                        });
+                                @Override
+                                public void onAnimationRepeat(Animator animation) {
+                                }
+                            });
 
-                        Message msgObj2 = mHandler.obtainMessage();
-                        msgObj2.what = MainActivity.HANLDER_MESSAGE_CAPTION;
-                        mHandler.sendMessageDelayed(msgObj2, MainActivity.MAIN_MESSAGE_TIME);
+                            Message msgObj2 = mHandler.obtainMessage();
+                            msgObj2.what = MainActivity.HANLDER_MESSAGE_CAPTION;
+                            mHandler.sendMessageDelayed(msgObj2, MainActivity.MAIN_MESSAGE_TIME);
+                        }
+
                         break;
 
                     default:
@@ -449,11 +459,11 @@ public class InfoFragment extends Fragment {
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        View v = inflater.inflate(R.layout.dialog_details, null);
+        View v = inflater.inflate(R.layout.dialog_details,null);
 
         builder.setView(v);
 
-        Button aceptar = (Button) v.findViewById(R.id.btn_aceptar);
+        Button aceptar = (Button) v.findViewById(R.id.button_back);
 
         WebView web = (WebView) v.findViewById(R.id.text_details);
         web.loadData(mDetail, "text/html", null);
@@ -473,6 +483,10 @@ public class InfoFragment extends Fragment {
 
         return dialog;
     }
+
+
+
+
 
     public String getTitle() {
         return mTitle;

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -9,21 +8,19 @@
     BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 %>
 
+<%
+HttpSession sesion = request.getSession(true);
+String logged = (String)sesion.getAttribute("log");
+if(logged==null){
+    %>
+    <form id="frmadmn" action="login.html" method="post" />
+    <script type="text/javascript">
+        document.getElementById('frmadmn').submit(); // SUBMIT FORM
+     </script>
+    <%
+}
+%>
 
-<!-- 
-Template Name: Metronic - Responsive Admin Dashboard Template build with Twitter Bootstrap 3.3.5
-Version: 4.5
-Author: KeenThemes
-Website: http://www.keenthemes.com/
-Contact: support@keenthemes.com
-Follow: www.twitter.com/keenthemes
-Like: www.facebook.com/keenthemes
-Purchase: http://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemes
-License: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.
--->
-<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
-<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
-<!--[if !IE]><!-->
 <html lang="en">
     <!--<![endif]-->
     <!-- BEGIN HEAD -->
@@ -95,7 +92,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                 </li>
                                 <li class="divider"> </li>-->
                                <li>
-                                    <a href="page_user_login_1.html">
+                                    <a href="logout.jsp">
                                         <i class="icon-key"></i> Cerrar sesi&oacuten </a>
                                 </li>
                             </ul>

@@ -27,7 +27,9 @@ if(formtype.equals("login")){
                 objSesion.setAttribute("user", user);
                 objSesion.setAttribute("log", "true");
                 %>
-                    <form id="frmadmn" action="admin.jsp" method="post" />
+                    <form id="frmadmn" action="admin.jsp" method="post" >
+                        <input type="hidden" name="aut" value="true" />
+                    </form>
                     <script type="text/javascript">
                         document.getElementById('frmadmn').submit(); // SUBMIT FORM
                     </script>

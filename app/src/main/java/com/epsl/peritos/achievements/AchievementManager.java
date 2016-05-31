@@ -2,6 +2,9 @@ package com.epsl.peritos.achievements;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.TypedValue;
+
+import com.epsl.peritos.peritos.R;
 
 /**
  * Created by Juan Carlos on 26/05/2016.
@@ -141,7 +144,7 @@ public class AchievementManager {
         ed.putInt(ACHIEVEMENT_POINTS, temp);
         ed.commit();
 
-        setPointsToWeek(context,(int)getCurrentCycle(context),temp);
+
 
 
     }
@@ -155,6 +158,44 @@ public class AchievementManager {
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();
         return p.getInt(ACHIEVEMENT_POINTS, DEFAULT_ACIEVEMNTPOINTS);
+
+    }
+
+
+    /**
+     * Actualiza los puntos de logro del usuario
+     *
+     * @param context Contexto de la aplicación
+     */
+    static public String getAchievementMessage(Context context) {
+        String message="";
+        int points=getAchievementPoints(context);
+        if(points<=100 && points>90)
+            message=context.getString(R.string.achv_maximo_2);
+        if(points<=90 && points>80)
+            message=context.getString(R.string.achv_maximo_2);
+        if(points<=80 && points>74)
+            message=context.getString(R.string.achv_maximo_2);
+        if(points<=74 && points>65)
+            message=context.getString(R.string.achv_menos75_2);
+        if(points<=65 && points>57)
+            message=context.getString(R.string.achv_menos75_1);
+        if(points<=57 && points>49)
+            message=context.getString(R.string.achv_menos75_0);
+        if(points<=49 && points>40)
+            message=context.getString(R.string.achv_menos50_2);
+        if(points<=40 && points>30)
+            message=context.getString(R.string.achv_menos50_1);
+        if(points<=30 && points>24)
+            message=context.getString(R.string.achv_menos50_0);
+        if(points<=24 && points>20)
+            message=context.getString(R.string.achv_menos25_2);
+        if(points<=20 && points>10)
+            message=context.getString(R.string.achv_menos25_1);
+        if(points<=10 && points>=0)
+            message=context.getString(R.string.achv_menos25_0);
+
+        return message;
 
     }
 
@@ -234,7 +275,7 @@ public class AchievementManager {
 
     }
 
-    protected static void setPointsToWeek(Context context, int week, int points) {
+    public static void setPointsToWeek(Context context, int week, int points) {
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();
         int temp = 0;

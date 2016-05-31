@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     public static final String HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA = "puntos";
 
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -287,35 +288,42 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
                             long week = AchievementManager.getCurrentCycle(MainActivity.this);
                             int total = AchievementManager.getAchievementPoints(MainActivity.this);
-                            int prevMedal = AchievementManager.getWeeklyAchievement(MainActivity.this,(int)week);
-                            int nextLevel =-1;
-                            int nextMedal =-1;
+                            int prevMedal = AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week);
+                            int nextLevel = -1;
+                            int nextMedal = -1;
                             int level = AchievementManager.getPatientLevel(MainActivity.this);
 
                             AchievementManager.modifyAchievementPoints(MainActivity.this, points);
-                            nextLevel = AchievementManager.getWeeklyAchievement(MainActivity.this,(int)week);
+                            AchievementManager.setPointsToWeek(MainActivity.this, (int) week, points);
+                            //TODO Borrar
+                            AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 1) % 4, points);
+                            AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 2) % 4, points);
+                            AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 3) % 4, points);
+
+
+                            nextMedal = AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week);
                             nextLevel = AchievementManager.getPatientLevel(MainActivity.this);
 
                             String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[level];
 
-                            if(prevMedal<nextMedal) {
+                            if (prevMedal < nextMedal) {
                                 String medalla = "";
                                 switch (nextMedal) {
                                     case 1:
-                                        medalla=getString(R.string.achv_medalladebronce);
+                                        medalla = getString(R.string.achv_medalladebronce);
                                         break;
                                     case 2:
-                                        medalla=getString(R.string.achv_medalladeplata);
+                                        medalla = getString(R.string.achv_medalladeplata);
                                         break;
                                     case 3:
-                                        medalla=getString(R.string.achv_medalladeoro);
+                                        medalla = getString(R.string.achv_medalladeoro);
                                         break;
                                     default:
-                                        medalla="Aún no tiene ningún logro";
+                                        medalla = "Aún no tiene ningún logro";
                                 }
-                                insertarLogro(medalla,AchievementManager.getAchievementPoints(MainActivity.this), nextMedal);
+                                insertarLogro(medalla, AchievementManager.getAchievementPoints(MainActivity.this), nextMedal);
                             }
-                            if(level<nextLevel)
+                            if (level < nextLevel)
                                 insertarLogro(nivelPaciente, AchievementManager.getAchievementPoints(MainActivity.this), 0);
 
                             actualizeMedals();
@@ -434,7 +442,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         i.setFlags(Intent.FLAG_FROM_BACKGROUND);
         i.setAction(Constants.INSTALLAPP);
         startService(i);
-
 
         actualizeMedals();
     }

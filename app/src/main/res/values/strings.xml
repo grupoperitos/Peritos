@@ -36,4 +36,5 @@
     <string name="content_description_nextmessage">Siguiente mensaje</string>
     <string name="content_description_medicine">Tomar la medicación</string>
     <string name="siguiente">Siguiente</string>
+    <string name="controlsintomas_fatiga_maxima">Máxima</string>
 </resources>

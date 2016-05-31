@@ -208,7 +208,7 @@
                 android:textStyle="italic"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
             <TextView
-                android:text="Mucho"
+                android:text="@string/controlsintomas_fatiga_maxima"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"

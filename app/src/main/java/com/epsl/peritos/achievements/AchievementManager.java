@@ -3,19 +3,27 @@ package com.epsl.peritos.achievements;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.util.Date;
-
 /**
  * Created by Juan Carlos on 26/05/2016.
  */
 public class AchievementManager {
-    public static final String ACHIEVEMENTS_FILE ="ACHIEVEMENTS";
+
+    public static final long DAY = 3600*24*1000;
+    public static final long WEEK = DAY*7;
+
+    public static final String ACHIEVEMENTS_FILE = "ACHIEVEMENTS";
 
     public static final int DEFAULT_ACIEVEMNTPOINTS = 50;
     public static final String START_DATE = "startdate";
+    public static final String START_CYCLE = "startcycle";
     public static final String CURRENT_DATE = "currentdate";
     public static final String ACHIEVEMENT_POINTS = "achievementpoints";
-    public static final String PATIET_LEVEL = "patientlevel";
+    public static final String PATIENT_LEVEL = "patientlevel";
+    //Points of each week of the cicle
+    public static final String WEEK_1 = "week1";
+    public static final String WEEK_2 = "week2";
+    public static final String WEEK_3 = "week3";
+    public static final String WEEK_4 = "week4";
 
     //Puntos de logro
     public static final int ACHIEVE_VIDEO = 2;
@@ -24,68 +32,176 @@ public class AchievementManager {
     public static final int ACHIEVE_MEDICINE = 2;
     public static final int ACHIEVE_NOENTER = -25;
     public static final int ACHIEVE_NOMEDICINE = -10;
+
+    public static final String [] PATIENT_LEVEL_TEXT={"F-","F","E-","E","D","D+","C","C+","B","B+","A","A+"};
+
     /**
      * Establece en punto inicial de la aplicación para el control de logros
+     *
      * @param context
      */
-    static public void setStartDate(Context context)
-    {
+    static public void setStartDate(Context context) {
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();
+        long time = System.currentTimeMillis();
+        ed.putLong(START_DATE, time);
+        ed.putLong(CURRENT_DATE, time);
+        ed.commit();
+
+    }
+
+
+    static public void setStartCycleDate(Context context) {
+        SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        long time = System.currentTimeMillis();
+        ed.putLong(START_CYCLE, time);
+        ed.commit();
+
+    }
+
+    static public long geCurrentCycle(Context context) {
+        SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        int potins = p.getInt(ACHIEVEMENT_POINTS, DEFAULT_ACIEVEMNTPOINTS);
         long time=System.currentTimeMillis();
-        ed.putLong(START_DATE,time);
-        ed.putLong(CURRENT_DATE,time);
-        ed.commit();
+        long start =  p.getLong(START_CYCLE, time);
+        long cycle = time/WEEK;
+
+        return cycle;
 
     }
-    /**
-     * Actualiza los puntos de logro del usuario
-     * @param context Contexto de la aplicación
-     * @param points putos a añadir o restar
-     */
-    static public void modifyAchievementPoints(Context context,int points)
-    {
-        SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
-        final SharedPreferences.Editor ed = p.edit();
-        int temp=p.getInt(ACHIEVEMENT_POINTS,DEFAULT_ACIEVEMNTPOINTS);
-        temp=temp+points;
-        if(temp>100)
-            temp=100;
-        if(temp<0)
-            temp=0;
-        ed.putInt(ACHIEVEMENT_POINTS,temp);
-        ed.commit();
-    }
+
+
 
     /**
      * Actualiza los puntos de logro del usuario
-     * @param context Contexto de la aplicación
      *
+     * @param context Contexto de la aplicación
+     * @param points  putos a añadir o restar
      */
-    static public int getAchievementPoints(Context context)
-    {
+    static public void modifyAchievementPoints(Context context, int points) {
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();
-         return p.getInt(ACHIEVEMENT_POINTS,DEFAULT_ACIEVEMNTPOINTS);
+        int temp = p.getInt(ACHIEVEMENT_POINTS, DEFAULT_ACIEVEMNTPOINTS);
+        temp = temp + points;
+        if (temp > 100)
+            temp = 100;
+        if (temp < 0)
+            temp = 0;
+        ed.putInt(ACHIEVEMENT_POINTS, temp);
+        ed.commit();
+    }
+
+    /**
+     * Actualiza los puntos de logro del usuario
+     *
+     * @param context Contexto de la aplicación
+     */
+    static public int getAchievementPoints(Context context) {
+        SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        return p.getInt(ACHIEVEMENT_POINTS, DEFAULT_ACIEVEMNTPOINTS);
 
     }
 
     /**
      * Actualiza los puntos de logro del usuario
+     *
      * @param context Contexto de la aplicación
-     * @param points putos a añadir o restar
+     * @param points  putos a añadir o restar
      */
-    static public void modifyPatientLevel(Context context,int points)
+    static public void modifyPatientLevel(Context context, int points) {
+        SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        int temp = p.getInt(PATIENT_LEVEL, DEFAULT_ACIEVEMNTPOINTS);
+        temp = temp + points;
+        if (temp > 12)
+            temp = 12;
+        if (temp < 0)
+            temp = 0;
+        ed.putInt(PATIENT_LEVEL, temp);
+        ed.commit();
+    }
+
+    public static int getWeek(Context context, int number) {
+        SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        int temp = 0;
+        switch (number) {
+            case 0:
+                temp = p.getInt(WEEK_1, 0);
+                break;
+            case 1:
+                temp = p.getInt(WEEK_2, 0);
+                break;
+            case 2:
+                temp = p.getInt(WEEK_3, 0);
+                break;
+            case 3:
+                temp = p.getInt(WEEK_4, 0);
+                break;
+            default:
+                break;
+        }
+        return temp;
+    }
+
+    public static void addPointsToWeek(Context context, int week,int points) {
+        SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        int temp = 0;
+        String key="";
+        switch (week) {
+            case 0:
+                key=WEEK_1;
+                break;
+            case 1:
+                key=WEEK_2;
+                break;
+            case 2:
+                key=WEEK_3;
+                break;
+            case 3:
+                key=WEEK_4;
+                break;
+
+        }
+
+        ed.putInt(key,points);
+        ed.commit();
+    }
+
+    public static void resetWeeks(Context context) {
+        SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        ed.putInt(WEEK_1,0);
+        ed.putInt(WEEK_2,0);
+        ed.putInt(WEEK_3,0);
+        ed.putInt(WEEK_4,0);
+        ed.commit();
+    }
+
+    public static int getPatientLevel(Context context)
+    {
+        int pl=0;
+        for(int i=0;i<4;i++)
+        {
+            pl=pl+getWeek(context,i);
+        }
+        SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        ed.putInt(PATIENT_LEVEL,pl);
+        ed.commit();
+        return pl;
+    }
+
+    public static void resetPatientLevel(Context context)
     {
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();
-        int temp=p.getInt(PATIET_LEVEL,DEFAULT_ACIEVEMNTPOINTS);
-        temp=temp+points;
-        if(temp>12)
-            temp=12;
-        if(temp<0)
-            temp=0;
-        ed.putInt(PATIET_LEVEL,temp);
+        ed.putInt(PATIENT_LEVEL,0);
         ed.commit();
+
     }
 }

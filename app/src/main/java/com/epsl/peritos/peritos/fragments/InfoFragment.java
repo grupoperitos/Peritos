@@ -529,7 +529,7 @@ public class InfoFragment extends Fragment {
 
         builder.setView(v);
 
-        Button aceptar = (Button) v.findViewById(R.id.button_back);
+        Button aceptar = (Button) v.findViewById(R.id.btn_aceptar);
 
         WebView web = (WebView) v.findViewById(R.id.text_details);
         web.loadData(mDetail, "text/html", null);

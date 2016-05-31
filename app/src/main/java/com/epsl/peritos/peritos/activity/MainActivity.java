@@ -269,6 +269,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
                             AchievementManager.modifyAchievementPoints(MainActivity.this, points);
                             int total = AchievementManager.getAchievementPoints(MainActivity.this);
+                            String nivelPaciente="Nivel de paciente "+AchievementManager.PATIENT_LEVEL_TEXT[AchievementManager.getPatientLevel(MainActivity.this)];
+                            insertarLogro(nivelPaciente,AchievementManager.getAchievementPoints(MainActivity.this),0);
                             Snackbar.make(viewPager, getString(R.string.achv_haganado) + " " + points + " " + getString(R.string.achv_puntos) + " Total: " + total, Snackbar.LENGTH_SHORT).show();
                         }
                         break;
@@ -1405,59 +1407,62 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-    public void insertarLogro(String causa, int puntos){
+    public void insertarLogro(String causa, int puntos,int medalla){
 
         //Fecha actual
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
         String fecha_act = sdf.format(new Date());
 
         //Causas
         String c="";
-        if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F-")){
-            c="00";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F")){
-            c="01";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("E-")){
-            c="02";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("E")){
-            c="03";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("D")){
-            c="04";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("D+")){
-            c="05";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("C")){
-            c="06";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("C+")){
-            c="07";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("B")){
-            c="08";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("B+")){
-            c="09";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("A")){
-            c="10";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("A+")){
-            c="11";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Sin logro")){
-            c="12";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de bronce")){
-            c="13";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de plata")){
-            c="14";
-        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de oro")){
-            c="15";
-        }
+//        if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F-")){
+//            c="00";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F")){
+//            c="01";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("E-")){
+//            c="02";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("E")){
+//            c="03";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("D")){
+//            c="04";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("D+")){
+//            c="05";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("C")){
+//            c="06";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("C+")){
+//            c="07";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("B")){
+//            c="08";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("B+")){
+//            c="09";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("A")){
+//            c="10";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("A+")){
+//            c="11";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Sin logro")){
+//            c="12";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de bronce")){
+//            c="13";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de plata")){
+//            c="14";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de oro")){
+//            c="15";
+//        }
 
-        String imagen="";
+        String imagen="-1";
         //IMAGEN MEDALLA
-        if(c.equals("12")){
-            imagen="0";
-        }else if(c.equals("13")){
-            imagen="1";
-        }else if(c.equals("14")){
-            imagen="2";
-        }else if(c.equals("15")){
-            imagen="3";
-        }
+//        if(c.equals("12")){
+//            imagen="0";
+//        }else if(c.equals("13")){
+//            imagen="1";
+//        }else if(c.equals("14")){
+//            imagen="2";
+//        }else if(c.equals("15")){
+//            imagen="3";
+//        }else {
+//            causa = "Nivel de paciente "+causa;
+//            imagen = "-1";
+//        }
 
 
         //ALMACENAMIENTO EN FICHERO
@@ -1564,6 +1569,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 if (line != null) {
 
 
+                    String[]partes = line.split("\t");
+                    String fecha= partes[0];
+                    String causa = partes[1];
+                    String puntos = partes[2];
+                    String imagen = partes [3];
+
                     fila=new TableRow(MainActivity.this);
                     fila.setLayoutParams(layoutFila);
 
@@ -1573,35 +1584,57 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     img = new ImageView(this);
 
 
-                    txtFecha_completa.setText(line.subSequence(0,14));
+                    //txtFecha_completa.setText(line.subSequence(0,14));
+                    txtFecha_completa.setText(fecha);
                     txtFecha_completa.setGravity(Gravity.CENTER);
                     txtFecha_completa.setPadding(0, 0, 5, 0);
                     txtFecha_completa.setTextSize(14);
                     txtFecha_completa.setTypeface(null, Typeface.ITALIC);
                     txtFecha_completa.setLayoutParams(layoutFecha_completa);
 
-                    txtCausa.setText(line.subSequence(16,17));
+                    //txtCausa.setText(line.subSequence(16,17));
+                    txtCausa.setText(causa);
                     txtCausa.setGravity(Gravity.CENTER);
                     txtCausa.setPadding(0, 0, 5, 0);
                     txtCausa.setTextSize(14);
                     txtCausa.setTypeface(null, Typeface.ITALIC);
                     txtCausa.setLayoutParams(layoutCausa);
 
-                    txtPuntos.setText(line.charAt(19));
+                    //txtPuntos.setText(""+line.charAt(19));
+                    txtPuntos.setText(puntos);
                     txtPuntos.setGravity(Gravity.CENTER);
                     txtPuntos.setPadding(0, 0, 5, 0);
                     txtPuntos.setTextSize(14);
                     txtPuntos.setTypeface(null, Typeface.ITALIC);
                     txtPuntos.setLayoutParams(layoutPuntos);
-
-                    img.setImageResource(R.drawable.ic_medallaoro);
-                    img.setPadding(0, 0, 5, 0);
-                    img.setLayoutParams(layoutIMG);
+                    int imagenn=0;
+                    try {
+                        imagenn = Integer.parseInt(imagen);
+                    }catch(NumberFormatException ex){}
+                    int ires=0;
+                    switch(imagenn) {
+                        case 0:ires=R.drawable.ic_medallagris;
+                            break;
+                        case 1: ires=R.drawable.ic_medallabronce;
+                            break;
+                        case 2: ires=R.drawable.ic_medallaplata;
+                            break;
+                        case 3: ires=R.drawable.ic_medallaoro;
+                            break;
+                        default:
+                            ires=-1;
+                    }
 
                     fila.addView(txtFecha_completa);
                     fila.addView(txtCausa);
                     fila.addView(txtPuntos);
-                    fila.addView(img);
+                    if(ires!=-1) {
+                        img.setImageResource(ires);
+                        img.setPadding(0, 0, 5, 0);
+                        img.setLayoutParams(layoutIMG);
+                        fila.addView(img);
+
+                    }
 
 
                     tablalogros.addView(fila);

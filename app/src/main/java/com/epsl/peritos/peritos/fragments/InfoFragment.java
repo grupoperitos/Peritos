@@ -246,13 +246,18 @@ public class InfoFragment extends Fragment {
                 intent.setDataAndType(Uri.parse(videoUrl), "video/mp4");
                 startActivity(intent);
 
+                //Iniciar el carrusel
+                Message msgObj1 = mActivity.mHandler.obtainMessage();
+                msgObj1.what=MainActivity.HANLDER_MESSAGE_STARTCARRUSEL;
+                mActivity.mHandler.sendMessage(msgObj1);
+
                 //Control de logros
-                Message msgObj = mActivity.mHandler.obtainMessage();
-                msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Message msgObj2 = mActivity.mHandler.obtainMessage();
+                msgObj2.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
                 Bundle b = new Bundle();
                 b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_VIDEO);
-                msgObj.setData(b);
-                mActivity.mHandler.sendMessage(msgObj);
+                msgObj2.setData(b);
+                mActivity.mHandler.sendMessage(msgObj2);
 
             } else {//The file does not exists, mainly due to a first run
                 //TODO: Parar el carrusel para cuando se recibe el video para que se reproduzca
@@ -327,11 +332,9 @@ public class InfoFragment extends Fragment {
                                         .getString(c
                                                 .getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
 
-                                //Iniciar el carrusel
-                                Message msgObj = mActivity.mHandler.obtainMessage();
-                                msgObj.what=MainActivity.HANLDER_MESSAGE_STARTCARRUSEL;
-                                mActivity.mHandler.sendMessage(msgObj);
                                 startVideo();
+
+
                             }
                         }
                         getActivity().unregisterReceiver(mReceiver);

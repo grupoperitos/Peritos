@@ -655,8 +655,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
             resetMedallas();
 
-            for(int n=0;n<ciclo;n++) {
-                cambiarMedalla(n,AchievementManager.getWeeklyAchievement(this,n));
+            for(int n=1;n<=ciclo;n++) {
+                cambiarMedalla(n,AchievementManager.getWeeklyAchievement(this,n-1));
             }
 
 

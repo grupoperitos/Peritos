@@ -2,9 +2,6 @@ package com.epsl.peritos.achievements;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.provider.Settings;
-import android.support.design.widget.Snackbar;
-import android.widget.Toast;
 
 /**
  * Created by Juan Carlos on 26/05/2016.
@@ -144,6 +141,8 @@ public class AchievementManager {
         ed.putInt(ACHIEVEMENT_POINTS, temp);
         ed.commit();
 
+        setPointsToWeek(context,(int)getCurrentCycle(context),temp);
+
 
     }
 
@@ -252,6 +251,9 @@ public class AchievementManager {
                 break;
             case 3:
                 key = WEEK_4;
+                break;
+            default:
+                resetWeeks(context);
                 break;
 
         }

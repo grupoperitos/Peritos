@@ -612,6 +612,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         mHandler.sendMessageDelayed(msgObj, MAXPAGE_WAIT);
 
 
+        //Actualización de logros
         if (AchievementManager.isFirstRun(this)) {
             AchievementManager.setFirstRun(this);
         } else {
@@ -630,6 +631,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 AchievementManager.resetPatientLevel(this);
                 AchievementManager.resetWeeks(this);
 
+                insertarLogro(getString(R.string.achv_consequence_4week),AchievementManager.ACHIEVE_NOENTERWEEK,-1);
+                insertarLogro(getString(R.string.achv_consequence_critical),0,-1);
+
             } else if ((currenttime - lastdate) > AchievementManager.WEEK) {
                 Toast.makeText(this,getString(R.string.achv_gretings_bad1), Toast.LENGTH_LONG).show();
                 //Control de logros
@@ -642,6 +646,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                 AchievementManager.resetPatientLevel(this);
                 AchievementManager.resetWeeks(this);
+
+                insertarLogro(getString(R.string.achv_consequence_week),AchievementManager.ACHIEVE_NOENTERWEEK,-1);
+                insertarLogro(getString(R.string.achv_consequence_critical),0,-1);
+
             } else if ((currenttime - lastdate) > AchievementManager.DAY) {
                 Toast.makeText(this,getString(R.string.achv_gretings_bad2), Toast.LENGTH_LONG).show();
                 //Control de logros
@@ -651,6 +659,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_NOENTERWEEK);
                 msgbad.setData(b);
                 mHandler.sendMessage(msgbad);
+
+                insertarLogro(getString(R.string.achv_consequence_day),AchievementManager.ACHIEVE_NOENTER,-1);
+
             }
 
             resetMedallas();

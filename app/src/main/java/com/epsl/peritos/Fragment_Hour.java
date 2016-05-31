@@ -143,24 +143,36 @@ public class Fragment_Hour extends Fragment implements  OnTimeSetListener{
             @Override
             public void onClick(View arg0) {
 
+                SharedPreferences pr = getActivity().getSharedPreferences("PRFS", getContext().MODE_PRIVATE);
+                boolean comprobar_hora = pr.getBoolean("NEW_HOUR", false);
+                if(comprobar_hora==true){
+
+                    Intent h = new Intent(getActivity(),MainActivity.class);
+                    startActivity(h);
+                    System.out.println("HA ENTRADO EN LA COMPROBACION DE SHAREDPREFERENCES");
+                    ///// IMPORTANTE : AQUI IRIA SOLAMENTE UNA CONSULTA PARA MODIFICAR LA WAKE_HOUR
 
 
 
-                System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-                for(StructureParametersBBDD.Treatment listTreatmet: listTreatment ){
-                    System.out.println(listTreatmet.getNameMedicine() + "   "+ listTreatmet.getQuantifyTake());
-                }
-                System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-                for(int i =0; i < listTreatment.size();i++){
-
-                    System.out.println(listTreatment.size());
+                }else{
 
 
-                    StructureParametersBBDD.Treatment t = listTreatment.get(i);
-                    t.setFirsTakeDay(wakeHour);
-                    new BBDDTratamiento(getContext()).setTreatment(t);
-                    // CONSULTA DE INSERCIÓN PARA CADA OBJETO t
-                }
+
+                    System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+                    for(StructureParametersBBDD.Treatment listTreatmet: listTreatment ){
+                        System.out.println(listTreatmet.getNameMedicine() + "   "+ listTreatmet.getQuantifyTake());
+                    }
+                    System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+                    for(int i =0; i < listTreatment.size();i++){
+
+                        System.out.println(listTreatment.size());
+
+
+                        StructureParametersBBDD.Treatment t = listTreatment.get(i);
+                        t.setFirsTakeDay(wakeHour);
+                        new BBDDTratamiento(getContext()).setTreatment(t);
+                        // CONSULTA DE INSERCIÓN PARA CADA OBJETO t
+                    }
 
 
 //                Intent i = new Intent(getContext(),MyserviceTwo.class);
@@ -169,17 +181,29 @@ public class Fragment_Hour extends Fragment implements  OnTimeSetListener{
 //                i.setAction(Constants.INSTALLAPP);
 //                getActivity().startService(i);
 
-                final SharedPreferences prefs = getActivity().getSharedPreferences("PRFS", Context.MODE_PRIVATE);
-                final SharedPreferences.Editor editor = prefs.edit();
-                editor.putString("FIRST_TIME","1");
-                editor.commit();
+                    final SharedPreferences prefs = getActivity().getSharedPreferences("PRFS", Context.MODE_PRIVATE);
+                    final SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("FIRST_TIME","1");
+                    editor.commit();
 
-                Intent in = new Intent(getContext(),MainActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                in.setFlags(Intent.FLAG_FROM_BACKGROUND);
-                getActivity().startActivity(in);
+                    Intent in = new Intent(getContext(),MainActivity.class);
+                    in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    in.setFlags(Intent.FLAG_FROM_BACKGROUND);
+                    getActivity().startActivity(in);
 
-                getActivity().finish();
+                    getActivity().finish();
+
+
+
+
+
+
+
+
+                }
+
+
+
 
             }
 

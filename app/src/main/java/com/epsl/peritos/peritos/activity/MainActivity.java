@@ -288,13 +288,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
                             long week = AchievementManager.getCurrentCycle(MainActivity.this);
                             int total = AchievementManager.getAchievementPoints(MainActivity.this);
-                            int prevMedal = AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week);
+                            int prevMedal = Math.max(AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week),0);
                             int nextLevel = -1;
                             int nextMedal = -1;
                             int level = AchievementManager.getPatientLevel(MainActivity.this);
 
                             AchievementManager.modifyAchievementPoints(MainActivity.this, points);
-                            AchievementManager.setPointsToWeek(MainActivity.this, (int) week, points);
+                            AchievementManager.setPointsToWeek(MainActivity.this, (int) week, AchievementManager.getAchievementPoints(MainActivity.this));
                             //TODO Borrar
                             //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 1) % 4, points);
                             //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 2) % 4, points);

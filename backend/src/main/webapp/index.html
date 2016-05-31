@@ -41,7 +41,7 @@
             <!-- BEGIN LOGO -->
             <div class="page-logo">
                 <a href="index.html">
-                    <img src="logo2.png" alt="logo" class="logo-default" />
+                    <img src="assets/logo2.png" alt="logo" class="logo-default" />
                 </a>
             </div>
             <!-- END LOGO -->
@@ -86,7 +86,16 @@
             <div class="hor-menu  ">
                 <ul class="nav navbar-nav">
                     <li class="menu-dropdown classic-menu-dropdown ">
-                        <a href="javascript:;"> Inicio </a>
+                        <a href=""> Formulario </a>
+                    </li>
+                    <li class="menu-dropdown classic-menu-dropdown ">
+                        <a href="aplicacion.html"> Aplicación </a>
+                    </li>
+                    <li class="menu-dropdown classic-menu-dropdown ">
+                        <a href="manual.html"> Manual </a>
+                    </li>
+                    <li class="menu-dropdown classic-menu-dropdown ">
+                        <a href="acerca.html"> Acerca de </a>
                     </li>
                     <li class="menu-dropdown classic-menu-dropdown ">
                         <a href="login.html"> Administración </a>
@@ -108,8 +117,7 @@
             <div class="container">
                 <!-- BEGIN PAGE TITLE -->
                 <div class="page-title">
-                    <h1>Formulario de creación de tratamiento
-                    </h1>
+                    <h1>Formulario de creación de tratamiento</h1>
                 </div>
                 <!-- END PAGE TITLE -->
             </div>
@@ -331,7 +339,7 @@ function addInputIn(){
      var newdiv = document.createElement('div');
      var divid = "divin"+counterIn;
      newdiv.setAttribute("id", divid);
-     newdiv.innerHTML = "<div class='row'><div class='col-md-3'><div class='form-group form-md-line-input form-md-floating-label has-info'><input type='text' name='in"+counterIn+"' class='form-control' id='in"+counterIn+"'>        <label for='in"+counterIn+"'>Inhalador</label>        <span class='help-block'>Nombre del medicamento</span>    </div></div><div class='col-md-3'>    <div class='form-group form-md-line-input has-info'><select name='ti"+counterIn+"' class='form-control' id='ti"+counterIn+"'><option value=''></option><option value='1'>Accuhaler</option><option value='2'>Breezhaler</option><option value='3'>Cartucho presurizado con Camara</option><option value='4'>Cartucho presurizado</option><option value='5'>Ellipta</option><option value='6'>Genuari</option><option value='7'>Handihaler</option><option value='8'>Nexthaler</option><option value='9'>Respimat</option><option value='10'>Spiromax</option><option value='11'>Turbuhaler</option></select><label for='ti"+counterIn+"'>Tipo de inhalador</label></div></div><div class='col-md-3'><div class='form-group form-md-line-input has-info'><select name='ni"+counterIn+"' class='form-control' id='ni"+counterIn+"'><option value=''></option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select><label for='ni"+counterIn+"'>Número de inhalaciones</label></div></div><div class='col-md-3'><div class='form-group form-md-line-input has-info'><select name='pi"+counterIn+"' class='form-control' id='pi"+counterIn+"'><option value=''></option><option value='1'>1 hora</option><option value='2'>2 horas</option><option value='4'>4 horas</option><option value='6'>6 horas</option><option value='8'>8 horas</option><option value='10'>10 horas</option><option value='12'>12 horas</option><option value='24'>24 horas</option></select><label for='pi"+counterIn+"'>Tiempo entre inhalaciones</label></div></div></div></div>";
+     newdiv.innerHTML = "<div class='row'><div class='col-md-3'><div class='form-group form-md-line-input form-md-floating-label has-info'><input required type='text' name='in"+counterIn+"' class='form-control' id='in"+counterIn+"'>        <label for='in"+counterIn+"'>Inhalador</label>        <span class='help-block'>Nombre del medicamento</span>    </div></div><div class='col-md-3'>    <div class='form-group form-md-line-input has-info'><select required name='ti"+counterIn+"' class='form-control' id='ti"+counterIn+"'><option value=''></option><option value='1'>Accuhaler</option><option value='2'>Breezhaler</option><option value='3'>Cartucho presurizado con Camara</option><option value='4'>Cartucho presurizado</option><option value='5'>Ellipta</option><option value='6'>Genuari</option><option value='7'>Handihaler</option><option value='8'>Nexthaler</option><option value='9'>Respimat</option><option value='10'>Spiromax</option><option value='11'>Turbuhaler</option></select><label for='ti"+counterIn+"'>Tipo de inhalador</label></div></div><div class='col-md-3'><div class='form-group form-md-line-input has-info'><select required name='ni"+counterIn+"' class='form-control' id='ni"+counterIn+"'><option value=''></option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select><label for='ni"+counterIn+"'>Número de inhalaciones</label></div></div><div class='col-md-3'><div class='form-group form-md-line-input has-info'><select required name='pi"+counterIn+"' class='form-control' id='pi"+counterIn+"'><option value=''></option><option value='1'>1 hora</option><option value='2'>2 horas</option><option value='4'>4 horas</option><option value='6'>6 horas</option><option value='8'>8 horas</option><option value='10'>10 horas</option><option value='12'>12 horas</option><option value='24'>24 horas</option></select><label for='pi"+counterIn+"'>Tiempo entre inhalaciones</label></div></div></div></div>";
      document.getElementById('inhaladores').appendChild(newdiv);
      counterIn++;
 }
@@ -340,7 +348,7 @@ function addInputPa(divName){
      var newdiv = document.createElement('div');
      var divid = "divpa"+counterPa;
      newdiv.setAttribute("id", divid);
-     newdiv.innerHTML = "<div class='row'><div class='col-md-4'><div class='form-group form-md-line-input form-md-floating-label has-info'><input type='text' name='pa"+counterPa+"' class='form-control' id='pa"+counterPa+"'>        <label for='in"+counterIn+"'>Pastilla</label>        <span class='help-block'>Nombre del medicamento</span>    </div></div><div class='col-md-4'><div class='form-group form-md-line-input has-info'><select name='np"+counterPa+"' class='form-control' id='np"+counterPa+"'><option value=''></option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select><label for='ni"+counterIn+"'>Número de pastillas</label></div></div><div class='col-md-4'><div class='form-group form-md-line-input has-info'><select name='tt"+counterPa+"' class='form-control' id='tt"+counterPa+"'><option value=''></option><option value='1'>1 hora</option><option value='2'>2 horas</option><option value='4'>4 horas</option><option value='6'>6 horas</option><option value='8'>8 horas</option><option value='10'>10 horas</option><option value='12'>12 horas</option><option value='24'>24 horas</option></select><label for='pi"+counterIn+"'>Tiempo entre tomas</label></div></div></div></div>";
+     newdiv.innerHTML = "<div class='row'><div class='col-md-4'><div class='form-group form-md-line-input form-md-floating-label has-info'><input required type='text' name='pa"+counterPa+"' class='form-control' id='pa"+counterPa+"'>        <label for='in"+counterIn+"'>Pastilla</label>        <span class='help-block'>Nombre del medicamento</span>    </div></div><div class='col-md-4'><div class='form-group form-md-line-input has-info'><select required name='np"+counterPa+"' class='form-control' id='np"+counterPa+"'><option value=''></option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select><label for='ni"+counterIn+"'>Número de pastillas</label></div></div><div class='col-md-4'><div class='form-group form-md-line-input has-info'><select required name='tt"+counterPa+"' class='form-control' id='tt"+counterPa+"'><option value=''></option><option value='1'>1 hora</option><option value='2'>2 horas</option><option value='4'>4 horas</option><option value='6'>6 horas</option><option value='8'>8 horas</option><option value='10'>10 horas</option><option value='12'>12 horas</option><option value='24'>24 horas</option></select><label for='pi"+counterIn+"'>Tiempo entre tomas</label></div></div></div></div>";
      document.getElementById('pastillas').appendChild(newdiv);
      counterPa++;
 }

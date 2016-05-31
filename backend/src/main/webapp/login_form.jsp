@@ -42,8 +42,8 @@ if(formtype.equals("login")){
     HttpSession objSesion = request.getSession(true);
     objSesion.setAttribute("log", "false");
     %>
-    <form id="index" action="index.html" method="post" >
-            <input type="hidden" name="r" value="authfail"/>
+    <form id="index" action="login.html" method="post" >
+        <input type="hidden" name="r" value="authfail"/>
     </form>
     <script type="text/javascript">
            document.getElementById('index').submit(); // SUBMIT FORM

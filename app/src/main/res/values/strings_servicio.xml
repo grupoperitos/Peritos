@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sv_toma">Es el momento de tomar su medicación.</string>
+    <string name="sv_recuerdo">Aún no se ha tomado su medicación.</string>
+    <string name="sv_recuerdo2">La medicación es importante para su salud. Tómesela.</string>
+</resources>

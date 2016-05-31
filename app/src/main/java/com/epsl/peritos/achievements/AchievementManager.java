@@ -2,6 +2,8 @@ package com.epsl.peritos.achievements;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.design.widget.Snackbar;
+import android.widget.Toast;
 
 /**
  * Created by Juan Carlos on 26/05/2016.
@@ -33,7 +35,7 @@ public class AchievementManager {
     public static final int ACHIEVE_NOENTER = -25;
     public static final int ACHIEVE_NOMEDICINE = -10;
 
-    public static final String [] PATIENT_LEVEL_TEXT={"F-","F","E-","E","D","D+","C","C+","B","B+","A","A+"};
+    public static final String [] PATIENT_LEVEL_TEXT={"F-","F","E-","E","D","D+","C","C+","B","B+","A","A+","Sin logro","Mesalla de bronce","Medalla de plata","Medalla de oro"};
 
     /**
      * Establece en punto inicial de la aplicación para el control de logros
@@ -91,6 +93,8 @@ public class AchievementManager {
             temp = 0;
         ed.putInt(ACHIEVEMENT_POINTS, temp);
         ed.commit();
+
+
     }
 
     /**

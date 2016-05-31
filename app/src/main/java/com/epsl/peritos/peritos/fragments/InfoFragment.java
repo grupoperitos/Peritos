@@ -373,7 +373,13 @@ public class InfoFragment extends Fragment {
                 AlertDialog details = createDetailsDialog();
                 //details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
                 details.show();
-                //Llamar al método de la interfaz con la actividad para que añada los puntos de logro
+                //Control de logros
+                Message msgObj = mActivity.mHandler.obtainMessage();
+                msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_MESSAGE);
+                msgObj.setData(b);
+                mActivity.mHandler.sendMessage(msgObj);
             }
         });
         mCaptionView.setOnClickListener(new View.OnClickListener() {
@@ -383,7 +389,30 @@ public class InfoFragment extends Fragment {
                 details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
                 details.show();
 
-                //Llamar al método de la interfaz con la actividad para que añada los puntos de logro
+                //Control de logros
+                Message msgObj = mActivity.mHandler.obtainMessage();
+                msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_MESSAGE);
+                msgObj.setData(b);
+                mActivity.mHandler.sendMessage(msgObj);
+            }
+        });
+
+        mTitleView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog details = createDetailsDialog();
+                details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
+                details.show();
+
+                //Control de logros
+                Message msgObj = mActivity.mHandler.obtainMessage();
+                msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_MESSAGE);
+                msgObj.setData(b);
+                mActivity.mHandler.sendMessage(msgObj);
             }
         });
 
@@ -486,7 +515,7 @@ public class InfoFragment extends Fragment {
             public void onClick(View v) {
                 Message msgObj = mHandler.obtainMessage();
                 msgObj.what = MainActivity.HANLDER_MESSAGE_PREV_TEXT;
-                ((MainActivity) getActivity()).mHandler.sendMessage(msgObj);
+                mActivity.mHandler.sendMessage(msgObj);
             }
         });
 
@@ -495,7 +524,7 @@ public class InfoFragment extends Fragment {
             public void onClick(View v) {
                 Message msgObj = mHandler.obtainMessage();
                 msgObj.what = MainActivity.HANLDER_MESSAGE_NEXT_TEXT;
-                ((MainActivity) getActivity()).mHandler.sendMessage(msgObj);
+                mActivity.mHandler.sendMessage(msgObj);
             }
         });
     }

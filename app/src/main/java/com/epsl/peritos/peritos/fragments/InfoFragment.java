@@ -58,6 +58,7 @@ public class InfoFragment extends Fragment {
     public static final String INFO_URL = "infourl";
     public static final String INFO_CAPSULE = "infocapsule";
     public static final String INFO_INHALADOR = "ininh";
+    public static final String INFO_ACHIEVEMENT = "achv";
 
     public static final String TAG_DETAILS = "details";
 
@@ -67,6 +68,7 @@ public class InfoFragment extends Fragment {
     private String mCaption = "";
     private String mDetail = "";
     private String mURL = "";
+    private int    mAchivPoints = 0;
     int mType = -1;
 
     private View mFragmentView = null;
@@ -96,7 +98,7 @@ public class InfoFragment extends Fragment {
     private MainActivity mActivity=null;
 
 
-    public static InfoFragment newInstance(int type, String title, String caption, String message, String detail, String url) {
+    public static InfoFragment newInstance(int type, String title, String caption, String message, String detail, String url,int points) {
         InfoFragment fragment = new InfoFragment();
         Bundle args = new Bundle();
         args.putInt(INFO_TYPE, type);
@@ -105,6 +107,8 @@ public class InfoFragment extends Fragment {
         args.putString(INFO_MESSAGE, message);
         args.putString(INFO_DETAIL, detail);
         args.putString(INFO_URL, url);
+        args.putInt(INFO_ACHIEVEMENT,points);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -118,6 +122,7 @@ public class InfoFragment extends Fragment {
         args.putString(INFO_MESSAGE, message.getCommentary());
         args.putString(INFO_DETAIL, message.getDetail());
         args.putString(INFO_URL, message.getURL());
+        args.putInt(INFO_ACHIEVEMENT,message.getAchievement());
         fragment.setArguments(args);
         return fragment;
     }
@@ -132,6 +137,7 @@ public class InfoFragment extends Fragment {
             mMessage = getArguments().getString(INFO_MESSAGE);
             mDetail = getArguments().getString(INFO_DETAIL);
             mURL = getArguments().getString(INFO_URL);
+            mAchivPoints = getArguments().getInt(INFO_ACHIEVEMENT);
         }
     }
 
@@ -148,6 +154,7 @@ public class InfoFragment extends Fragment {
             mURL = savedInstanceState.getString(INFO_URL);
             mShowCapsule = savedInstanceState.getBoolean(INFO_CAPSULE);
             mShowInhalador = savedInstanceState.getBoolean(INFO_INHALADOR);
+            mAchivPoints = savedInstanceState.getInt(INFO_ACHIEVEMENT);
 
         }
         mFragmentView = inflater.inflate(R.layout.fragment_info, container, false);
@@ -327,9 +334,10 @@ public class InfoFragment extends Fragment {
                                 startVideo();
                             }
                         }
+                        getActivity().unregisterReceiver(mReceiver);
                     }
                 }
-                getActivity().unregisterReceiver(mReceiver);
+
             }
         };
 
@@ -377,7 +385,7 @@ public class InfoFragment extends Fragment {
                 Message msgObj = mActivity.mHandler.obtainMessage();
                 msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
                 Bundle b = new Bundle();
-                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_MESSAGE);
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, mAchivPoints);
                 msgObj.setData(b);
                 mActivity.mHandler.sendMessage(msgObj);
             }
@@ -393,7 +401,7 @@ public class InfoFragment extends Fragment {
                 Message msgObj = mActivity.mHandler.obtainMessage();
                 msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
                 Bundle b = new Bundle();
-                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_MESSAGE);
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, mAchivPoints);
                 msgObj.setData(b);
                 mActivity.mHandler.sendMessage(msgObj);
             }
@@ -410,7 +418,7 @@ public class InfoFragment extends Fragment {
                 Message msgObj = mActivity.mHandler.obtainMessage();
                 msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
                 Bundle b = new Bundle();
-                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_MESSAGE);
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, mAchivPoints);
                 msgObj.setData(b);
                 mActivity.mHandler.sendMessage(msgObj);
             }
@@ -637,6 +645,7 @@ public class InfoFragment extends Fragment {
         outState.putString(INFO_URL, mURL);
         outState.putBoolean(INFO_CAPSULE,mShowCapsule);
         outState.putBoolean(INFO_INHALADOR,mShowInhalador);
+        outState.putInt(INFO_ACHIEVEMENT,mAchivPoints);
 
     }
 

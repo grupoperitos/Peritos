@@ -795,6 +795,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         } catch (IOException e1) {
                             e1.printStackTrace();
                         }
+
+
+                        //Control de logros
+                        Message msgObj = mHandler.obtainMessage();
+                        msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                        Bundle b = new Bundle();
+                        b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_SINTOMAS);
+                        msgObj.setData(b);
+                        mHandler.sendMessage(msgObj);
                         dialog.dismiss();
                     }
                 }

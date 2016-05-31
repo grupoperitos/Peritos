@@ -30,12 +30,19 @@ public class AchievementManager {
     //Puntos de logro
     public static final int ACHIEVE_VIDEO = 2;
     public static final int ACHIEVE_MESSAGE = 1;
-    public static final int ACHIEVE_EXCERCISE = 5;
+    public static final int ACHIEVE_SINTOMAS = 5;
     public static final int ACHIEVE_MEDICINE = 2;
     public static final int ACHIEVE_NOENTER = -25;
     public static final int ACHIEVE_NOMEDICINE = -10;
 
     public static final String [] PATIENT_LEVEL_TEXT={"F-","F","E-","E","D","D+","C","C+","B","B+","A","A+","Sin logro","Medalla de bronce","Medalla de plata","Medalla de oro"};
+
+    //Medallas
+    public static final int MEDAL_GOLD = 3;
+    public static final int MEDAL_SILVER = 2;
+    public static final int MEDAL_BRONZE = 1;
+    public static final int MEDAL_NO = 0;
+
 
     /**
      * Establece en punto inicial de la aplicación para el control de logros
@@ -128,11 +135,11 @@ public class AchievementManager {
         ed.commit();
     }
 
-    public static int getWeek(Context context, int number) {
+    public static int getWeek(Context context, int week) {
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();
         int temp = 0;
-        switch (number) {
+        switch (week) {
             case 0:
                 temp = p.getInt(WEEK_1, 0);
                 break;
@@ -151,6 +158,40 @@ public class AchievementManager {
         return temp;
     }
 
+    public static int getWeeklyAchievement(Context context,int week){
+        SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        int temp = 0;
+        switch (week) {
+            case 0:
+                temp = p.getInt(WEEK_1, 0);
+                break;
+            case 1:
+                temp = p.getInt(WEEK_2, 0);
+                break;
+            case 2:
+                temp = p.getInt(WEEK_3, 0);
+                break;
+            case 3:
+                temp = p.getInt(WEEK_4, 0);
+                break;
+            default:
+                break;
+        }
+        return temp;
+    }
+
+    public static int getWeeklyAchievemntMedal(int achvpoints)
+    {
+        if(achvpoints>=90)
+            return MEDAL_GOLD;
+        if(achvpoints>=75)
+            return MEDAL_SILVER;
+        if(achvpoints>=50)
+            return MEDAL_BRONZE;
+        return MEDAL_NO;
+
+    }
     public static void addPointsToWeek(Context context, int week,int points) {
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();

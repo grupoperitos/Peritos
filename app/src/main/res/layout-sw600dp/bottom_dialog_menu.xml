@@ -76,7 +76,7 @@
 
     <!--Opcion 4 Menu-->
     <TextView
-        android:id="@+id/txt_settings"
+        android:id="@+id/txt_preferencias"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/settings"

@@ -1,4 +1,4 @@
-package com.epsl.peritos;
+package com.epsl.peritos.sintomas_registro;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,7 +18,7 @@ public class ReceiverBoot extends BroadcastReceiver {
         //LANZAR SERVICIO
 
         Toast.makeText(context, "REBOOT", Toast.LENGTH_LONG).show();
-        Intent intentService = new Intent(context.getApplicationContext(),MyserviceTwo.class);
+        Intent intentService = new Intent(context.getApplicationContext(),ServiceTreatment.class);
         intentService.setAction(Constants.REBOOTMOBILE);
         context.startService(intentService);
     }

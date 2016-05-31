@@ -11,8 +11,7 @@
         android:id="@+id/text_details"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/btn_aceptar"
-        android:layout_marginBottom="@dimen/info_title_margin_bottom" />
+        android:layout_above="@+id/btn_aceptar" />
 
     <Button
         android:id="@+id/btn_aceptar"

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:paddingTop="@dimen/dialog_body"
+    android:paddingLeft="@dimen/dialog_body"
+    android:gravity="center_horizontal">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ejercicios"
+            android:textColor="#4FC3F7"
+            android:textAppearance="?android:attr/textAppearanceSearchResultTitle"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:gravity="center|top"
+        android:paddingTop="24dp"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/pregunta3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="Seleccione el tipo de ejercicio a realizar:"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/dialog_body"
+            android:layout_marginBottom="20dp"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+                <RadioGroup
+                    android:id="@+id/rb_ejercicio_seleccionado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/radio1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/radio_button_style"
+                        android:button="@android:color/transparent"
+                        android:text="Respiratorios"
+                        android:textStyle="italic"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginLeft="10dp"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:layout_row="0"
+                        android:layout_column="1" />
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/respirar"
+                        android:layout_row="0"
+                        android:layout_column="0" />
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/superior"
+                        android:layout_row="1"
+                        android:layout_column="0" />
+
+                    <RadioButton
+                        android:id="@+id/radio0"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/radio_button_style"
+                        android:button="@android:color/transparent"
+                        android:text="Caminar"
+                        android:textStyle="italic"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginLeft="10dp"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:layout_row="2"
+                        android:layout_column="1" />
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"></LinearLayout>
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/pasear"
+                        android:layout_row="2"
+                        android:layout_column="0" />
+
+
+
+
+
+
+        <RadioButton
+            android:id="@+id/radio2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/radio_button_style"
+            android:button="@android:color/transparent"
+            android:text="Miembros superiores"
+            android:textStyle="italic"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="10dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_row="1"
+            android:layout_column="1"
+            android:layout_gravity="center_horizontal" />
+
+        </RadioGroup>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/altura_cuadro_buttons"
+        android:gravity="bottom|right"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:paddingBottom="10dp"
+        android:paddingRight="@dimen/button_padding"
+        android:id="@+id/linearLayout">
+
+        <Button
+            android:id="@+id/btn_cancelar_ejercicios"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/altura_button"
+            android:textColor="@color/colorPrimary"
+            android:padding="@dimen/button_padding"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="TERMINAR"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+        <Button
+            android:id="@+id/btn_pausar_ejercicios"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/altura_button"
+            android:textColor="@color/colorPrimary"
+            android:padding="@dimen/button_padding"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="PAUSAR"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+
+        <Button
+            android:id="@+id/btn_iniciar_ejercicios"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/altura_button"
+            android:textColor="@color/colorPrimary"
+            android:padding="@dimen/button_padding"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="INICIAR"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>

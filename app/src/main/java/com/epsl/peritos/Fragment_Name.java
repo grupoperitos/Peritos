@@ -18,6 +18,7 @@ import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.epsl.peritos.peritos.R;
+import com.epsl.peritos.sintomas_registro.StructureParametersBBDD;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

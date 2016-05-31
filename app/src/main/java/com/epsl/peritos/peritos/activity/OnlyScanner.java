@@ -18,9 +18,9 @@ import com.epsl.peritos.CustomViewPager;
 import com.epsl.peritos.Fragment_Hour;
 import com.epsl.peritos.Fragment_Name;
 import com.epsl.peritos.Fragment_Qr;
-import com.epsl.peritos.StructureParametersBBDD;
 import com.epsl.peritos.communications.CommunicationAsynctask;
 import com.epsl.peritos.peritos.R;
+import com.epsl.peritos.sintomas_registro.StructureParametersBBDD;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;

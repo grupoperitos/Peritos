@@ -1,4 +1,4 @@
-package com.epsl.peritos;
+package com.epsl.peritos.sintomas_registro;
 
 import java.io.Serializable;
 
@@ -89,7 +89,17 @@ public class StructureParametersBBDD {
         String timestamp;
         boolean isTaken;
 
-        public TakeTreatment( String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken) {
+        public TakeTreatment(int idTake, String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken) {
+            this.idTake = idTake;
+            this.nameMedicine = nameMedicine;
+            this.typeMedicine = typeMedicine;
+
+            this.dateTake = dateTake;
+            this.timestamp = timestamp;
+            this.isTaken = isTaken;
+        }
+        public TakeTreatment(String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken) {
+
             this.nameMedicine = nameMedicine;
             this.typeMedicine = typeMedicine;
 

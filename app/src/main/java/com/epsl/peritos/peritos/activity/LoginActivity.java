@@ -1,9 +1,12 @@
 package com.epsl.peritos.peritos.activity;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,9 +20,10 @@ import com.epsl.peritos.CustomViewPager;
 import com.epsl.peritos.Fragment_Hour;
 import com.epsl.peritos.Fragment_Name;
 import com.epsl.peritos.Fragment_Qr;
-import com.epsl.peritos.StructureParametersBBDD;
+
 import com.epsl.peritos.communications.CommunicationAsynctask;
 import com.epsl.peritos.peritos.R;
+import com.epsl.peritos.sintomas_registro.StructureParametersBBDD;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
@@ -42,6 +46,11 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_act_layout);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M   && this.checkSelfPermission(Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA},
+                    0);
+        }
 
 //        Intent i = new Intent(this,MyserviceTwo.class);
 //        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

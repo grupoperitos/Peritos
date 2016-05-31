@@ -17,7 +17,7 @@ import com.epsl.peritos.peritos.R;
 import com.epsl.peritos.peritos.activity.MainActivity;
 import com.epsl.peritos.peritos.activity.OnlyScanner;
 import com.epsl.peritos.peritos.activity.PreferenciasActivity;
-
+import com.epsl.peritos.sintomas_registro.StructureParametersBBDD;
 import java.util.ArrayList;
 
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
@@ -56,11 +56,6 @@ public class Fragment_Qr extends Fragment implements ZBarScannerView.ResultHandl
         bot.setVisibility(View.INVISIBLE);
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M   && getActivity().checkSelfPermission(Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA},
-                    0);
-        }
 
 
         mScannerView = new ZBarScannerView(getActivity());
@@ -75,11 +70,7 @@ public class Fragment_Qr extends Fragment implements ZBarScannerView.ResultHandl
         super.onResume();
         mScannerView.setResultHandler(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M   && getActivity().checkSelfPermission(Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA},
-                    0);
-        }
+
         mScannerView.startCamera();
         System.out.println("METODO ONRESUME DEL QR");
     }

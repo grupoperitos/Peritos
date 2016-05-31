@@ -2,7 +2,7 @@ package com.epsl.peritos.sintomas_registro;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
+import com.epsl.peritos.peritos.R;
 /**
  * Created by rla_city on 31/05/2016.
  */
@@ -20,7 +20,11 @@ public class InfoNotification implements NotificationTypes {
     int tipoDialogo;
 
 
-    public InfoNotification(SharedPreferences prefe,int tipomedicamento,String nombreMedicina, String numTomas, String horaToma,int tipoDialogo) {
+
+    RespiraNotif respNotif;
+    int imageNotif;
+
+    public InfoNotification(SharedPreferences prefe,int tipomedicamento,String nombreMedicina, String horaToma,int tipoDialogo) {
         prefs = prefe;
         nombrePaciente = prefs.getString("NOM_USUARIO", "");
         if(tipomedicamento == 0){
@@ -33,8 +37,22 @@ public class InfoNotification implements NotificationTypes {
 
         this.nombreMedicina = nombreMedicina;
         this.horaToma = horaToma;
-        this.numTomas = numTomas;
+
         this.tipoDialogo = tipoDialogo;
+
+        if(medicamento.equalsIgnoreCase("Pastillas") == true){
+            this.imageNotif = R.drawable.drug;
+
+        }else{
+
+
+            this.imageNotif = R.drawable.inhaler;
+        }
+
+
+
+        this.respNotif = new RespiraNotif(nombreMedicina,getNotificationType(tipoDialogo),imageNotif);
+
 
     }
 
@@ -45,15 +63,22 @@ public class InfoNotification implements NotificationTypes {
 
        switch (tipoDialogo){
 
-           case FIRST:
+           case FIRST_DAY:
 
-               notifText = nombrePaciente+", le toca tomarse "+numTomas+" "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma;
+               notifText = "Buenos Días "+nombrePaciente+", le toca tomarse 1 "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma;
+
+               break;
+
+
+           case NORMAL:
+
+               notifText = "Hola " +nombrePaciente+"  , le toca tomarse 1 "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma;
 
                break;
 
            case DELAY_1:
 
-               notifText = nombrePaciente+", parece que se le ha olvidado tomarse "+numTomas+" "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma+ ".Es buen momento para tomársela";
+               notifText ="Hola " + nombrePaciente+", parece que se le ha olvidado tomarse 1 "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma+ ".Es buen momento para tomársela";
 
 
 
@@ -61,14 +86,14 @@ public class InfoNotification implements NotificationTypes {
 
            case DELAY_2:
 
-               notifText = nombrePaciente+", tenga cuidado, recuerde tomar "+numTomas+" "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma + ". Debería de tomarsela, ya que más adelante podría no ser efectiva.";
+               notifText ="Hola " + nombrePaciente+", tenga cuidado, recuerde tomar 1 "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma + ". Debería de tomarsela, ya que más adelante podría no ser efectiva.";
 
 
                break;
 
            case NOT_TAKE:
 
-               notifText = nombrePaciente+", ha perdido una toma, ya NO debe tomar "+numTomas+" "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma + ". Permanezca atento a su siguiente toma";
+               notifText ="Hola " + nombrePaciente+", ha perdido una toma, ya NO debe tomar 1"+" "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma + ". Permanezca atento a su siguiente toma";
 
 
                break;
@@ -87,7 +112,13 @@ public class InfoNotification implements NotificationTypes {
 
 
 
+    public RespiraNotif getRespNotif() {
+        return respNotif;
+    }
 
+    public void setRespNotif(RespiraNotif respNotif) {
+        this.respNotif = respNotif;
+    }
 
 
 

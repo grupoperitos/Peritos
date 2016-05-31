@@ -1,10 +1,10 @@
-package com.epsl.peritos;
+package com.epsl.peritos.sintomas_registro;
+
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
-
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,6 +20,7 @@ public class BBDDTratamiento {
     private final Lock r = rwl.readLock();
     private final Lock w = rwl.writeLock();
     Context context;
+
     SQLiteCreateBBDD dbHelper;
     public BBDDTratamiento(Context context) {
         this.context = context;
@@ -85,8 +86,8 @@ public class BBDDTratamiento {
                 do {
 //String typeTreatmentNumeric, String nameMedicine, String quantifyTake, String intervalHour, String firsTakeDay) {
 
-                        listTreatment.add(new StructureParametersBBDD.Treatment(
-                                c.getInt(0),
+                    listTreatment.add(new StructureParametersBBDD.Treatment(
+                            c.getInt(0),
                             c.getString(1),
                             c.getString(2),
                             c.getString(3),
@@ -102,7 +103,7 @@ public class BBDDTratamiento {
         }
     }
 
-//Metodo para sacar una lista completa de las tomas
+    //Metodo para sacar una lista completa de las tomas
     public ArrayList<StructureParametersBBDD.TakeTreatment> getList() {
         r.lock();
         try {
@@ -117,7 +118,8 @@ public class BBDDTratamiento {
 // String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken
                     listTreatment.add(new StructureParametersBBDD.TakeTreatment(
 
-                            c.getString(1)
+                            c.getInt(0)
+                            ,c.getString(1)
                             ,c.getString(2)
                             ,c.getString(3)
                             ,c.getString(4)
@@ -168,7 +170,7 @@ public class BBDDTratamiento {
                     if(!c.isNull( 0 ) ) {
 // String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken
 
-                        tratamiento = new StructureParametersBBDD.TakeTreatment(c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getInt(5) > 0);
+                        tratamiento = new StructureParametersBBDD.TakeTreatment(c.getInt(0),c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getInt(5) > 0);
                     }
                 } while (c.moveToNext());
             }
@@ -188,22 +190,73 @@ public class BBDDTratamiento {
             StructureParametersBBDD.TakeTreatment tratamiento;
 
             Cursor c = db.rawQuery(" SELECT * FROM TakeTreatment " +
-                    "WHERE CONTAINS(TIMESTAMP, '"+timespam+"')", null);
-
+                    "WHERE INSTR(TIMESTAMP, '" + timespam.split(" ")[0] + "') > 0" +
+                    " GROUP BY TYPE_MEDICINE " +
+                    "ORDER BY TIMESTAMP DESC " +
+                    "", null);
             if (c.moveToFirst()) {
                 do {
-
                     listTreatment.add(new StructureParametersBBDD.TakeTreatment(
-// String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken
-                            c.getString(1)
-                            ,c.getString(2)
-                            ,c.getString(3)
-                            ,c.getString(4)
-                            ,c.getInt(5) > 0));
+//TakeTreatment(int idTake, String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken) {
+
+                            c.getInt(0)
+                            ,c.getString(1)
+                            , c.getString(2)
+                            , c.getString(3)
+                            , c.getString(4)
+                            , c.getInt(5) > 0));
                 } while (c.moveToNext());
             }
             db.close();
             return listTreatment;
+        } finally {
+            r.unlock();
+        }
+    }
+
+    //Metodo para sacar una lista completa de las tomas
+    public int getTimeBetweenShots(String nameMedicine, String tipeMedicine) {
+        r.lock();
+        try {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            ArrayList<StructureParametersBBDD.TakeTreatment> listTreatment = new ArrayList<StructureParametersBBDD.TakeTreatment>();
+            int intervalHousTreatment = 0;
+            Cursor c = db.rawQuery(" SELECT INTERVAL_HOUR FROM Treatment " +
+                    "WHERE NAME_MEDICINE = '" + nameMedicine + "'" +
+                    "AND TYPE_TREATMENT_NUMERIC = '" + tipeMedicine + "'", null);
+            if (c.moveToFirst()) {
+                do {
+                    intervalHousTreatment =  c.getInt(0);
+                } while (c.moveToNext());
+            }
+            db.close();
+            return intervalHousTreatment;
+        } finally {
+            r.unlock();
+        }
+    }
+
+
+
+    //Metodo para sacar una lista completa de las tomas
+    public int getIdTreament(String nameMedicine, String tipeMedicine) {
+        r.lock();
+        try {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            ArrayList<StructureParametersBBDD.TakeTreatment> listTreatment = new ArrayList<StructureParametersBBDD.TakeTreatment>();
+            int idTreatment = 0;
+            Cursor c = db.rawQuery(" SELECT ID_TREATMENT FROM Treatment " +
+                    "WHERE NAME_MEDICINE = '" + nameMedicine + "'" +
+                    "AND TYPE_TREATMENT_NUMERIC = '" + tipeMedicine + "'", null);
+            if (c.moveToFirst()) {
+                do {
+                    idTreatment =  c.getInt(0);
+                } while (c.moveToNext());
+            }
+            db.close();
+            Log.d("bbdd", "ESTE ES EL  public int getIdTreament(String nameMedicine, String tipeMedicine) { de"+nameMedicine +", con id:"+tipeMedicine+" = "+idTreatment);
+            System.out.println("ESTE ES EL  public int getIdTreament(String nameMedicine, String tipeMedicine) { de"+nameMedicine +", con id:"+tipeMedicine+" = "+idTreatment);
+            return idTreatment;
         } finally {
             r.unlock();
         }
@@ -229,7 +282,8 @@ public class BBDDTratamiento {
 
                     listTreatment.add(new StructureParametersBBDD.TakeTreatment(
 // String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken
-                            c.getString(1)
+                            c.getInt(0)
+                            ,c.getString(1)
                             ,c.getString(2)
                             ,c.getString(3)
                             ,c.getString(4)
@@ -247,7 +301,7 @@ public class BBDDTratamiento {
         w.lock();
         try {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
-System.out.println("Insertando datos ");
+            System.out.println("Insertando datos ");
 //(int idTake, String nameMedicine, String typeMedicine, int typeTreatmentNumeric, String dateTake, String timestamp, boolean isTaken)
             db.execSQL("INSERT INTO Treatment(TYPE_TREATMENT_NUMERIC,NAME_MEDICINE,QUANTITY,INTERVAL_HOUR,FIRS_TAKE_HOUR_DAY)" +
                     " VALUES(" +
@@ -271,7 +325,7 @@ System.out.println("Insertando datos ");
             w.unlock();
         }
     }
-//Insertamos una toma nueva
+    //Insertamos una toma nueva
     public void setTake(StructureParametersBBDD.TakeTreatment take) {
         w.lock();
         try {
@@ -338,3 +392,4 @@ System.out.println("Insertando datos ");
 
 
 }
+

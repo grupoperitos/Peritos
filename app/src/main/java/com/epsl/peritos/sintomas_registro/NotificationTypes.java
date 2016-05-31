@@ -6,10 +6,11 @@ package com.epsl.peritos.sintomas_registro;
 
 
     public interface NotificationTypes {
-        public final int FIRST           = 1; //Primera notificación
+        public final int NORMAL           = 1; //Primera notificación
         public final int DELAY_1         = 2; //Primera notificación retrasada.
         public final int DELAY_2         = 3; //Segunda notificación retrasada.
         public final int NOT_TAKE        = 4; //Notificacion no tomada.
+    public final int FIRST_DAY        = 5; //Notificacion no tomada.
 
     }
 

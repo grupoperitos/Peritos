@@ -22,6 +22,8 @@ import android.widget.TimePicker;
 import com.epsl.peritos.peritos.R;
 import com.epsl.peritos.peritos.activity.LoginActivity;
 import com.epsl.peritos.peritos.activity.MainActivity;
+import com.epsl.peritos.sintomas_registro.BBDDTratamiento;
+import com.epsl.peritos.sintomas_registro.StructureParametersBBDD;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog.OnTimeSetListener;
 

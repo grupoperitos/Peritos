@@ -28,6 +28,7 @@ import com.epsl.peritos.achievements.AchievementManager;
 
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -42,7 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.epsl.peritos.Constants;
-import com.epsl.peritos.MyserviceTwo;
+
 import com.epsl.peritos.achievements.AchievementManager;
 import com.epsl.peritos.info.InformationManager;
 
@@ -70,6 +71,7 @@ import java.util.List;
 import android.content.Intent;
 import android.net.Uri;
 
+import com.epsl.peritos.sintomas_registro.ServiceTreatment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -162,234 +164,237 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             Intent in = new Intent(this, LoginActivity.class);
             MainActivity.this.finish();
             startActivity(in);
+        }else {
+
+            Intent i = new Intent(this, ServiceTreatment.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.setFlags(Intent.FLAG_FROM_BACKGROUND);
+            i.setAction(Constants.INSTALLAPP);
+            startService(i);
+
+            messageList = InformationManager.loadInformation(this);
+            if (messageList != null) {
+                messageTabs[MessageTypes.INFO_TRATAMIENTO] = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
+                messageTabs[MessageTypes.INFO_DIETA] = messageList.getMessagesByType(MessageTypes.INFO_DIETA);
+                messageTabs[MessageTypes.INFO_EJERCICIO] = messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
+                messageTabs[MessageTypes.INFO_EPOC] = messageList.getMessagesByType(MessageTypes.INFO_EPOC);
+            } else {
+                Toast.makeText(this, getString(R.string.error_cargarrecursos), Toast.LENGTH_LONG).show();
+                finish();
+            }
+
+
+            setContentView(R.layout.activity_main);
+
+
+            medalla1 = (ImageView) findViewById(R.id.medalla1);
+            medalla2 = (ImageView) findViewById(R.id.medalla2);
+            medalla3 = (ImageView) findViewById(R.id.medalla3);
+            medalla4 = (ImageView) findViewById(R.id.medalla4);
+
+
+            viewPager = (ViewPager) findViewById(R.id.viewpager);
+            setupViewPager(viewPager);
+
+            tabLayout = (TabLayout) findViewById(R.id.tabs);
+            tabLayout.setupWithViewPager(viewPager);
+            tabLayout.setOnTabSelectedListener(this);
+
+
+            mHandler = new Handler(Looper.getMainLooper()) {
+                /*
+                         * handleMessage() defines the operations to perform when
+                         * the Handler receives a new Message to process.
+                         */
+                @Override
+                public void handleMessage(Message inputMessage) {
+
+                    switch (inputMessage.what) {
+                        case HANDLER_MESSAGE_CHANGETAB:
+                            //Cambiar la pestaña activa
+                            mHandler.removeMessages(HANDLER_MESSAGE_CHANGETAB);
+                            tabLayout.post(new Carrusel());
+
+                            //Snackbar.make(viewPager, "Handler 1", Snackbar.LENGTH_SHORT).show();
+                            break;
+                        case HANLDER_MESSAGE_CHANGE_TEXT:
+                            mHandler.removeMessages(HANLDER_MESSAGE_CHANGE_TEXT);
+
+                            int pos = tabLayout.getSelectedTabPosition();
+                            mFragmentList.get(pos).actualize(messageTabs[pos].getNextMessage());
+
+                            //Send the message to change the text
+                            Message msgObj = mHandler.obtainMessage();
+                            msgObj.what = MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
+                            mHandler.sendMessageDelayed(msgObj, MAXTEXT_WAIT);
+
+                            //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_CHANGE_TEXT, Snackbar.LENGTH_SHORT).show();
+                            break;
+                        case HANLDER_MESSAGE_STOPCARRUSEL:
+                            //Mensaje enviado cuando se inicia la descarga de un video hasta que este empieza a reproducirse
+                            //Se deben parar los mensajes pendientes:
+                            // - HANDLER_MESSAGE_CHANGETAB
+                            // - HANLDER_MESSAGE_CHANGE_TEXT
+                            mHandler.removeMessages(HANLDER_MESSAGE_CHANGE_TEXT);
+                            mHandler.removeMessages(HANDLER_MESSAGE_CHANGETAB);
+                            //Estos mensajes no se reactivarán hasta que se descargue el vídeo o el usuario toque en la interfaz porque quiere ver otra cosa
+                            break;
+                        case HANLDER_MESSAGE_STARTCARRUSEL:
+                            //Mensaje enviado cuando se ha descargado el vídeo para reiniciar el carrusel
+                            //Se iniciar  parar los mensajes pendientes:
+                            // - HANDLER_MESSAGE_CHANGETAB
+                            // - HANLDER_MESSAGE_CHANGE_TEXT
+
+                            Message msgCarrusel = mHandler.obtainMessage();
+                            msgCarrusel.what = MainActivity.HANDLER_MESSAGE_CHANGETAB;
+                            mHandler.sendMessageDelayed(msgCarrusel, MAXPAGE_WAIT);
+
+                            Message msgText = mHandler.obtainMessage();
+                            msgText.what = MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
+                            mHandler.sendMessageDelayed(msgText, MAXTEXT_WAIT);
+
+                            break;
+                        case HANLDER_MESSAGE_PREV_TEXT:
+                            mHandler.removeMessages(HANLDER_MESSAGE_PREV_TEXT);
+
+                            int posP = tabLayout.getSelectedTabPosition();
+                            mFragmentList.get(posP).actualize(messageTabs[posP].getPrevMessage());
+
+                            //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_PREV_TEXT, Snackbar.LENGTH_SHORT).show();
+                            break;
+                        case HANLDER_MESSAGE_NEXT_TEXT:
+                            mHandler.removeMessages(HANLDER_MESSAGE_NEXT_TEXT);
+
+                            int posN = tabLayout.getSelectedTabPosition();
+                            mFragmentList.get(posN).actualize(messageTabs[posN].getNextMessage());
+
+                            //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_NEXT_TEXT, Snackbar.LENGTH_SHORT).show();
+                            break;
+
+                        case HANLDER_MESSAGE_ACHIEVEMENT_POINTS:
+                            Bundle data = inputMessage.getData();
+                            if (data != null) {
+                                int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
+                                AchievementManager.modifyAchievementPoints(MainActivity.this, points);
+                                long week = AchievementManager.getCurrentCycle(MainActivity.this);
+                                int total = AchievementManager.getAchievementPoints(MainActivity.this);
+                                AchievementManager.setPointsToWeek(MainActivity.this, (int) week, total);
+                                String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[AchievementManager.getPatientLevel(MainActivity.this)];
+
+                                insertarLogro(nivelPaciente, AchievementManager.getAchievementPoints(MainActivity.this), 0);
+
+                                Snackbar.make(viewPager, getString(R.string.achv_haganado) + " " + points + " " + getString(R.string.achv_puntos) + " Total: " + total, Snackbar.LENGTH_SHORT).show();
+                            }
+                            break;
+                        default:
+                            //Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+            };
+
+            setupTabControl();
+
+            //Send the message to change the text
+            Message msgObj = mHandler.obtainMessage();
+            msgObj.what = MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
+            mHandler.sendMessageDelayed(msgObj, MAXTEXT_WAIT);
+
+            //MiniFAB salud Responde
+            miniFAB_SR = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_SR);
+            miniFAB_SR.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + 902505060));
+                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    startActivity(intent);
+
+
+                    Snackbar.make(view, getString(R.string.interfaz_saludresponde), Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
+
+
+            //MiniFAB Control Sintomas
+            miniFAB_Sintomas = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_control_sintomas);
+            miniFAB_Sintomas.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog dialogo_sintomas = createSintomasDialog();
+                    //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
+                    dialogo_sintomas.show();
+                }
+            });
+
+
+            //MiniFAB llamar cuidador
+            miniFAB_Cuidador = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_cuidador);
+            SharedPreferences pr = getSharedPreferences("PRFS", MODE_PRIVATE);
+            nom_cuidador = pr.getString("CARER_NAME", "NO HAY CUIDADOR REGISTRADO");
+            if (nom_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
+
+            } else {
+                miniFAB_Cuidador.setTitle("LLamar a " + nom_cuidador);
+            }
+            miniFAB_Cuidador.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    SharedPreferences pr = getSharedPreferences("PRFS", MODE_PRIVATE);
+                    nom_cuidador = pr.getString("CARER_NAME", "NO HAY CUIDADOR REGISTRADO");
+                    tlf_cuidador = pr.getString("CARER_PHONE", "NO HAY CUIDADOR REGISTRADO");
+                    if (tlf_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
+                        tlf_cuidador = "000000000";
+                    }
+                    if (nom_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
+
+                    } else {
+                        miniFAB_Cuidador.setTitle("LLamar a " + nom_cuidador);
+                    }
+                    //Indicamos el telefono para llamar
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.CALL_PHONE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
+                                0);
+                    }
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + tlf_cuidador));
+                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    startActivity(intent);
+                }
+            });
+
+
+            //Registro del día y hora de último uso de la app
+            SharedPreferences p = getSharedPreferences("PRFS", MODE_PRIVATE);
+            final SharedPreferences.Editor ed = p.edit();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            String fecha = sdf.format(new Date());
+            ed.putString("LAST_USE", fecha);
+            ed.apply();
+
+            //Servicio de control de medicación
+
+
         }
-        messageList = InformationManager.loadInformation(this);
-        if (messageList != null) {
-            messageTabs[MessageTypes.INFO_TRATAMIENTO] = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
-            messageTabs[MessageTypes.INFO_DIETA] = messageList.getMessagesByType(MessageTypes.INFO_DIETA);
-            messageTabs[MessageTypes.INFO_EJERCICIO] = messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
-            messageTabs[MessageTypes.INFO_EPOC] = messageList.getMessagesByType(MessageTypes.INFO_EPOC);
-        } else {
-            Toast.makeText(this, getString(R.string.error_cargarrecursos), Toast.LENGTH_LONG).show();
-            finish();
-        }
-
-
-        setContentView(R.layout.activity_main);
-
-
-        medalla1 = (ImageView) findViewById(R.id.medalla1);
-        medalla2 = (ImageView) findViewById(R.id.medalla2);
-        medalla3 = (ImageView) findViewById(R.id.medalla3);
-        medalla4 = (ImageView) findViewById(R.id.medalla4);
-
-
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
-
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setOnTabSelectedListener(this);
-
-
-        mHandler = new Handler(Looper.getMainLooper()) {
-            /*
-                     * handleMessage() defines the operations to perform when
-                     * the Handler receives a new Message to process.
-                     */
-            @Override
-            public void handleMessage(Message inputMessage) {
-
-                switch (inputMessage.what) {
-                    case HANDLER_MESSAGE_CHANGETAB:
-                        //Cambiar la pestaña activa
-                        mHandler.removeMessages(HANDLER_MESSAGE_CHANGETAB);
-                        tabLayout.post(new Carrusel());
-
-                        //Snackbar.make(viewPager, "Handler 1", Snackbar.LENGTH_SHORT).show();
-                        break;
-                    case HANLDER_MESSAGE_CHANGE_TEXT:
-                        mHandler.removeMessages(HANLDER_MESSAGE_CHANGE_TEXT);
-
-                        int pos = tabLayout.getSelectedTabPosition();
-                        mFragmentList.get(pos).actualize(messageTabs[pos].getNextMessage());
-
-                        //Send the message to change the text
-                        Message msgObj = mHandler.obtainMessage();
-                        msgObj.what = MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
-                        mHandler.sendMessageDelayed(msgObj, MAXTEXT_WAIT);
-
-                        //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_CHANGE_TEXT, Snackbar.LENGTH_SHORT).show();
-                        break;
-                    case HANLDER_MESSAGE_STOPCARRUSEL:
-                        //Mensaje enviado cuando se inicia la descarga de un video hasta que este empieza a reproducirse
-                        //Se deben parar los mensajes pendientes:
-                        // - HANDLER_MESSAGE_CHANGETAB
-                        // - HANLDER_MESSAGE_CHANGE_TEXT
-                        mHandler.removeMessages(HANLDER_MESSAGE_CHANGE_TEXT);
-                        mHandler.removeMessages(HANDLER_MESSAGE_CHANGETAB);
-                        //Estos mensajes no se reactivarán hasta que se descargue el vídeo o el usuario toque en la interfaz porque quiere ver otra cosa
-                        break;
-                    case HANLDER_MESSAGE_STARTCARRUSEL:
-                        //Mensaje enviado cuando se ha descargado el vídeo para reiniciar el carrusel
-                        //Se iniciar  parar los mensajes pendientes:
-                        // - HANDLER_MESSAGE_CHANGETAB
-                        // - HANLDER_MESSAGE_CHANGE_TEXT
-
-                        Message msgCarrusel = mHandler.obtainMessage();
-                        msgCarrusel.what = MainActivity.HANDLER_MESSAGE_CHANGETAB;
-                        mHandler.sendMessageDelayed(msgCarrusel, MAXPAGE_WAIT);
-
-                        Message msgText = mHandler.obtainMessage();
-                        msgText.what = MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
-                        mHandler.sendMessageDelayed(msgText, MAXTEXT_WAIT);
-
-                        break;
-                    case HANLDER_MESSAGE_PREV_TEXT:
-                        mHandler.removeMessages(HANLDER_MESSAGE_PREV_TEXT);
-
-                        int posP = tabLayout.getSelectedTabPosition();
-                        mFragmentList.get(posP).actualize(messageTabs[posP].getPrevMessage());
-
-                        //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_PREV_TEXT, Snackbar.LENGTH_SHORT).show();
-                        break;
-                    case HANLDER_MESSAGE_NEXT_TEXT:
-                        mHandler.removeMessages(HANLDER_MESSAGE_NEXT_TEXT);
-
-                        int posN = tabLayout.getSelectedTabPosition();
-                        mFragmentList.get(posN).actualize(messageTabs[posN].getNextMessage());
-
-                        //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_NEXT_TEXT, Snackbar.LENGTH_SHORT).show();
-                        break;
-
-                    case HANLDER_MESSAGE_ACHIEVEMENT_POINTS:
-                        Bundle data = inputMessage.getData();
-                        if (data != null) {
-                            int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
-                            AchievementManager.modifyAchievementPoints(MainActivity.this, points);
-                            long week = AchievementManager.getCurrentCycle(MainActivity.this);
-                            int total = AchievementManager.getAchievementPoints(MainActivity.this);
-                            AchievementManager.setPointsToWeek(MainActivity.this, (int) week, total);
-                            String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[AchievementManager.getPatientLevel(MainActivity.this)];
-
-                            insertarLogro(nivelPaciente, AchievementManager.getAchievementPoints(MainActivity.this), 0);
-
-                            Snackbar.make(viewPager, getString(R.string.achv_haganado) + " " + points + " " + getString(R.string.achv_puntos) + " Total: " + total, Snackbar.LENGTH_SHORT).show();
-                        }
-                        break;
-                    default:
-                        //Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        };
-
-        setupTabControl();
-
-        //Send the message to change the text
-        Message msgObj = mHandler.obtainMessage();
-        msgObj.what = MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
-        mHandler.sendMessageDelayed(msgObj, MAXTEXT_WAIT);
-
-        //MiniFAB salud Responde
-        miniFAB_SR = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_SR);
-        miniFAB_SR.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + 902505060));
-                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                startActivity(intent);
-
-
-                Snackbar.make(view, getString(R.string.interfaz_saludresponde), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-
-        //MiniFAB Control Sintomas
-        miniFAB_Sintomas = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_control_sintomas);
-        miniFAB_Sintomas.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog dialogo_sintomas = createSintomasDialog();
-                //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
-                dialogo_sintomas.show();
-            }
-        });
-
-
-        //MiniFAB llamar cuidador
-        miniFAB_Cuidador = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_cuidador);
-        SharedPreferences pr = getSharedPreferences("PRFS", MODE_PRIVATE);
-        nom_cuidador = pr.getString("CARER_NAME", "NO HAY CUIDADOR REGISTRADO");
-        if (nom_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
-
-        } else {
-            miniFAB_Cuidador.setTitle("LLamar a " + nom_cuidador);
-        }
-        miniFAB_Cuidador.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences pr = getSharedPreferences("PRFS", MODE_PRIVATE);
-                nom_cuidador = pr.getString("CARER_NAME", "NO HAY CUIDADOR REGISTRADO");
-                tlf_cuidador = pr.getString("CARER_PHONE", "NO HAY CUIDADOR REGISTRADO");
-                if (tlf_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
-                    tlf_cuidador = "000000000";
-                }
-                if (nom_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
-
-                } else {
-                    miniFAB_Cuidador.setTitle("LLamar a " + nom_cuidador);
-                }
-                //Indicamos el telefono para llamar
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.CALL_PHONE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
-                            0);
-                }
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + tlf_cuidador));
-                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                startActivity(intent);
-            }
-        });
-
-
-        //Registro del día y hora de último uso de la app
-        SharedPreferences p = getSharedPreferences("PRFS", MODE_PRIVATE);
-        final SharedPreferences.Editor ed = p.edit();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        String fecha = sdf.format(new Date());
-        ed.putString("LAST_USE", fecha);
-        ed.apply();
-
-        //Servicio de control de medicación
-        Intent i = new Intent(this, MyserviceTwo.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        i.setFlags(Intent.FLAG_FROM_BACKGROUND);
-        i.setAction(Constants.INSTALLAPP);
-        startService(i);
-
-
     }
 
 
@@ -1017,13 +1022,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     if (line.charAt(17) == '0') {
                         tipo_actividad = "Nada";
                     } else if (line.charAt(17) == '1') {
-                        tipo_actividad = "Ligera";
+                        tipo_actividad = "Ligero";
                     } else if (line.charAt(17) == '2') {
                         tipo_actividad = "Medio";
                     } else if (line.charAt(17) == '3') {
-                        tipo_actividad = "Alta";
+                        tipo_actividad = "Alto";
                     } else if (line.charAt(17) == '4') {
-                        tipo_actividad = "Intensa";
+                        tipo_actividad = "Intenso";
                     }
                     txtNIvelEjercicio.setText(tipo_actividad);
                     txtNIvelEjercicio.setGravity(Gravity.CENTER);
@@ -1548,6 +1553,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
+
+
     public AlertDialog createLogrosDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
@@ -1669,6 +1676,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     switch (imagenn) {
                         case 0:
                             ires = R.drawable.ic_medallagris;
+
                             break;
                         case 1:
                             ires = R.drawable.ic_medallabronce;

@@ -86,7 +86,6 @@
         android:contentDescription="@string/content_description_nextmessage"
         android:layout_below="@+id/scroll_caption"
         android:layout_alignParentEnd="true" />
-
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -107,4 +106,5 @@
         android:layout_marginRight="@dimen/info_play_margin"
         android:layout_below="@+id/scroll_caption"
         android:layout_toStartOf="@+id/info_play" />
+
 </RelativeLayout>

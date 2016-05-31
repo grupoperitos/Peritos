@@ -8,6 +8,7 @@
     <WebView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
         android:id="@+id/text_details"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
@@ -16,11 +17,12 @@
     <Button
         android:id="@+id/btn_aceptar"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/altura_button"
+        android:layout_height="wrap_content"
         android:textColor="@color/colorPrimary"
         android:padding="@dimen/button_padding"
         android:textStyle="bold"
         android:text="@string/dialog_aceptar"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_alignParentBottom="true"
         android:layout_alignEnd="@+id/text_details" />

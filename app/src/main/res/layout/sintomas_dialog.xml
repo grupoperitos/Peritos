@@ -38,11 +38,11 @@
             android:textStyle="bold"
             android:layout_marginTop="@dimen/dialog_body"
             android:layout_marginBottom="@dimen/button_padding"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <SeekBar
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
             android:id="@+id/seekBar_estado_esputo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,19 +56,24 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:paddingRight="20dp"
+            android:paddingLeft="20dp">
             <TextView
                 android:text="Blanco"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:textStyle="italic"/>
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
             <TextView
                 android:text="Verde"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:textStyle="italic"/>
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
         </FrameLayout>
 
 
@@ -86,21 +91,21 @@
             android:textStyle="bold"
             android:layout_marginTop="@dimen/dialog_body"
             android:layout_marginBottom="@dimen/button_padding"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_gravity="left"
                 android:src="@drawable/seated"/>
 
             <SeekBar
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
                 android:id="@+id/seekBar_estado_paciente"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -114,8 +119,8 @@
                 android:layout_toEndOf="@+id/imageView2" />
 
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_gravity="right"
                 android:src="@drawable/lifting"/>
         </FrameLayout>
@@ -124,19 +129,24 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:paddingRight="20dp"
+            android:paddingLeft="20dp">
             <TextView
                 android:text="Ninguna"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:textStyle="italic"/>
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
             <TextView
-                android:text="Escaleras"
+                android:text="Intensa"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:textStyle="italic"/>
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
         </FrameLayout>
 
 
@@ -152,20 +162,20 @@
             android:textStyle="bold"
             android:layout_marginTop="@dimen/dialog_body"
             android:layout_marginBottom="@dimen/button_padding"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_gravity="left"
             android:src="@drawable/resting"/>
 
             <SeekBar
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
                 android:id="@+id/seekBar_estado_fatiga"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -179,8 +189,8 @@
                 android:layout_toEndOf="@+id/imageView2" />
 
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_gravity="right"
                 android:src="@drawable/tired"/>
         </FrameLayout>
@@ -189,19 +199,24 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:paddingRight="20dp"
+            android:paddingLeft="20dp">
             <TextView
                 android:text="Nada"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:textStyle="italic"/>
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
             <TextView
                 android:text="Mucho"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:textStyle="italic"/>
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
         </FrameLayout>
 
         <!--Apartado Fiebre-->
@@ -211,12 +226,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:textStyle="bold"
             android:gravity="center"
             android:text="¿Tiene Fiebre?"
-            android:textStyle="bold"
-            android:layout_marginTop="@dimen/dialog_body"
             android:layout_marginBottom="@dimen/button_padding"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -227,12 +241,14 @@
             <net.colindodd.toggleimagebutton.ToggleImageButton
                 xmlns:tib="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/tb_fiebre"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 tib:tib_drawable_on="@drawable/term_fiebre"
                 tib:tib_drawable_off="@drawable/term_no_fiebre" />
 
+
         </LinearLayout>
+
 
     </LinearLayout>
 
@@ -255,6 +271,7 @@
             android:textColor="@color/colorPrimary"
             android:padding="@dimen/button_padding"
             android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="@string/dialog_cancelar"
             style="@style/Widget.AppCompat.Button.Borderless"/>
 
@@ -266,11 +283,14 @@
             android:textColor="@color/colorPrimary"
             android:padding="@dimen/button_padding"
             android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="@string/dialog_aceptar"
             style="@style/Widget.AppCompat.Button.Borderless"/>
 
 
     </LinearLayout>
+
+
 
 
 </RelativeLayout>

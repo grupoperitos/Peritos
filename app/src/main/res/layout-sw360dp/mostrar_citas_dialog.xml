@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="400dp"
+    android:layout_height="550dp"
     android:background="@android:color/white"
     android:paddingTop="@dimen/dialog_body"
     android:paddingLeft="@dimen/dialog_body"
@@ -24,17 +24,24 @@
         android:paddingBottom="10dp"
         android:gravity="center|top"
         android:paddingTop="24dp"
-        android:paddingRight="@dimen/dialog_body">
+        android:paddingRight="@dimen/dialog_body"
+        android:layout_above="@+id/linearLayout">
 
-
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="10dp"
+            android:scrollbars="none"
+            android:layout_weight="1">
 
         <TableLayout
             android:id="@+id/tabla_citas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:stretchColumns="2"
-            android:shrinkColumns="2" >
+            android:shrinkColumns="2">
         </TableLayout>
+        </ScrollView>
     </LinearLayout>
 
 

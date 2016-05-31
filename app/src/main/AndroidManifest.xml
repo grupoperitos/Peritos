@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
 
     <application
         android:allowBackup="true"
@@ -23,6 +25,44 @@
         android:label="Login">
 
     </activity>
+
+
+
+
+        <!--Broadcast Alarm Manager-->
+        <receiver android:name="com.epsl.peritos.sintomas_registro.ReceiverDateNotify">
+            <intent-filter>
+                <action android:name=".alarmmanager"/>
+            </intent-filter>
+        </receiver>
+        <!--Broadcast BOOT-->
+        <receiver android:name="com.epsl.peritos.sintomas_registro.ReceiverBoot">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+
+        <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+        <!--Broadcast Alarm Manager-->
+        <receiver android:name="com.epsl.peritos.sintomas_registro.ReceiverDateNotify">
+            <intent-filter>
+                <action android:name=".alarmmanager"/>
+            </intent-filter>
+        </receiver>
+        <!--Broadcast BOOT-->
+        <receiver android:name="com.epsl.peritos.sintomas_registro.ReceiverBoot">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        Jua
+        <service
+            android:name="com.epsl.peritos.sintomas_registro.ServiceTreatment"
+            android:enabled="true"
+            android:exported="true"></service>
         <activity
             android:screenOrientation="portrait"
             android:name=".activity.MainActivity"

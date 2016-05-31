@@ -1,4 +1,4 @@
-package com.epsl.peritos;
+package com.epsl.peritos.sintomas_registro;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

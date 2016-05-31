@@ -49,32 +49,93 @@
             android:layout_weight="0.35"
             android:background="#4FC3F7"
             android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="right">
+
+
+                <ImageView
+                    android:id="@+id/medalla1"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ic_medallagris"
+                    android:scaleType="fitCenter"
+                    android:layout_marginBottom="20dp"
+                    android:layout_gravity="center|bottom"/>
+
+                <ImageView
+                    android:id="@+id/medalla2"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ic_medallagris"
+                    android:scaleType="fitCenter"
+                    android:layout_marginBottom="20dp"
+                    android:layout_gravity="center|bottom"/>
+
+                <ImageView
+                    android:id="@+id/medalla3"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ic_medallagris"
+                    android:scaleType="fitCenter"
+                    android:layout_marginBottom="20dp"
+                    android:layout_gravity="center|bottom"/>
+
+                <ImageView
+                    android:id="@+id/medalla4"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ic_medallagris"
+                    android:scaleType="fitCenter"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_gravity="center|bottom"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="A++"
+                    android:paddingRight="10dp"
+                    android:textColor="#00ff00"
+                    android:textSize="45dp"
+                    android:textStyle="bold|italic" />
+
+
+            </LinearLayout>
+
+
         </FrameLayout>
 
 
     </LinearLayout> <!--Cierre Layout Superior, incluye dentro el inferior-->
 
+
+
     <!--Imagen Bocadillo doctor-->
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="135dp"
+        android:layout_height="120dp"
         android:src="@drawable/bocadillo_doctor"
         android:scaleType="fitCenter"
-        android:layout_marginLeft="20dp"
+        android:onClick="openBottomSheet"
+        android:layout_marginLeft="0dp"
         android:layout_marginBottom="20dp"
         android:layout_gravity="center|bottom"/>
 
     <!--Botón Imagen izquierda-->
     <ImageButton
         android:layout_width="wrap_content"
-        android:layout_height="280dp"
+        android:layout_height="300dp"
         android:src="@drawable/doctor"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:layout_gravity="left|bottom"
         android:onClick="openBottomSheet"
         android:background="@null"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="10dp"/>
 
     <!--FAB emergencias-->
     <com.getbase.floatingactionbutton.FloatingActionsMenu

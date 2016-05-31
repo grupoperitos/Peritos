@@ -67,7 +67,7 @@ if(logged==null){
                 <div class="page-logo">
                     <h4 style="color:white;">RESPIRAPP</h4>
                     <!--<a href="index.html">
-                        <img src="logo.png" alt="logo" class="logo-default" /> </a>
+                    <img src="assets/logo.png" alt="logo" class="logo-default" />
                     <div class="menu-toggler sidebar-toggler"> </div>-->
                 </div>
                 <!-- END LOGO -->

@@ -115,7 +115,7 @@ public class AchievementManager {
         int potins = p.getInt(ACHIEVEMENT_POINTS, DEFAULT_ACIEVEMNTPOINTS);
         long time = System.currentTimeMillis();
         long start = p.getLong(START_CYCLE, time);
-        long cycle = time / WEEK;
+        long cycle = (time-start) / WEEK;
 
 
         return cycle;
@@ -183,16 +183,16 @@ public class AchievementManager {
         int temp = 0;
         switch (week) {
             case 0:
-                temp = p.getInt(WEEK_1, 0);
+                temp = p.getInt(WEEK_1, -1);
                 break;
             case 1:
-                temp = p.getInt(WEEK_2, 0);
+                temp = p.getInt(WEEK_2, -1);
                 break;
             case 2:
-                temp = p.getInt(WEEK_3, 0);
+                temp = p.getInt(WEEK_3, -1);
                 break;
             case 3:
-                temp = p.getInt(WEEK_4, 0);
+                temp = p.getInt(WEEK_4, -1);
                 break;
             default:
                 break;
@@ -234,7 +234,7 @@ public class AchievementManager {
 
     }
 
-    public static void setPointsToWeek(Context context, int week, int points) {
+    protected static void setPointsToWeek(Context context, int week, int points) {
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();
         int temp = 0;
@@ -258,7 +258,7 @@ public class AchievementManager {
 
         }
 
-        ed.putInt(key, points);
+        ed.putInt(key, getWeeklyAchievemntMedal(points));
         ed.commit();
     }
 
@@ -275,7 +275,7 @@ public class AchievementManager {
     public static int getPatientLevel(Context context) {
         int pl = 0;
         for (int i = 0; i < 4; i++) {
-            pl = pl + getWeek(context, i);
+            pl = pl + Math.max(getWeek(context, i),0);
         }
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();

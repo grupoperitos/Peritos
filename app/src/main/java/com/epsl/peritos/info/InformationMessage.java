@@ -7,7 +7,7 @@ public class InformationMessage {
 
     private int code = 0;
     private int type = 0;
-    private int priority = 0; //Prioridad, por defecto 0 que seria la maxima prioridad, implica que un mensaje se mostrara mas a menudo que otros
+    private int subtype = 0; //Prioridad, por defecto 0 que seria la maxima prioridad, implica que un mensaje se mostrara mas a menudo que otros
     private int achievement = 1; //Puntos de logro que gana el usuario cuando ve el detalle del mensaje
     private String title = "-"; //titulo generico a mostrar cuando sale el mensaje
     private String caption = "-"; //Mensaje corto, normalmente una frase
@@ -34,7 +34,7 @@ public class InformationMessage {
                     ex.printStackTrace();
                 }
                 try {
-                    this.setPriority(Integer.parseInt(fields[MessageFormat.POS_PRIORIDAD]));
+                    this.setSubtype(Integer.parseInt(fields[MessageFormat.POS_PRIORIDAD]));
                 } catch (NumberFormatException ex) {
                     ex.printStackTrace();
                 }
@@ -57,13 +57,13 @@ public class InformationMessage {
     @Override
     public String toString() {
         String result = "";
-        result = getType() + "\t" + getCode() + "\t" + getPriority() + "\t" + getAchievement() + "\t" + getTitle() + "\t" + getCaption() + "\t" + getCommentary() + "\t" + getDetail()+"\t" + getURL();
+        result = getType() + "\t" + getCode() + "\t" + getSubtype() + "\t" + getAchievement() + "\t" + getTitle() + "\t" + getCaption() + "\t" + getCommentary() + "\t" + getDetail()+"\t" + getURL();
         return result;
     }
 
     public String toSummarySting() {
         String result = "";
-        result = " T=" + getType() + " C=" + getCode() + " P=" + getPriority() + " A=" + getAchievement() + "\n" + getTitle() + "\n" + getCaption() + "\n" + getCommentary() + "\n" + getDetail()+"\n" + getURL();
+        result = " T=" + getType() + " C=" + getCode() + " P=" + getSubtype() + " A=" + getAchievement() + "\n" + getTitle() + "\n" + getCaption() + "\n" + getCommentary() + "\n" + getDetail()+"\n" + getURL();
 
         return result;
     }
@@ -88,12 +88,12 @@ public class InformationMessage {
         this.type = type;
     }
 
-    public int getPriority() {
-        return priority;
+    public int getSubtype() {
+        return subtype;
     }
 
-    public void setPriority(int priority) {
-        this.priority = priority;
+    public void setSubtype(int subtype) {
+        this.subtype = subtype;
     }
 
     public int getAchievement() {

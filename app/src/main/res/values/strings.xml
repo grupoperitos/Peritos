@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Peritos</string>
+    <string name="app_name">RespirAPP</string>
     <string name="error_IputOutput">Error de entrada/salida</string>
     <string name="text_info_title">Title</string>
     <string name="info_text_dieta">DIETA</string>

@@ -24,10 +24,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentManager;
 
+import com.epsl.peritos.BBDDTratamiento;
+import com.epsl.peritos.StructureParametersBBDD;
 import com.epsl.peritos.achievements.AchievementManager;
 
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -144,6 +148,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     ImageView medalla3;
     ImageView medalla4;
 
+    TextView mPatientLevel = null;
+
 
     //Mensajes
     public static MessageList messageList = null;
@@ -165,6 +171,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
         messageList = InformationManager.loadInformation(this);
         if (messageList != null) {
+            //BBDDTratamiento bbdd = new BBDDTratamiento(this);
+            //ArrayList<StructureParametersBBDD.Treatment> data = bbdd.getListTreatment();
+            //MessageList temp= messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
+            //int []tipos = new int[data.size()];
+//            int n=0;
+//            for(StructureParametersBBDD.Treatment tt:data)
+//            {
+//                String tipo = tt.getTypeTreatmentNumeric();
+//                int tipo_int = Integer.parseInt(tipo);
+//                tipos[n]=tipo_int;
+//                n++;
+//            }
             messageTabs[MessageTypes.INFO_TRATAMIENTO] = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
             messageTabs[MessageTypes.INFO_DIETA] = messageList.getMessagesByType(MessageTypes.INFO_DIETA);
             messageTabs[MessageTypes.INFO_EJERCICIO] = messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
@@ -182,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         medalla2 = (ImageView) findViewById(R.id.medalla2);
         medalla3 = (ImageView) findViewById(R.id.medalla3);
         medalla4 = (ImageView) findViewById(R.id.medalla4);
+        mPatientLevel = (TextView) findViewById(R.id.nivelpaciente);
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -269,10 +288,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             AchievementManager.modifyAchievementPoints(MainActivity.this, points);
                             long week = AchievementManager.getCurrentCycle(MainActivity.this);
                             int total = AchievementManager.getAchievementPoints(MainActivity.this);
-                            AchievementManager.setPointsToWeek(MainActivity.this, (int) week, total);
-                            String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[AchievementManager.getPatientLevel(MainActivity.this)];
+
+                            int level = AchievementManager.getPatientLevel(MainActivity.this);
+                            String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[level];
 
                             insertarLogro(nivelPaciente, AchievementManager.getAchievementPoints(MainActivity.this), 0);
+
+                            actualizeMedals();
 
                             Snackbar.make(viewPager, getString(R.string.achv_haganado) + " " + points + " " + getString(R.string.achv_puntos) + " Total: " + total, Snackbar.LENGTH_SHORT).show();
                         }
@@ -491,8 +513,28 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
 
-    //Menú que se despliega del médico
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.menu_doctor:
+                openBottomSheet(null);
+                return true;
+
+            default:
+                return false;
+
+        }
+
+    }
+//Menú que se despliega del médico
 
     public void openBottomSheet(View v) {
 
@@ -616,11 +658,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         if (AchievementManager.isFirstRun(this)) {
             AchievementManager.setFirstRun(this);
         } else {
-            long ciclo = AchievementManager.getCurrentCycle(this);
+
             long currenttime = System.currentTimeMillis();
             long lastdate = AchievementManager.getLastDate(this);
             if ((currenttime - lastdate) > 4 * AchievementManager.WEEK) {
-                Toast.makeText(this,getString(R.string.achv_gretings_bad0), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.achv_gretings_bad0), Toast.LENGTH_LONG).show();
                 //Control de logros
                 Message msgbad = mHandler.obtainMessage();
                 msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
@@ -631,11 +673,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 AchievementManager.resetPatientLevel(this);
                 AchievementManager.resetWeeks(this);
 
-                insertarLogro(getString(R.string.achv_consequence_4week),AchievementManager.ACHIEVE_NOENTERWEEK,-1);
-                insertarLogro(getString(R.string.achv_consequence_critical),0,-1);
+                insertarLogro(getString(R.string.achv_consequence_4week), AchievementManager.ACHIEVE_NOENTERWEEK, -1);
+                insertarLogro(getString(R.string.achv_consequence_critical), 0, -1);
 
             } else if ((currenttime - lastdate) > AchievementManager.WEEK) {
-                Toast.makeText(this,getString(R.string.achv_gretings_bad1), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.achv_gretings_bad1), Toast.LENGTH_LONG).show();
                 //Control de logros
                 Message msgbad = mHandler.obtainMessage();
                 msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
@@ -647,11 +689,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 AchievementManager.resetPatientLevel(this);
                 AchievementManager.resetWeeks(this);
 
-                insertarLogro(getString(R.string.achv_consequence_week),AchievementManager.ACHIEVE_NOENTERWEEK,-1);
-                insertarLogro(getString(R.string.achv_consequence_critical),0,-1);
+                insertarLogro(getString(R.string.achv_consequence_week), AchievementManager.ACHIEVE_NOENTERWEEK, -1);
+                insertarLogro(getString(R.string.achv_consequence_critical), 0, -1);
 
             } else if ((currenttime - lastdate) > AchievementManager.DAY) {
-                Toast.makeText(this,getString(R.string.achv_gretings_bad2), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.achv_gretings_bad2), Toast.LENGTH_LONG).show();
                 //Control de logros
                 Message msgbad = mHandler.obtainMessage();
                 msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
@@ -660,20 +702,33 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 msgbad.setData(b);
                 mHandler.sendMessage(msgbad);
 
-                insertarLogro(getString(R.string.achv_consequence_day),AchievementManager.ACHIEVE_NOENTER,-1);
+                insertarLogro(getString(R.string.achv_consequence_day), AchievementManager.ACHIEVE_NOENTER, -1);
 
             }
 
             resetMedallas();
 
-            for(int n=1;n<=ciclo;n++) {
-                cambiarMedalla(n,AchievementManager.getWeeklyAchievement(this,n-1));
-            }
+            actualizeMedals();
 
 
         }
     }
 
+    private void actualizeMedals() {
+        long ciclo = AchievementManager.getCurrentCycle(this);
+
+        for (int n = 0; n <= ciclo && n < 4; n++) {
+            if (AchievementManager.getWeeklyAchievement(this, n) != -1)
+                cambiarMedalla(n + 1, AchievementManager.getWeeklyAchievement(this, n));
+            else
+                cambiarMedalla(n + 1, -1);
+
+        }
+
+        int level = AchievementManager.getPatientLevel(this);
+        if (mPatientLevel != null)
+            mPatientLevel.setText(AchievementManager.PATIENT_LEVEL_TEXT[level]);
+    }
 
     @Override
     public void onTimeSet(RadialPickerLayout v, int hora_dia, int min, int sec) {
@@ -1399,6 +1454,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
      */
 
     public void cambiarMedalla(int pos, int color) {
+        if (medalla1 == null || medalla2 == null || medalla3 == null || medalla4 == null)
+            return;
         //Medalla 1
         if (pos == 1) {
             //medalla1 = (ImageView)findViewById(R.id.medalla1);

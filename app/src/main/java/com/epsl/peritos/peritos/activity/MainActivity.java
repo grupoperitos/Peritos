@@ -24,6 +24,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentManager;
 
+import com.epsl.peritos.achievements.AchievementManager;
+
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -528,9 +530,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
             @Override
             public void onClick(View v) {
-                AlertDialog dialogo_Ejercicios = createEjericiosDialog();
+                AlertDialog dialogo_Logros = createLogrosDialog();
                 //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
-                dialogo_Ejercicios.show();
+                dialogo_Logros.show();
             }
         });
 
@@ -1310,6 +1312,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
+    /**
+     *
+     * Método para cambiar el color de la medalla para los logros
+     * @param pos
+     * @param color
+     */
+
     public void cambiarMedalla(int pos, int color) {
         //Medalla 1
         if (pos == 1) {
@@ -1384,6 +1393,253 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 medalla4.setImageResource(R.drawable.ic_medallaoro);
             }
         }
+    }
+
+
+    public void insertarLogro(String causa, int puntos){
+
+        //Fecha actual
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy HH:mm");
+        String fecha_act = sdf.format(new Date());
+
+        //Causas
+        String c="";
+        if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F-")){
+            c="00";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F")){
+            c="01";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("E-")){
+            c="02";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("E")){
+            c="03";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("D")){
+            c="04";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("D+")){
+            c="05";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("C")){
+            c="06";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("C+")){
+            c="07";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("B")){
+            c="08";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("B+")){
+            c="09";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("A")){
+            c="10";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("A+")){
+            c="11";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Sin logro")){
+            c="12";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de bronce")){
+            c="13";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de plata")){
+            c="14";
+        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de oro")){
+            c="15";
+        }
+
+        String imagen="";
+        //IMAGEN MEDALLA
+        if(c.equals("12")){
+            imagen="0";
+        }else if(c.equals("13")){
+            imagen="1";
+        }else if(c.equals("14")){
+            imagen="2";
+        }else if(c.equals("15")){
+            imagen="3";
+        }
+
+
+        //ALMACENAMIENTO EN FICHERO
+        FileOutputStream fos = null;
+        try {
+            fos = MainActivity.this.openFileOutput("registro_logros", MODE_APPEND);
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+
+        OutputStreamWriter os = new OutputStreamWriter(fos);
+
+        BufferedWriter bw = new BufferedWriter(os);
+
+        try {
+            bw.write(fecha_act + "\t" + causa + "\t" + puntos + "\t" + imagen);
+            bw.newLine();
+            //Toast.makeText(MainActivity.this, "Registro almacenado correctamente", Toast.LENGTH_SHORT).show();
+            bw.close();
+            os.close();
+            fos.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+    }
+
+
+
+
+    public AlertDialog createLogrosDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.mostrar_logros_dialog, null);
+
+        builder.setView(v);
+
+        Button aceptar = (Button) v.findViewById(R.id.btn_aceptar_logros);
+
+        TableLayout tablalogros=(TableLayout) v.findViewById(R.id.tabla_logros);
+
+        TableRow.LayoutParams layoutFila=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFecha_completa=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutCausa=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutPuntos=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutIMG=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+
+        TableRow fila;
+        TextView txtFecha_completa;
+        TextView txtCausa;
+        TextView txtPuntos;
+        ImageView img;
+
+
+        //Reseteamos la tabla al entrar
+        tablalogros.removeAllViews();
+
+        //Formateo Cabecera
+        String cabeceras[] = { "Fecha", "Motivo", "Ptos", "Obs."};
+        TableRow cabecera = new TableRow(this);
+        cabecera.setLayoutParams(new TableLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        tablalogros.addView(cabecera);
+        // Textos de la cabecera
+        for (int i = 0; i < 4; i++)
+        {
+            TextView columna = new TextView(this);
+            columna.setLayoutParams(new TableRow.LayoutParams(
+                    LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+            columna.setText(cabeceras[i]);
+            columna.setTextSize(15);
+            columna.setTextColor(Color.parseColor("#4FC3F7"));
+            columna.setGravity(Gravity.CENTER_HORIZONTAL);
+            columna.setTypeface(null, Typeface.BOLD_ITALIC);
+            columna.setPadding(5, 5, 5, 5);
+            cabecera.addView(columna);
+        }
+        // Línea que separa la cabecera de los datos
+        TableRow separador_cabecera = new TableRow(this);
+        separador_cabecera.setLayoutParams(new TableLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        FrameLayout linea_cabecera = new FrameLayout(this);
+        TableRow.LayoutParams linea_cabecera_params =
+                new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
+        linea_cabecera_params.span = 6;
+        linea_cabecera.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        separador_cabecera.addView(linea_cabecera, linea_cabecera_params);
+        tablalogros.addView(separador_cabecera);
+
+
+
+        try {
+
+            FileInputStream fin = MainActivity.this.openFileInput("registro_logros");
+
+            InputStreamReader is = new InputStreamReader(fin);
+
+            BufferedReader b = new BufferedReader(is);
+            String line = "";
+            do {
+                line = b.readLine();
+                if (line != null) {
+
+
+                    fila=new TableRow(MainActivity.this);
+                    fila.setLayoutParams(layoutFila);
+
+                    txtFecha_completa=new TextView(this);
+                    txtCausa = new TextView(this);
+                    txtPuntos = new TextView(this);
+                    img = new ImageView(this);
+
+
+                    txtFecha_completa.setText(line.subSequence(0,14));
+                    txtFecha_completa.setGravity(Gravity.CENTER);
+                    txtFecha_completa.setPadding(0, 0, 5, 0);
+                    txtFecha_completa.setTextSize(14);
+                    txtFecha_completa.setTypeface(null, Typeface.ITALIC);
+                    txtFecha_completa.setLayoutParams(layoutFecha_completa);
+
+                    txtCausa.setText(line.subSequence(16,17));
+                    txtCausa.setGravity(Gravity.CENTER);
+                    txtCausa.setPadding(0, 0, 5, 0);
+                    txtCausa.setTextSize(14);
+                    txtCausa.setTypeface(null, Typeface.ITALIC);
+                    txtCausa.setLayoutParams(layoutCausa);
+
+                    txtPuntos.setText(line.charAt(19));
+                    txtPuntos.setGravity(Gravity.CENTER);
+                    txtPuntos.setPadding(0, 0, 5, 0);
+                    txtPuntos.setTextSize(14);
+                    txtPuntos.setTypeface(null, Typeface.ITALIC);
+                    txtPuntos.setLayoutParams(layoutPuntos);
+
+                    img.setImageResource(R.drawable.ic_medallaoro);
+                    img.setPadding(0, 0, 5, 0);
+                    img.setLayoutParams(layoutIMG);
+
+                    fila.addView(txtFecha_completa);
+                    fila.addView(txtCausa);
+                    fila.addView(txtPuntos);
+                    fila.addView(img);
+
+
+                    tablalogros.addView(fila);
+
+                    // Línea que separa cada fila de datos
+                    TableRow separador_filas = new TableRow(this);
+                    separador_filas.setLayoutParams(new TableLayout.LayoutParams(
+                            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    FrameLayout linea = new FrameLayout(this);
+                    TableRow.LayoutParams linea_totales_params =
+                            new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
+                    linea_totales_params.span = 6;
+                    linea.setBackgroundColor(Color.parseColor("#4FC3F7"));
+                    linea.setPadding(0,5,0,0);
+                    separador_filas.addView(linea, linea_totales_params);
+                    tablalogros.addView(separador_filas);
+
+                }
+            } while (line != null);
+            b.close();
+            is.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+
+
+        aceptar.setOnClickListener(
+                new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        dialog.dismiss();
+                    }
+                }
+        );
+
+
+
+        return dialog;
     }
 
 

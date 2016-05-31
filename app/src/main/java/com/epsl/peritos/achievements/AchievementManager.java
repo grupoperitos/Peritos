@@ -35,7 +35,7 @@ public class AchievementManager {
     public static final int ACHIEVE_NOENTER = -25;
     public static final int ACHIEVE_NOMEDICINE = -10;
 
-    public static final String [] PATIENT_LEVEL_TEXT={"F-","F","E-","E","D","D+","C","C+","B","B+","A","A+","Sin logro","Mesalla de bronce","Medalla de plata","Medalla de oro"};
+    public static final String [] PATIENT_LEVEL_TEXT={"F-","F","E-","E","D","D+","C","C+","B","B+","A","A+","Sin logro","Medalla de bronce","Medalla de plata","Medalla de oro"};
 
     /**
      * Establece en punto inicial de la aplicación para el control de logros

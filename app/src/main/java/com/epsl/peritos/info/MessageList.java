@@ -58,4 +58,15 @@ public class MessageList extends ArrayList<InformationMessage> {
         return result;
     }
 
+    public MessageList getMessagesBySubType(int []subtype) {
+        MessageList result = new MessageList();
+
+        for (InformationMessage message : this) {
+            for(int t:subtype)
+            if (message.getSubtype() == t)
+                result.add(message);
+        }
+        return result;
+    }
+
 }

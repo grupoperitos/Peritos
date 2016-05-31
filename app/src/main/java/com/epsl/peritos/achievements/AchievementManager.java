@@ -2,9 +2,9 @@ package com.epsl.peritos.achievements;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.provider.Settings;
-import android.support.design.widget.Snackbar;
-import android.widget.Toast;
+import android.util.TypedValue;
+
+import com.epsl.peritos.peritos.R;
 
 /**
  * Created by Juan Carlos on 26/05/2016.
@@ -118,7 +118,7 @@ public class AchievementManager {
         int potins = p.getInt(ACHIEVEMENT_POINTS, DEFAULT_ACIEVEMNTPOINTS);
         long time = System.currentTimeMillis();
         long start = p.getLong(START_CYCLE, time);
-        long cycle = time / WEEK;
+        long cycle = (time-start) / WEEK;
 
 
         return cycle;
@@ -145,6 +145,8 @@ public class AchievementManager {
         ed.commit();
 
 
+
+
     }
 
     /**
@@ -156,6 +158,44 @@ public class AchievementManager {
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();
         return p.getInt(ACHIEVEMENT_POINTS, DEFAULT_ACIEVEMNTPOINTS);
+
+    }
+
+
+    /**
+     * Actualiza los puntos de logro del usuario
+     *
+     * @param context Contexto de la aplicación
+     */
+    static public String getAchievementMessage(Context context) {
+        String message="";
+        int points=getAchievementPoints(context);
+        if(points<=100 && points>90)
+            message=context.getString(R.string.achv_maximo_2);
+        if(points<=90 && points>80)
+            message=context.getString(R.string.achv_maximo_2);
+        if(points<=80 && points>74)
+            message=context.getString(R.string.achv_maximo_2);
+        if(points<=74 && points>65)
+            message=context.getString(R.string.achv_menos75_2);
+        if(points<=65 && points>57)
+            message=context.getString(R.string.achv_menos75_1);
+        if(points<=57 && points>49)
+            message=context.getString(R.string.achv_menos75_0);
+        if(points<=49 && points>40)
+            message=context.getString(R.string.achv_menos50_2);
+        if(points<=40 && points>30)
+            message=context.getString(R.string.achv_menos50_1);
+        if(points<=30 && points>24)
+            message=context.getString(R.string.achv_menos50_0);
+        if(points<=24 && points>20)
+            message=context.getString(R.string.achv_menos25_2);
+        if(points<=20 && points>10)
+            message=context.getString(R.string.achv_menos25_1);
+        if(points<=10 && points>=0)
+            message=context.getString(R.string.achv_menos25_0);
+
+        return message;
 
     }
 
@@ -184,16 +224,16 @@ public class AchievementManager {
         int temp = 0;
         switch (week) {
             case 0:
-                temp = p.getInt(WEEK_1, 0);
+                temp = p.getInt(WEEK_1, -1);
                 break;
             case 1:
-                temp = p.getInt(WEEK_2, 0);
+                temp = p.getInt(WEEK_2, -1);
                 break;
             case 2:
-                temp = p.getInt(WEEK_3, 0);
+                temp = p.getInt(WEEK_3, -1);
                 break;
             case 3:
-                temp = p.getInt(WEEK_4, 0);
+                temp = p.getInt(WEEK_4, -1);
                 break;
             default:
                 break;
@@ -253,10 +293,13 @@ public class AchievementManager {
             case 3:
                 key = WEEK_4;
                 break;
+            default:
+                resetWeeks(context);
+                break;
 
         }
 
-        ed.putInt(key, points);
+        ed.putInt(key, getWeeklyAchievemntMedal(points));
         ed.commit();
     }
 
@@ -273,7 +316,7 @@ public class AchievementManager {
     public static int getPatientLevel(Context context) {
         int pl = 0;
         for (int i = 0; i < 4; i++) {
-            pl = pl + getWeek(context, i);
+            pl = pl + Math.max(getWeek(context, i),0);
         }
         SharedPreferences p = context.getSharedPreferences(ACHIEVEMENTS_FILE, Context.MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();

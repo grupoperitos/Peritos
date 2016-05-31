@@ -24,10 +24,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentManager;
 
+import com.epsl.peritos.BBDDTratamiento;
+import com.epsl.peritos.StructureParametersBBDD;
 import com.epsl.peritos.achievements.AchievementManager;
 
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +46,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.epsl.peritos.Constants;
-
+import com.epsl.peritos.MyserviceTwo;
 import com.epsl.peritos.achievements.AchievementManager;
 import com.epsl.peritos.info.InformationManager;
 
@@ -146,6 +149,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     ImageView medalla3;
     ImageView medalla4;
 
+    TextView mPatientLevel = null;
+
 
     //Mensajes
     public static MessageList messageList = null;
@@ -187,10 +192,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             setContentView(R.layout.activity_main);
 
 
-            medalla1 = (ImageView) findViewById(R.id.medalla1);
-            medalla2 = (ImageView) findViewById(R.id.medalla2);
-            medalla3 = (ImageView) findViewById(R.id.medalla3);
-            medalla4 = (ImageView) findViewById(R.id.medalla4);
+        medalla1 = (ImageView) findViewById(R.id.medalla1);
+        medalla2 = (ImageView) findViewById(R.id.medalla2);
+        medalla3 = (ImageView) findViewById(R.id.medalla3);
+        medalla4 = (ImageView) findViewById(R.id.medalla4);
+        mPatientLevel = (TextView) findViewById(R.id.nivelpaciente);
 
 
             viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -271,27 +277,61 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_NEXT_TEXT, Snackbar.LENGTH_SHORT).show();
                             break;
 
-                        case HANLDER_MESSAGE_ACHIEVEMENT_POINTS:
-                            Bundle data = inputMessage.getData();
-                            if (data != null) {
-                                int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
-                                AchievementManager.modifyAchievementPoints(MainActivity.this, points);
-                                long week = AchievementManager.getCurrentCycle(MainActivity.this);
-                                int total = AchievementManager.getAchievementPoints(MainActivity.this);
-                                AchievementManager.setPointsToWeek(MainActivity.this, (int) week, total);
-                                String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[AchievementManager.getPatientLevel(MainActivity.this)];
+                    case HANLDER_MESSAGE_ACHIEVEMENT_POINTS:
+                        Bundle data = inputMessage.getData();
+                        if (data != null) {
+                            int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
+                            long week = AchievementManager.getCurrentCycle(MainActivity.this);
+                            int total = AchievementManager.getAchievementPoints(MainActivity.this);
+                            int prevMedal = Math.max(AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week),0);
+                            int nextLevel = -1;
+                            int nextMedal = -1;
+                            int level = AchievementManager.getPatientLevel(MainActivity.this);
 
+                            AchievementManager.modifyAchievementPoints(MainActivity.this, points);
+                            AchievementManager.setPointsToWeek(MainActivity.this, (int) week, AchievementManager.getAchievementPoints(MainActivity.this));
+                            //TODO Borrar
+                            //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 1) % 4, points);
+                            //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 2) % 4, points);
+                            //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 3) % 4, points);
+
+
+                            nextMedal = AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week);
+                            nextLevel = AchievementManager.getPatientLevel(MainActivity.this);
+
+                            String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[level];
+
+                            if (prevMedal < nextMedal) {
+                                String medalla = "";
+                                switch (nextMedal) {
+                                    case 1:
+                                        medalla = getString(R.string.achv_medalladebronce);
+                                        break;
+                                    case 2:
+                                        medalla = getString(R.string.achv_medalladeplata);
+                                        break;
+                                    case 3:
+                                        medalla = getString(R.string.achv_medalladeoro);
+                                        break;
+                                    default:
+                                        medalla = "Aún no tiene ningún logro";
+                                }
+                                insertarLogro(medalla, AchievementManager.getAchievementPoints(MainActivity.this), nextMedal);
+                            }
+                            if (level < nextLevel)
                                 insertarLogro(nivelPaciente, AchievementManager.getAchievementPoints(MainActivity.this), 0);
 
-                                Snackbar.make(viewPager, getString(R.string.achv_haganado) + " " + points + " " + getString(R.string.achv_puntos) + " Total: " + total, Snackbar.LENGTH_SHORT).show();
-                            }
-                            break;
-                        default:
-                            //Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
-                            break;
-                    }
+                            actualizeMedals();
+
+                            Snackbar.make(viewPager, getString(R.string.achv_haganado) + " " + points + " " + getString(R.string.achv_puntos) + " Total: " + total, Snackbar.LENGTH_LONG).show();
+                        }
+                        break;
+                    default:
+                        //Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
+                        break;
                 }
-            };
+            }
+        };
 
             setupTabControl();
 
@@ -393,8 +433,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
             //Servicio de control de medicación
 
-
-        }
+        actualizeMedals();
     }
 
 
@@ -496,8 +535,28 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
 
-    //Menú que se despliega del médico
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.menu_doctor:
+                openBottomSheet(null);
+                return true;
+
+            default:
+                return false;
+
+        }
+
+    }
+//Menú que se despliega del médico
 
     public void openBottomSheet(View v) {
 
@@ -617,14 +676,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         mHandler.sendMessageDelayed(msgObj, MAXPAGE_WAIT);
 
 
+        //Actualización de logros
         if (AchievementManager.isFirstRun(this)) {
             AchievementManager.setFirstRun(this);
         } else {
-            long ciclo = AchievementManager.getCurrentCycle(this);
+
             long currenttime = System.currentTimeMillis();
             long lastdate = AchievementManager.getLastDate(this);
             if ((currenttime - lastdate) > 4 * AchievementManager.WEEK) {
-                Toast.makeText(this,getString(R.string.achv_gretings_bad0), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.achv_gretings_bad0), Toast.LENGTH_LONG).show();
                 //Control de logros
                 Message msgbad = mHandler.obtainMessage();
                 msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
@@ -634,9 +694,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 mHandler.sendMessage(msgbad);
                 AchievementManager.resetPatientLevel(this);
                 AchievementManager.resetWeeks(this);
+
+                insertarLogro(getString(R.string.achv_consequence_4week), AchievementManager.ACHIEVE_NOENTERWEEK, -1);
+                insertarLogro(getString(R.string.achv_consequence_critical), 0, -1);
 
             } else if ((currenttime - lastdate) > AchievementManager.WEEK) {
-                Toast.makeText(this,getString(R.string.achv_gretings_bad1), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.achv_gretings_bad1), Toast.LENGTH_LONG).show();
                 //Control de logros
                 Message msgbad = mHandler.obtainMessage();
                 msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
@@ -647,8 +710,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                 AchievementManager.resetPatientLevel(this);
                 AchievementManager.resetWeeks(this);
+
+                insertarLogro(getString(R.string.achv_consequence_week), AchievementManager.ACHIEVE_NOENTERWEEK, -1);
+                insertarLogro(getString(R.string.achv_consequence_critical), 0, -1);
+
             } else if ((currenttime - lastdate) > AchievementManager.DAY) {
-                Toast.makeText(this,getString(R.string.achv_gretings_bad2), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.achv_gretings_bad2), Toast.LENGTH_LONG).show();
                 //Control de logros
                 Message msgbad = mHandler.obtainMessage();
                 msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
@@ -656,18 +723,36 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_NOENTERWEEK);
                 msgbad.setData(b);
                 mHandler.sendMessage(msgbad);
+
+                insertarLogro(getString(R.string.achv_consequence_day), AchievementManager.ACHIEVE_NOENTER, -1);
+
             }
 
-            resetMedallas();
 
-            for(int n=1;n<=ciclo;n++) {
-                cambiarMedalla(n,AchievementManager.getWeeklyAchievement(this,n-1));
-            }
+            actualizeMedals();
 
 
         }
     }
 
+    private void actualizeMedals() {
+        long ciclo = AchievementManager.getCurrentCycle(this);
+
+        resetMedallas();
+
+        for (int n = 0; n <= ciclo && n < 4; n++) {
+            int medal = AchievementManager.getWeeklyAchievement(this, n);
+            if (medal != -1) {
+                cambiarMedalla(n + 1, medal);
+            } else {
+                cambiarMedalla(n + 1, -1);
+            }
+        }
+
+        int level = AchievementManager.getPatientLevel(this);
+        if (mPatientLevel != null)
+            mPatientLevel.setText(AchievementManager.PATIENT_LEVEL_TEXT[level]);
+    }
 
     @Override
     public void onTimeSet(RadialPickerLayout v, int hora_dia, int min, int sec) {
@@ -1393,13 +1478,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
      */
 
     public void cambiarMedalla(int pos, int color) {
+        if (medalla1 == null || medalla2 == null || medalla3 == null || medalla4 == null)
+            return;
         //Medalla 1
         if (pos == 1) {
             //medalla1 = (ImageView)findViewById(R.id.medalla1);
             if (color == -1) {
                 medalla1.setVisibility(View.INVISIBLE);
             } else
-                medalla4.setVisibility(View.VISIBLE);
+                medalla1.setVisibility(View.VISIBLE);
 
             if (color == 0) {
                 medalla1.setImageResource(R.drawable.ic_medallagris);
@@ -1477,55 +1564,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         //Causas
         String c = "";
-//        if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F-")){
-//            c="00";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F")){
-//            c="01";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("E-")){
-//            c="02";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("E")){
-//            c="03";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("D")){
-//            c="04";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("D+")){
-//            c="05";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("C")){
-//            c="06";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("C+")){
-//            c="07";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("B")){
-//            c="08";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("B+")){
-//            c="09";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("A")){
-//            c="10";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("A+")){
-//            c="11";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Sin logro")){
-//            c="12";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de bronce")){
-//            c="13";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de plata")){
-//            c="14";
-//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de oro")){
-//            c="15";
-//        }
 
         String imagen = "-1";
-        //IMAGEN MEDALLA
-//        if(c.equals("12")){
-//            imagen="0";
-//        }else if(c.equals("13")){
-//            imagen="1";
-//        }else if(c.equals("14")){
-//            imagen="2";
-//        }else if(c.equals("15")){
-//            imagen="3";
-//        }else {
-//            causa = "Nivel de paciente "+causa;
-//            imagen = "-1";
-//        }
-
 
         //ALMACENAMIENTO EN FICHERO
         FileOutputStream fos = null;

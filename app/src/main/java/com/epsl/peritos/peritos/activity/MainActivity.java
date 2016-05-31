@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,14 +24,19 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentManager;
 
-import android.util.TypedValue;
+import com.epsl.peritos.BBDDTratamiento;
+import com.epsl.peritos.StructureParametersBBDD;
+import com.epsl.peritos.achievements.AchievementManager;
+
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
@@ -41,9 +47,9 @@ import android.widget.Toast;
 
 import com.epsl.peritos.Constants;
 import com.epsl.peritos.MyserviceTwo;
+import com.epsl.peritos.achievements.AchievementManager;
 import com.epsl.peritos.info.InformationManager;
 
-import com.epsl.peritos.info.InformationMessage;
 import com.epsl.peritos.info.MessageList;
 import com.epsl.peritos.info.MessageTypes;
 import com.epsl.peritos.peritos.R;
@@ -52,7 +58,6 @@ import com.epsl.peritos.peritos.fragments.InfoFragment;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -61,21 +66,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 
 import android.content.Intent;
 import android.net.Uri;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -90,24 +89,24 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    public Handler mHandler=null;//Handled to manage tab iteration
+    public Handler mHandler = null;//Handled to manage tab iteration
     public static final String CARRUSEL = "carrusel";
 
 
     public static final long MAXPAGE_WAIT = 65000;//milisegundos Control del tiempo que está cada tab activa
     public static final long MAXTEXT_WAIT = 30000;//milisegundos Control del tiempo que está cada tab activo
     public static final long MAIN_MESSAGE_TIME = 5700;
-    public static final int HANDLER_MESSAGE_CHANGETAB   = 1;
-    public static final int HANLDER_MESSAGE_CAPTION     = 2;
-    public static final int HANLDER_MESSAGE_COMMENTARY  = 3;
+    public static final int HANDLER_MESSAGE_CHANGETAB = 1;
+    public static final int HANLDER_MESSAGE_CAPTION = 2;
+    public static final int HANLDER_MESSAGE_COMMENTARY = 3;
     public static final int HANLDER_MESSAGE_CHANGE_TEXT = 4;
-    public static final int HANLDER_MESSAGE_PREV_TEXT   = 5;
-    public static final int HANLDER_MESSAGE_NEXT_TEXT   = 6;
-    public static final int HANLDER_MESSAGE_ACHIEVEMENT_POINTS   = 7;
+    public static final int HANLDER_MESSAGE_PREV_TEXT = 5;
+    public static final int HANLDER_MESSAGE_NEXT_TEXT = 6;
+    public static final int HANLDER_MESSAGE_ACHIEVEMENT_POINTS = 7;
     public static final int HANLDER_MESSAGE_STOPCARRUSEL = 8;
     public static final int HANLDER_MESSAGE_STARTCARRUSEL = 9;
 
-    public static final String HANLDER_MESSAGE_WHAT7_PUNTOS = "puntos";
+    public static final String HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA = "puntos";
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -129,21 +128,27 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     //Variables para Seekbars Control sintomas.
     //Control de estados inicial, si acaban en 1000, tras darle a aceptar, el valor es
     //el central del seekbar. (Valor inicial).
-    int valor_esputo_estado_inicial=1000;
-    int valor_pacientes_estado_inicial=1000;
-    int valor_fatiga_estado_inicial=1000;
-    int estados_seekbar[]=new int[4];
-    String str_fichero="";
+    int valor_esputo_estado_inicial = 1000;
+    int valor_pacientes_estado_inicial = 1000;
+    int valor_fatiga_estado_inicial = 1000;
+    int estados_seekbar[] = new int[4];
+    String str_fichero = "";
 
 
     //Numero del cuidador que recojemos mas adelante del sharedpreferences
-    String tlf_cuidador=null;
-    String nom_cuidador=null;
+    String tlf_cuidador = null;
+    String nom_cuidador = null;
 
     //CITAS
-    String dia_cita="";
-    String hora_cita="";
+    String dia_cita = "";
+    String hora_cita = "";
 
+    ImageView medalla1;
+    ImageView medalla2;
+    ImageView medalla3;
+    ImageView medalla4;
+
+    TextView mPatientLevel = null;
 
 
     //Mensajes
@@ -151,14 +156,33 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     public static MessageList[] messageTabs = new MessageList[4];
 
 
-
     static final int DIALOG_ID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final SharedPreferences prefs = getSharedPreferences("PRFS", Context.MODE_PRIVATE);
+        String isFirstTime = prefs.getString("FIRST_TIME", "0");
+        if (isFirstTime.equals("0")) {
+            Intent in = new Intent(this, LoginActivity.class);
+            MainActivity.this.finish();
+            startActivity(in);
+        }
         messageList = InformationManager.loadInformation(this);
         if (messageList != null) {
+            //BBDDTratamiento bbdd = new BBDDTratamiento(this);
+            //ArrayList<StructureParametersBBDD.Treatment> data = bbdd.getListTreatment();
+            //MessageList temp= messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
+            //int []tipos = new int[data.size()];
+//            int n=0;
+//            for(StructureParametersBBDD.Treatment tt:data)
+//            {
+//                String tipo = tt.getTypeTreatmentNumeric();
+//                int tipo_int = Integer.parseInt(tipo);
+//                tipos[n]=tipo_int;
+//                n++;
+//            }
             messageTabs[MessageTypes.INFO_TRATAMIENTO] = messageList.getMessagesByType(MessageTypes.INFO_TRATAMIENTO);
             messageTabs[MessageTypes.INFO_DIETA] = messageList.getMessagesByType(MessageTypes.INFO_DIETA);
             messageTabs[MessageTypes.INFO_EJERCICIO] = messageList.getMessagesByType(MessageTypes.INFO_EJERCICIO);
@@ -170,6 +194,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
         setContentView(R.layout.activity_main);
+
+
+        medalla1 = (ImageView) findViewById(R.id.medalla1);
+        medalla2 = (ImageView) findViewById(R.id.medalla2);
+        medalla3 = (ImageView) findViewById(R.id.medalla3);
+        medalla4 = (ImageView) findViewById(R.id.medalla4);
+        mPatientLevel = (TextView) findViewById(R.id.nivelpaciente);
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -188,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             @Override
             public void handleMessage(Message inputMessage) {
 
-                switch(inputMessage.what){
+                switch (inputMessage.what) {
                     case HANDLER_MESSAGE_CHANGETAB:
                         //Cambiar la pestaña activa
                         mHandler.removeMessages(HANDLER_MESSAGE_CHANGETAB);
@@ -204,8 +235,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                         //Send the message to change the text
                         Message msgObj = mHandler.obtainMessage();
-                        msgObj.what=MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
-                        mHandler.sendMessageDelayed(msgObj,MAXTEXT_WAIT);
+                        msgObj.what = MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
+                        mHandler.sendMessageDelayed(msgObj, MAXTEXT_WAIT);
 
                         //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_CHANGE_TEXT, Snackbar.LENGTH_SHORT).show();
                         break;
@@ -225,12 +256,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         // - HANLDER_MESSAGE_CHANGE_TEXT
 
                         Message msgCarrusel = mHandler.obtainMessage();
-                        msgCarrusel.what=MainActivity.HANDLER_MESSAGE_CHANGETAB;
-                        mHandler.sendMessageDelayed(msgCarrusel,MAXPAGE_WAIT);
+                        msgCarrusel.what = MainActivity.HANDLER_MESSAGE_CHANGETAB;
+                        mHandler.sendMessageDelayed(msgCarrusel, MAXPAGE_WAIT);
 
                         Message msgText = mHandler.obtainMessage();
-                        msgText.what=MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
-                        mHandler.sendMessageDelayed(msgText,MAXTEXT_WAIT);
+                        msgText.what = MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
+                        mHandler.sendMessageDelayed(msgText, MAXTEXT_WAIT);
 
                         break;
                     case HANLDER_MESSAGE_PREV_TEXT:
@@ -249,6 +280,25 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                         //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_NEXT_TEXT, Snackbar.LENGTH_SHORT).show();
                         break;
+
+                    case HANLDER_MESSAGE_ACHIEVEMENT_POINTS:
+                        Bundle data = inputMessage.getData();
+                        if (data != null) {
+                            int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
+                            AchievementManager.modifyAchievementPoints(MainActivity.this, points);
+                            long week = AchievementManager.getCurrentCycle(MainActivity.this);
+                            int total = AchievementManager.getAchievementPoints(MainActivity.this);
+
+                            int level = AchievementManager.getPatientLevel(MainActivity.this);
+                            String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[level];
+
+                            insertarLogro(nivelPaciente, AchievementManager.getAchievementPoints(MainActivity.this), 0);
+
+                            actualizeMedals();
+
+                            Snackbar.make(viewPager, getString(R.string.achv_haganado) + " " + points + " " + getString(R.string.achv_puntos) + " Total: " + total, Snackbar.LENGTH_SHORT).show();
+                        }
+                        break;
                     default:
                         //Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
                         break;
@@ -260,8 +310,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         //Send the message to change the text
         Message msgObj = mHandler.obtainMessage();
-        msgObj.what=MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
-        mHandler.sendMessageDelayed(msgObj,MAXTEXT_WAIT);
+        msgObj.what = MainActivity.HANLDER_MESSAGE_CHANGE_TEXT;
+        mHandler.sendMessageDelayed(msgObj, MAXTEXT_WAIT);
 
         //MiniFAB salud Responde
         miniFAB_SR = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_SR);
@@ -305,10 +355,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         miniFAB_Cuidador = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_llamar_cuidador);
         SharedPreferences pr = getSharedPreferences("PRFS", MODE_PRIVATE);
         nom_cuidador = pr.getString("CARER_NAME", "NO HAY CUIDADOR REGISTRADO");
-        if(nom_cuidador.equals("NO HAY CUIDADOR REGISTRADO")){
+        if (nom_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
 
-        }else{
-            miniFAB_Cuidador.setTitle("LLamar a "+nom_cuidador);
+        } else {
+            miniFAB_Cuidador.setTitle("LLamar a " + nom_cuidador);
         }
         miniFAB_Cuidador.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,16 +366,21 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 SharedPreferences pr = getSharedPreferences("PRFS", MODE_PRIVATE);
                 nom_cuidador = pr.getString("CARER_NAME", "NO HAY CUIDADOR REGISTRADO");
                 tlf_cuidador = pr.getString("CARER_PHONE", "NO HAY CUIDADOR REGISTRADO");
-                if(tlf_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
+                if (tlf_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
                     tlf_cuidador = "000000000";
                 }
-                if(nom_cuidador.equals("NO HAY CUIDADOR REGISTRADO")){
+                if (nom_cuidador.equals("NO HAY CUIDADOR REGISTRADO")) {
 
-                }else{
-                    miniFAB_Cuidador.setTitle("LLamar a "+nom_cuidador);
+                } else {
+                    miniFAB_Cuidador.setTitle("LLamar a " + nom_cuidador);
                 }
                 //Indicamos el telefono para llamar
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+tlf_cuidador));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.CALL_PHONE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
+                            0);
+                }
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + tlf_cuidador));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -350,13 +405,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         ed.apply();
 
         //Servicio de control de medicación
-        Intent i = new Intent(this,MyserviceTwo.class);
+        Intent i = new Intent(this, MyserviceTwo.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         i.setFlags(Intent.FLAG_FROM_BACKGROUND);
         i.setAction(Constants.INSTALLAPP);
         startService(i);
-    }
 
+
+    }
 
 
     //CONFIGURACION TABS Y SUS FRAGMENTS CON VIEWPAGER
@@ -396,6 +452,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     @Override
     public void onStop() {
+        AchievementManager.setLastDate(this);
         super.onStop();
 
     }
@@ -406,15 +463,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         int pos = tabLayout.getSelectedTabPosition();
 
         tab.select();
-        tabLayout.setScrollPosition(pos,0f,true);
+        tabLayout.setScrollPosition(pos, 0f, true);
 
-        viewPager.setCurrentItem(pos,true);
+        viewPager.setCurrentItem(pos, true);
         tabLayout.invalidate();
         viewPager.invalidate();
 
         Message msgObj = mHandler.obtainMessage();
-        msgObj.what=MainActivity.HANDLER_MESSAGE_CHANGETAB;
-        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
+        msgObj.what = MainActivity.HANDLER_MESSAGE_CHANGETAB;
+        mHandler.sendMessageDelayed(msgObj, MAXPAGE_WAIT);
     }
 
     @Override
@@ -424,7 +481,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-       // Snackbar.make(viewPager, "tab reselected", Snackbar.LENGTH_SHORT).show();
+        // Snackbar.make(viewPager, "tab reselected", Snackbar.LENGTH_SHORT).show();
     }
 
 
@@ -456,8 +513,28 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
 
-    //Menú que se despliega del médico
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.menu_doctor:
+                openBottomSheet(null);
+                return true;
+
+            default:
+                return false;
+
+        }
+
+    }
+//Menú que se despliega del médico
 
     public void openBottomSheet(View v) {
 
@@ -468,7 +545,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         TextView txtPreferencias = (TextView) view.findViewById(R.id.txt_preferencias);
 
 
-
         final Dialog bottomDialogMenu = new Dialog(MainActivity.this,
                 R.style.MaterialDialogMenu);
         bottomDialogMenu.setContentView(view);
@@ -477,7 +553,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         bottomDialogMenu.getWindow().setGravity(Gravity.BOTTOM);
         bottomDialogMenu.show();
-
 
 
         //BOTON MENU CITAS
@@ -505,9 +580,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
             @Override
             public void onClick(View v) {
-                AlertDialog dialogo_Ejercicios = createEjericiosDialog();
+                AlertDialog dialogo_Logros = createLogrosDialog();
                 //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
-                dialogo_Ejercicios.show();
+                dialogo_Logros.show();
             }
         });
 
@@ -518,7 +593,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 //AlertDialog dialogo_preferencias = createPreferenciasDialog();
                 //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
                 //dialogo_preferencias.show();
-                startActivity(new Intent (MainActivity.this,PreferenciasActivity.class));
+                startActivity(new Intent(MainActivity.this, PreferenciasActivity.class));
                 bottomDialogMenu.dismiss();
             }
         });
@@ -529,14 +604,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     public void onDateSet(DatePickerDialog v, int ano, int mes_ano, int dia_mes) {
         //POR DEFECTO EN JAVA LOS MESES VAN DE 0 A 11, POR ESO SUMAMOS 1, PARA MOSTRARLO BIEN
-        mes_ano=mes_ano+1;
-        String mes="";
-        String dia="";
+        mes_ano = mes_ano + 1;
+        String mes = "";
+        String dia = "";
         //Añadir 0 delante si mes es menor que 10
-        if(mes_ano<10){
-            mes="0"+mes_ano;
-        }else{
-            mes=String.valueOf(mes_ano);
+        if (mes_ano < 10) {
+            mes = "0" + mes_ano;
+        } else {
+            mes = String.valueOf(mes_ano);
         }
         //Aádir 0 delante si dia es menor que 10
         if (dia_mes < 10) {
@@ -544,7 +619,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         } else {
             dia = String.valueOf(dia_mes);
         }
-        dia_cita=dia+"-"+mes+"-"+ano;
+        dia_cita = dia + "-" + mes + "-" + ano;
         /*Toast.makeText(
                 this, "El dia de la cita es: " + dia + "-" + mes + "-" + ano,
                 Toast.LENGTH_LONG).show();*/
@@ -575,28 +650,103 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         if (tpd != null) tpd.setOnTimeSetListener(this);
 
         Message msgObj = mHandler.obtainMessage();
-        msgObj.what=1;
-        mHandler.sendMessageDelayed(msgObj,MAXPAGE_WAIT);
+        msgObj.what = 1;
+        mHandler.sendMessageDelayed(msgObj, MAXPAGE_WAIT);
+
+
+        //Actualización de logros
+        if (AchievementManager.isFirstRun(this)) {
+            AchievementManager.setFirstRun(this);
+        } else {
+
+            long currenttime = System.currentTimeMillis();
+            long lastdate = AchievementManager.getLastDate(this);
+            if ((currenttime - lastdate) > 4 * AchievementManager.WEEK) {
+                Toast.makeText(this, getString(R.string.achv_gretings_bad0), Toast.LENGTH_LONG).show();
+                //Control de logros
+                Message msgbad = mHandler.obtainMessage();
+                msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_NOENTERWEEK);
+                msgbad.setData(b);
+                mHandler.sendMessage(msgbad);
+                AchievementManager.resetPatientLevel(this);
+                AchievementManager.resetWeeks(this);
+
+                insertarLogro(getString(R.string.achv_consequence_4week), AchievementManager.ACHIEVE_NOENTERWEEK, -1);
+                insertarLogro(getString(R.string.achv_consequence_critical), 0, -1);
+
+            } else if ((currenttime - lastdate) > AchievementManager.WEEK) {
+                Toast.makeText(this, getString(R.string.achv_gretings_bad1), Toast.LENGTH_LONG).show();
+                //Control de logros
+                Message msgbad = mHandler.obtainMessage();
+                msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_NOENTERWEEK);
+                msgbad.setData(b);
+                mHandler.sendMessage(msgbad);
+
+                AchievementManager.resetPatientLevel(this);
+                AchievementManager.resetWeeks(this);
+
+                insertarLogro(getString(R.string.achv_consequence_week), AchievementManager.ACHIEVE_NOENTERWEEK, -1);
+                insertarLogro(getString(R.string.achv_consequence_critical), 0, -1);
+
+            } else if ((currenttime - lastdate) > AchievementManager.DAY) {
+                Toast.makeText(this, getString(R.string.achv_gretings_bad2), Toast.LENGTH_LONG).show();
+                //Control de logros
+                Message msgbad = mHandler.obtainMessage();
+                msgbad.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_NOENTERWEEK);
+                msgbad.setData(b);
+                mHandler.sendMessage(msgbad);
+
+                insertarLogro(getString(R.string.achv_consequence_day), AchievementManager.ACHIEVE_NOENTER, -1);
+
+            }
+
+            resetMedallas();
+
+            actualizeMedals();
+
+
+        }
     }
 
+    private void actualizeMedals() {
+        long ciclo = AchievementManager.getCurrentCycle(this);
+
+        for (int n = 0; n <= ciclo && n < 4; n++) {
+            if (AchievementManager.getWeeklyAchievement(this, n) != -1)
+                cambiarMedalla(n + 1, AchievementManager.getWeeklyAchievement(this, n));
+            else
+                cambiarMedalla(n + 1, -1);
+
+        }
+
+        int level = AchievementManager.getPatientLevel(this);
+        if (mPatientLevel != null)
+            mPatientLevel.setText(AchievementManager.PATIENT_LEVEL_TEXT[level]);
+    }
 
     @Override
     public void onTimeSet(RadialPickerLayout v, int hora_dia, int min, int sec) {
-        String h="";
-        String m="";
+        String h = "";
+        String m = "";
         //Añadir 0 delante si hora es menor que 10
-        if(hora_dia<10){
-            h="0"+hora_dia;
-        }else{
-            h=String.valueOf(hora_dia);
+        if (hora_dia < 10) {
+            h = "0" + hora_dia;
+        } else {
+            h = String.valueOf(hora_dia);
         }
         //Añadir 0 delante si minuto es menor que 10
-        if(min<10){
-            m="0"+min;
-        }else{
-            m=String.valueOf(min);
+        if (min < 10) {
+            m = "0" + min;
+        } else {
+            m = String.valueOf(min);
         }
-        hora_cita=h+":"+m;
+        hora_cita = h + ":" + m;
        /* Toast.makeText(
                 this, "La hora de la cita es: " + h + ":" + m, Toast.LENGTH_LONG).show();*/
 
@@ -604,7 +754,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         //ALMACENAMIENTO EN FICHERO
         FileOutputStream fos = null;
         try {
-            fos = MainActivity.this.openFileOutput("registro_citas",MODE_PRIVATE);
+            fos = MainActivity.this.openFileOutput("registro_citas", MODE_APPEND);
         } catch (FileNotFoundException e1) {
             e1.printStackTrace();
         }
@@ -614,9 +764,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         BufferedWriter bw = new BufferedWriter(os);
 
         try {
-            bw.write(dia_cita+" | "+hora_cita);
+            bw.write(dia_cita + " | " + hora_cita);
             bw.newLine();
-            Toast.makeText(MainActivity.this,"Cita Almacenada Correctamente",Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Cita Almacenada Correctamente", Toast.LENGTH_SHORT).show();
             bw.close();
             os.close();
             fos.close();
@@ -649,14 +799,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         dialog.setCanceledOnTouchOutside(true);
 
         //Barra de Color de Esputo
-        SeekBar seekBarColorEsputo = (SeekBar)v.findViewById(R.id.seekBar_estado_esputo);
+        SeekBar seekBarColorEsputo = (SeekBar) v.findViewById(R.id.seekBar_estado_esputo);
         seekBarColorEsputo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int seekBarProgress = 0;
 
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarProgress = progress;
-                valor_esputo_estado_inicial=progress;
+                valor_esputo_estado_inicial = progress;
 
             }
 
@@ -664,23 +814,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                estados_seekbar[0]=seekBarProgress;
-                valor_esputo_estado_inicial=seekBarProgress;
+                estados_seekbar[0] = seekBarProgress;
+                valor_esputo_estado_inicial = seekBarProgress;
             }
 
 
         });
 
 
-
         //Barra de estado de paciente
-        SeekBar seekBarEstadoPaciente = (SeekBar)v.findViewById(R.id.seekBar_estado_paciente);
+        SeekBar seekBarEstadoPaciente = (SeekBar) v.findViewById(R.id.seekBar_estado_paciente);
         seekBarEstadoPaciente.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int seekBarProgress = 0;
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarProgress = progress;
-                valor_pacientes_estado_inicial=progress;
+                valor_pacientes_estado_inicial = progress;
 
             }
 
@@ -689,20 +838,20 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                estados_seekbar[1]=seekBarProgress;
-                valor_pacientes_estado_inicial=seekBarProgress;
+                estados_seekbar[1] = seekBarProgress;
+                valor_pacientes_estado_inicial = seekBarProgress;
             }
         });
 
 
         //Barra de estado Fatiga
-        SeekBar seekBarEstadoFatiga = (SeekBar)v.findViewById(R.id.seekBar_estado_fatiga);
+        SeekBar seekBarEstadoFatiga = (SeekBar) v.findViewById(R.id.seekBar_estado_fatiga);
         seekBarEstadoFatiga.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int seekBarProgress = 0;
 
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarProgress = progress;
-                valor_fatiga_estado_inicial=progress;
+                valor_fatiga_estado_inicial = progress;
 
             }
 
@@ -711,12 +860,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                estados_seekbar[2]=seekBarProgress;
-                valor_fatiga_estado_inicial=seekBarProgress;
+                estados_seekbar[2] = seekBarProgress;
+                valor_fatiga_estado_inicial = seekBarProgress;
             }
         });
 
-        final ToggleImageButton toggleFiebre = (ToggleImageButton)v.findViewById(R.id.tb_fiebre);
+        final ToggleImageButton toggleFiebre = (ToggleImageButton) v.findViewById(R.id.tb_fiebre);
 
         aceptar.setOnClickListener(
                 new View.OnClickListener() {
@@ -724,20 +873,20 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     public void onClick(View v) {
                         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy HH:mm");
                         String fecha_actual = sdf.format(new Date());
-                        if(valor_esputo_estado_inicial==1000){
-                            estados_seekbar[0]=1;
+                        if (valor_esputo_estado_inicial == 1000) {
+                            estados_seekbar[0] = 1;
                         }
-                        if(valor_pacientes_estado_inicial==1000){
-                            estados_seekbar[1]=2;
+                        if (valor_pacientes_estado_inicial == 1000) {
+                            estados_seekbar[1] = 2;
                         }
-                        if(valor_fatiga_estado_inicial==1000){
-                            estados_seekbar[2]=3;
+                        if (valor_fatiga_estado_inicial == 1000) {
+                            estados_seekbar[2] = 3;
                         }
                         int chek;
-                        if(toggleFiebre.isChecked()){
-                            estados_seekbar[3]=1;
-                        }else{
-                            estados_seekbar[3]=0;
+                        if (toggleFiebre.isChecked()) {
+                            estados_seekbar[3] = 1;
+                        } else {
+                            estados_seekbar[3] = 0;
                         }
 
 
@@ -752,7 +901,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         //ALMACENAMIENTO EN FICHERO
                         FileOutputStream fos = null;
                         try {
-                            fos = MainActivity.this.openFileOutput("registro_sintomas",MODE_APPEND);
+                            fos = MainActivity.this.openFileOutput("registro_sintomas", MODE_APPEND);
                         } catch (FileNotFoundException e1) {
                             e1.printStackTrace();
                         }
@@ -761,16 +910,25 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                         BufferedWriter bw = new BufferedWriter(os);
 
-                            try {
-                                bw.write(fecha_actual+"\t"+estados_seekbar[0]+"\t"+estados_seekbar[1]+"\t"+estados_seekbar[2]+"\t"+estados_seekbar[3]);
-                                bw.newLine();
-                                Toast.makeText(MainActivity.this,"Registro almacenado correctamente",Toast.LENGTH_SHORT).show();
-                                bw.close();
-                                os.close();
-                                fos.close();
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
+                        try {
+                            bw.write(fecha_actual + "\t" + estados_seekbar[0] + "\t" + estados_seekbar[1] + "\t" + estados_seekbar[2] + "\t" + estados_seekbar[3]);
+                            bw.newLine();
+                            Toast.makeText(MainActivity.this, "Registro almacenado correctamente", Toast.LENGTH_SHORT).show();
+                            bw.close();
+                            os.close();
+                            fos.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+
+
+                        //Control de logros
+                        Message msgObj = mHandler.obtainMessage();
+                        msgObj.what = MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                        Bundle b = new Bundle();
+                        b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_SINTOMAS);
+                        msgObj.setData(b);
+                        mHandler.sendMessage(msgObj);
                         dialog.dismiss();
                     }
                 }
@@ -790,28 +948,23 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-
     public class Carrusel implements Runnable {
         @Override
         public void run() {
             int pos = tabLayout.getSelectedTabPosition();
-            int ntabs= tabLayout.getTabCount();
-            int newPos = (pos+1) % ntabs;
+            int ntabs = tabLayout.getTabCount();
+            int newPos = (pos + 1) % ntabs;
             mFragmentList.get(newPos).actualize(messageTabs[newPos].getNextMessage());
             TabLayout.Tab tab = tabLayout.getTabAt(newPos);
             tab.select();
-            tabLayout.setScrollPosition(newPos,0f,true);
+            tabLayout.setScrollPosition(newPos, 0f, true);
             tabLayout.invalidate();
-            viewPager.setCurrentItem(newPos,true);
+            viewPager.setCurrentItem(newPos, true);
             viewPager.invalidate();
 
 
         }
     }
-
-
-
-
 
 
     /**
@@ -829,14 +982,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         Button aceptar = (Button) v.findViewById(R.id.btn_aceptar_Informes);
 
-        TableLayout tabladatos=(TableLayout) v.findViewById(R.id.tabla_informes);
+        TableLayout tabladatos = (TableLayout) v.findViewById(R.id.tabla_informes);
 
-        TableRow.LayoutParams layoutFila=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams layoutFecha=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams layoutEsputo=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams layoutNivelEjercicio=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams layoutFatiga=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams layoutFiebre=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFila = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFecha = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutEsputo = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutNivelEjercicio = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFatiga = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFiebre = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
         TableRow fila;
         TextView txtFecha;
         TextView txtEsputo;
@@ -848,14 +1001,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tabladatos.removeAllViews();
 
         //Formateo Cabecera
-        String cabeceras[] = { "Fecha", "Esputo", "Tipo Ej.", "Fatiga", "Fiebre" };
+        String cabeceras[] = {"Fecha", "Esputo", "Tipo Ej.", "Fatiga", "Fiebre"};
         TableRow cabecera = new TableRow(this);
         cabecera.setLayoutParams(new TableLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         tabladatos.addView(cabecera);
         // Textos de la cabecera
-        for (int i = 0; i < 5; i++)
-        {
+        for (int i = 0; i < 5; i++) {
             TextView columna = new TextView(this);
             columna.setLayoutParams(new TableRow.LayoutParams(
                     LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -879,7 +1031,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tabladatos.addView(separador_cabecera);
 
 
-
         try {
 
             FileInputStream fin = MainActivity.this.openFileInput("registro_sintomas");
@@ -893,16 +1044,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 if (line != null) {
 
 
-                    fila=new TableRow(MainActivity.this);
+                    fila = new TableRow(MainActivity.this);
                     fila.setLayoutParams(layoutFila);
 
-                    txtFecha=new TextView(this);
-                    txtEsputo=new TextView(this);
-                    txtNIvelEjercicio=new TextView(this);
-                    txtFatiga=new TextView(this);
-                    txtFiebre=new TextView(this);
+                    txtFecha = new TextView(this);
+                    txtEsputo = new TextView(this);
+                    txtNIvelEjercicio = new TextView(this);
+                    txtFatiga = new TextView(this);
+                    txtFiebre = new TextView(this);
 
-                    txtFecha.setText(line.subSequence(0,14));
+                    txtFecha.setText(line.subSequence(0, 14));
                     txtFecha.setGravity(Gravity.CENTER);
                     txtFecha.setPadding(0, 0, 5, 0);
                     txtFecha.setTextSize(12);
@@ -910,13 +1061,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     txtFecha.setLayoutParams(layoutFecha);
 
                     //Transformar codigo numerico del control esputo
-                    String esputo="";
-                    if(line.charAt(15)=='0'){
-                        esputo="Blanco";
-                    }else if(line.charAt(15)=='1'){
-                        esputo="Amarillo";
-                    }else if(line.charAt(15)=='2'){
-                        esputo="Verde";
+                    String esputo = "";
+                    if (line.charAt(15) == '0') {
+                        esputo = "Blanco";
+                    } else if (line.charAt(15) == '1') {
+                        esputo = "Amarillo";
+                    } else if (line.charAt(15) == '2') {
+                        esputo = "Verde";
                     }
 
                     txtEsputo.setText(esputo);
@@ -927,18 +1078,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     txtEsputo.setLayoutParams(layoutEsputo);
 
 
-                    String tipo_actividad="";
+                    String tipo_actividad = "";
 
-                    if(line.charAt(17)=='0'){
-                        tipo_actividad="Nada";
-                    }else if(line.charAt(17)=='1'){
-                        tipo_actividad="Ligera";
-                    }else if(line.charAt(17)=='2'){
-                        tipo_actividad="Medio";
-                    }else if(line.charAt(17)=='3'){
-                        tipo_actividad="Alta";
-                    }else if(line.charAt(17)=='4'){
-                        tipo_actividad="Intensa";
+                    if (line.charAt(17) == '0') {
+                        tipo_actividad = "Nada";
+                    } else if (line.charAt(17) == '1') {
+                        tipo_actividad = "Ligera";
+                    } else if (line.charAt(17) == '2') {
+                        tipo_actividad = "Medio";
+                    } else if (line.charAt(17) == '3') {
+                        tipo_actividad = "Alta";
+                    } else if (line.charAt(17) == '4') {
+                        tipo_actividad = "Intensa";
                     }
                     txtNIvelEjercicio.setText(tipo_actividad);
                     txtNIvelEjercicio.setGravity(Gravity.CENTER);
@@ -948,22 +1099,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     txtNIvelEjercicio.setLayoutParams(layoutNivelEjercicio);
 
 
-                    String fatiga="";
+                    String fatiga = "";
 
-                    if(line.charAt(19)=='0'){
-                        fatiga="Nada";
-                    }else if(line.charAt(19)=='1'){
-                        fatiga="Leve";
-                    }else if(line.charAt(19)=='2'){
-                        fatiga="Ligera";
-                    }else if(line.charAt(19)=='3'){
-                        fatiga="Media";
-                    }else if(line.charAt(19)=='4'){
-                        fatiga="Alta";
-                    }else if(line.charAt(19)=='5'){
-                        fatiga="Severa";
-                    }else if(line.charAt(19)=='6'){
-                        fatiga="Exacer.";
+                    if (line.charAt(19) == '0') {
+                        fatiga = "Nada";
+                    } else if (line.charAt(19) == '1') {
+                        fatiga = "Leve";
+                    } else if (line.charAt(19) == '2') {
+                        fatiga = "Ligera";
+                    } else if (line.charAt(19) == '3') {
+                        fatiga = "Media";
+                    } else if (line.charAt(19) == '4') {
+                        fatiga = "Alta";
+                    } else if (line.charAt(19) == '5') {
+                        fatiga = "Severa";
+                    } else if (line.charAt(19) == '6') {
+                        fatiga = "Exacer.";
                     }
 
                     txtFatiga.setText(fatiga);
@@ -973,11 +1124,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     txtFatiga.setTypeface(null, Typeface.ITALIC);
                     txtFatiga.setLayoutParams(layoutFatiga);
 
-                    String fiebre="";
-                    if(line.charAt(21)=='0'){
-                        fiebre="No";
-                    }else if(line.charAt(21)=='1'){
-                        fiebre="Si";
+                    String fiebre = "";
+                    if (line.charAt(21) == '0') {
+                        fiebre = "No";
+                    } else if (line.charAt(21) == '1') {
+                        fiebre = "Si";
                     }
 
                     txtFiebre.setText(fiebre);
@@ -1005,7 +1156,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
                     linea_totales_params.span = 6;
                     linea.setBackgroundColor(Color.parseColor("#4FC3F7"));
-                    linea.setPadding(0,5,0,0);
+                    linea.setPadding(0, 5, 0, 0);
                     separador_filas.addView(linea, linea_totales_params);
                     tabladatos.addView(separador_filas);
 
@@ -1021,28 +1172,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
 
 
-
-
         final AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(true);
 
 
-       aceptar.setOnClickListener(
-               new View.OnClickListener(){
-                   @Override
-                   public void onClick(View v){
+        aceptar.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
                         dialog.dismiss();
-                   }
-               }
-       );
-
+                    }
+                }
+        );
 
 
         return dialog;
     }
-
-
-
 
 
     /**
@@ -1068,9 +1213,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
         iniciar.setOnClickListener(
-                new View.OnClickListener(){
+                new View.OnClickListener() {
                     @Override
-                    public void onClick(View v){
+                    public void onClick(View v) {
 
                     }
                 }
@@ -1102,9 +1247,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
 
-
-
-
     /**
      * Crea Dialogo Perzonalizado para seleccionar el tipo de ejercicio
      */
@@ -1127,9 +1269,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
         agregar_cita.setOnClickListener(
-                new View.OnClickListener(){
+                new View.OnClickListener() {
                     @Override
-                    public void onClick(View v){
+                    public void onClick(View v) {
                         //DIA
                         Calendar fecha_actual = Calendar.getInstance();
                         DatePickerDialog dpd = DatePickerDialog.newInstance(
@@ -1159,12 +1301,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         );
 
 
-
         return dialog;
     }
-
-
-
 
 
     /**
@@ -1182,10 +1320,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         Button aceptar = (Button) v.findViewById(R.id.btn_aceptar_citas);
 
-        TableLayout tablacitas=(TableLayout) v.findViewById(R.id.tabla_citas);
+        TableLayout tablacitas = (TableLayout) v.findViewById(R.id.tabla_citas);
 
-        TableRow.LayoutParams layoutFila=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableRow.LayoutParams layoutFecha_completa=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFila = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFecha_completa = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
 
         TableRow fila;
         TextView txtFecha_completa;
@@ -1195,18 +1333,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tablacitas.removeAllViews();
 
         //Formateo Cabecera
-        String cabeceras[] = { "Fecha y Hora" };
+        String cabeceras[] = {"Fecha y Hora"};
         TableRow cabecera = new TableRow(this);
         cabecera.setLayoutParams(new TableLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         tablacitas.addView(cabecera);
         // Textos de la cabecera
-        for (int i = 0; i < 1; i++)
-        {
+        for (int i = 0; i < 1; i++) {
             TextView columna = new TextView(this);
             columna.setLayoutParams(new TableRow.LayoutParams(
                     LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
             columna.setText(cabeceras[i]);
+            columna.setTextSize(20);
             columna.setTextColor(Color.parseColor("#4FC3F7"));
             columna.setGravity(Gravity.CENTER_HORIZONTAL);
             columna.setTypeface(null, Typeface.BOLD_ITALIC);
@@ -1226,7 +1364,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         tablacitas.addView(separador_cabecera);
 
 
-
         try {
 
             FileInputStream fin = MainActivity.this.openFileInput("registro_citas");
@@ -1240,16 +1377,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 if (line != null) {
 
 
-                    fila=new TableRow(MainActivity.this);
+                    fila = new TableRow(MainActivity.this);
                     fila.setLayoutParams(layoutFila);
 
-                    txtFecha_completa=new TextView(this);
+                    txtFecha_completa = new TextView(this);
 
 
                     txtFecha_completa.setText(line);
                     txtFecha_completa.setGravity(Gravity.CENTER);
                     txtFecha_completa.setPadding(0, 0, 5, 0);
-                    txtFecha_completa.setTextSize(12);
+                    txtFecha_completa.setTextSize(22);
                     txtFecha_completa.setTypeface(null, Typeface.ITALIC);
                     txtFecha_completa.setLayoutParams(layoutFecha_completa);
 
@@ -1268,7 +1405,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
                     linea_totales_params.span = 6;
                     linea.setBackgroundColor(Color.parseColor("#4FC3F7"));
-                    linea.setPadding(0,5,0,0);
+                    linea.setPadding(0, 5, 0, 0);
                     separador_filas.addView(linea, linea_totales_params);
                     tablacitas.addView(separador_filas);
 
@@ -1284,6 +1421,373 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
 
 
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+
+
+        aceptar.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                }
+        );
+
+
+        return dialog;
+    }
+
+    private void resetMedallas() {
+        medalla1.setVisibility(View.INVISIBLE);
+        medalla2.setVisibility(View.INVISIBLE);
+        medalla3.setVisibility(View.INVISIBLE);
+        medalla4.setVisibility(View.INVISIBLE);
+    }
+
+
+    /**
+     * Método para cambiar el color de la medalla para los logros
+     *
+     * @param pos
+     * @param color
+     */
+
+    public void cambiarMedalla(int pos, int color) {
+        if (medalla1 == null || medalla2 == null || medalla3 == null || medalla4 == null)
+            return;
+        //Medalla 1
+        if (pos == 1) {
+            //medalla1 = (ImageView)findViewById(R.id.medalla1);
+            if (color == -1) {
+                medalla1.setVisibility(View.INVISIBLE);
+            } else
+                medalla4.setVisibility(View.VISIBLE);
+
+            if (color == 0) {
+                medalla1.setImageResource(R.drawable.ic_medallagris);
+            } else if (color == 1) {
+                medalla1.setImageResource(R.drawable.ic_medallabronce);
+            } else if (color == 2) {
+                medalla1.setImageResource(R.drawable.ic_medallaplata);
+            } else if (color == 3) {
+                medalla1.setImageResource(R.drawable.ic_medallaoro);
+            }
+        }
+
+        //Medalla 2
+        if (pos == 2) {
+            //medalla2 = (ImageView)findViewById(R.id.medalla2);
+            if (color == -1) {
+                medalla2.setVisibility(View.INVISIBLE);
+            } else
+                medalla2.setVisibility(View.VISIBLE);
+            if (color == 0) {
+                medalla2.setImageResource(R.drawable.ic_medallagris);
+            } else if (color == 1) {
+                medalla2.setImageResource(R.drawable.ic_medallabronce);
+            } else if (color == 2) {
+                medalla2.setImageResource(R.drawable.ic_medallaplata);
+            } else if (color == 3) {
+                medalla2.setImageResource(R.drawable.ic_medallaoro);
+            }
+        }
+
+        //Medalla
+        //medalla3 = (ImageView)findViewById(R.id.medalla3);
+        if (pos == 3) {
+            if (color == -1) {
+                medalla3.setVisibility(View.INVISIBLE);
+            } else
+                medalla3.setVisibility(View.VISIBLE);
+            if (color == 0) {
+                medalla3.setImageResource(R.drawable.ic_medallagris);
+            } else if (color == 1) {
+                medalla3.setImageResource(R.drawable.ic_medallabronce);
+            } else if (color == 2) {
+                medalla3.setImageResource(R.drawable.ic_medallaplata);
+            } else if (color == 3) {
+                medalla3.setImageResource(R.drawable.ic_medallaoro);
+            }
+        }
+
+        //Medalla 4
+        if (pos == 4) {
+            //medalla4 = (ImageView)findViewById(R.id.medalla4);
+            if (color == -1) {
+                medalla4.setVisibility(View.INVISIBLE);
+            } else
+                medalla4.setVisibility(View.VISIBLE);
+
+            if (color == 0) {
+                medalla4.setImageResource(R.drawable.ic_medallagris);
+            } else if (color == 1) {
+                medalla4.setImageResource(R.drawable.ic_medallabronce);
+            } else if (color == 2) {
+                medalla4.setImageResource(R.drawable.ic_medallaplata);
+            } else if (color == 3) {
+                medalla4.setImageResource(R.drawable.ic_medallaoro);
+            }
+        }
+    }
+
+
+    public void insertarLogro(String causa, int puntos, int medalla) {
+
+        //Fecha actual
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
+        String fecha_act = sdf.format(new Date());
+
+        //Causas
+        String c = "";
+//        if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F-")){
+//            c="00";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("F")){
+//            c="01";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("E-")){
+//            c="02";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("E")){
+//            c="03";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("D")){
+//            c="04";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("D+")){
+//            c="05";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("C")){
+//            c="06";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("C+")){
+//            c="07";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("B")){
+//            c="08";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("B+")){
+//            c="09";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("A")){
+//            c="10";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("A+")){
+//            c="11";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Sin logro")){
+//            c="12";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de bronce")){
+//            c="13";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de plata")){
+//            c="14";
+//        }else if(AchievementManager.PATIENT_LEVEL_TEXT.equals("Medalla de oro")){
+//            c="15";
+//        }
+
+        String imagen = "-1";
+        //IMAGEN MEDALLA
+//        if(c.equals("12")){
+//            imagen="0";
+//        }else if(c.equals("13")){
+//            imagen="1";
+//        }else if(c.equals("14")){
+//            imagen="2";
+//        }else if(c.equals("15")){
+//            imagen="3";
+//        }else {
+//            causa = "Nivel de paciente "+causa;
+//            imagen = "-1";
+//        }
+
+
+        //ALMACENAMIENTO EN FICHERO
+        FileOutputStream fos = null;
+        try {
+            fos = MainActivity.this.openFileOutput("registro_logros", MODE_APPEND);
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+
+        OutputStreamWriter os = new OutputStreamWriter(fos);
+
+        BufferedWriter bw = new BufferedWriter(os);
+
+        try {
+            bw.write(fecha_act + "\t" + causa + "\t" + puntos + "\t" + imagen);
+            bw.newLine();
+            //Toast.makeText(MainActivity.this, "Registro almacenado correctamente", Toast.LENGTH_SHORT).show();
+            bw.close();
+            os.close();
+            fos.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+    }
+
+
+    public AlertDialog createLogrosDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.mostrar_logros_dialog, null);
+
+        builder.setView(v);
+
+        Button aceptar = (Button) v.findViewById(R.id.btn_aceptar_logros);
+
+        TableLayout tablalogros = (TableLayout) v.findViewById(R.id.tabla_logros);
+
+        TableRow.LayoutParams layoutFila = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutFecha_completa = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutCausa = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutPuntos = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams layoutIMG = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+
+        TableRow fila;
+        TextView txtFecha_completa;
+        TextView txtCausa;
+        TextView txtPuntos;
+        ImageView img;
+
+
+        //Reseteamos la tabla al entrar
+        tablalogros.removeAllViews();
+
+        //Formateo Cabecera
+        String cabeceras[] = {"Fecha", "Motivo", "Ptos", "Obs."};
+        TableRow cabecera = new TableRow(this);
+        cabecera.setLayoutParams(new TableLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        tablalogros.addView(cabecera);
+        // Textos de la cabecera
+        for (int i = 0; i < 4; i++) {
+            TextView columna = new TextView(this);
+            columna.setLayoutParams(new TableRow.LayoutParams(
+                    LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+            columna.setText(cabeceras[i]);
+            columna.setTextSize(15);
+            columna.setTextColor(Color.parseColor("#4FC3F7"));
+            columna.setGravity(Gravity.CENTER_HORIZONTAL);
+            columna.setTypeface(null, Typeface.BOLD_ITALIC);
+            columna.setPadding(5, 5, 5, 5);
+            cabecera.addView(columna);
+        }
+        // Línea que separa la cabecera de los datos
+        TableRow separador_cabecera = new TableRow(this);
+        separador_cabecera.setLayoutParams(new TableLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        FrameLayout linea_cabecera = new FrameLayout(this);
+        TableRow.LayoutParams linea_cabecera_params =
+                new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
+        linea_cabecera_params.span = 6;
+        linea_cabecera.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        separador_cabecera.addView(linea_cabecera, linea_cabecera_params);
+        tablalogros.addView(separador_cabecera);
+
+
+        try {
+
+            FileInputStream fin = MainActivity.this.openFileInput("registro_logros");
+
+            InputStreamReader is = new InputStreamReader(fin);
+
+            BufferedReader b = new BufferedReader(is);
+            String line = "";
+            do {
+                line = b.readLine();
+                if (line != null) {
+
+
+                    String[] partes = line.split("\t");
+                    String fecha = partes[0];
+                    String causa = partes[1];
+                    String puntos = partes[2];
+                    String imagen = partes[3];
+
+                    fila = new TableRow(MainActivity.this);
+                    fila.setLayoutParams(layoutFila);
+
+                    txtFecha_completa = new TextView(this);
+                    txtCausa = new TextView(this);
+                    txtPuntos = new TextView(this);
+                    img = new ImageView(this);
+
+
+                    //txtFecha_completa.setText(line.subSequence(0,14));
+                    txtFecha_completa.setText(fecha);
+                    txtFecha_completa.setGravity(Gravity.CENTER);
+                    txtFecha_completa.setPadding(0, 0, 5, 0);
+                    txtFecha_completa.setTextSize(14);
+                    txtFecha_completa.setTypeface(null, Typeface.ITALIC);
+                    txtFecha_completa.setLayoutParams(layoutFecha_completa);
+
+                    //txtCausa.setText(line.subSequence(16,17));
+                    txtCausa.setText(causa);
+                    txtCausa.setGravity(Gravity.CENTER);
+                    txtCausa.setPadding(0, 0, 5, 0);
+                    txtCausa.setTextSize(14);
+                    txtCausa.setTypeface(null, Typeface.ITALIC);
+                    txtCausa.setLayoutParams(layoutCausa);
+
+                    //txtPuntos.setText(""+line.charAt(19));
+                    txtPuntos.setText(puntos);
+                    txtPuntos.setGravity(Gravity.CENTER);
+                    txtPuntos.setPadding(0, 0, 5, 0);
+                    txtPuntos.setTextSize(14);
+                    txtPuntos.setTypeface(null, Typeface.ITALIC);
+                    txtPuntos.setLayoutParams(layoutPuntos);
+                    int imagenn = 0;
+                    try {
+                        imagenn = Integer.parseInt(imagen);
+                    } catch (NumberFormatException ex) {
+                    }
+                    int ires = 0;
+                    switch (imagenn) {
+                        case 0:
+                            ires = R.drawable.ic_medallagris;
+                            break;
+                        case 1:
+                            ires = R.drawable.ic_medallabronce;
+                            break;
+                        case 2:
+                            ires = R.drawable.ic_medallaplata;
+                            break;
+                        case 3:
+                            ires = R.drawable.ic_medallaoro;
+                            break;
+                        default:
+                            ires = -1;
+                    }
+
+                    fila.addView(txtFecha_completa);
+                    fila.addView(txtCausa);
+                    fila.addView(txtPuntos);
+                    if (ires != -1) {
+                        img.setImageResource(ires);
+                        img.setPadding(0, 0, 5, 0);
+                        img.setLayoutParams(layoutIMG);
+                        fila.addView(img);
+
+                    }
+
+
+                    tablalogros.addView(fila);
+
+                    // Línea que separa cada fila de datos
+                    TableRow separador_filas = new TableRow(this);
+                    separador_filas.setLayoutParams(new TableLayout.LayoutParams(
+                            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    FrameLayout linea = new FrameLayout(this);
+                    TableRow.LayoutParams linea_totales_params =
+                            new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, 2);
+                    linea_totales_params.span = 6;
+                    linea.setBackgroundColor(Color.parseColor("#4FC3F7"));
+                    linea.setPadding(0, 5, 0, 0);
+                    separador_filas.addView(linea, linea_totales_params);
+                    tablalogros.addView(separador_filas);
+
+                }
+            } while (line != null);
+            b.close();
+            is.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         final AlertDialog dialog = builder.create();
@@ -1291,33 +1795,17 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
         aceptar.setOnClickListener(
-                new View.OnClickListener(){
+                new View.OnClickListener() {
                     @Override
-                    public void onClick(View v){
+                    public void onClick(View v) {
                         dialog.dismiss();
                     }
                 }
         );
 
 
-
         return dialog;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

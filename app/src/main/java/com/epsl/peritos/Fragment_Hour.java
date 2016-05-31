@@ -5,10 +5,12 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +20,16 @@ import android.widget.ImageButton;
 import android.widget.TimePicker;
 
 import com.epsl.peritos.peritos.R;
+import com.epsl.peritos.peritos.activity.LoginActivity;
 import com.epsl.peritos.peritos.activity.MainActivity;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog.OnTimeSetListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
 
-public class Fragment_Hour extends Fragment {
+public class Fragment_Hour extends Fragment implements  OnTimeSetListener{
 
 
     ArrayList<StructureParametersBBDD.Treatment> listTreatment;
@@ -99,7 +104,7 @@ public class Fragment_Hour extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Bundle bundle = getArguments();
-        View rootView = inflater.inflate(R.layout.fragment_hour_layout, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_hour_layout, container, false);
         // dataUser = (Data_User) bundle.getSerializable("dataUser");
         context = getActivity().getApplicationContext();
 
@@ -115,9 +120,17 @@ public class Fragment_Hour extends Fragment {
             public void onClick(View arg0) {
 
                 FragmentManager fragmentManager = getFragmentManager();
-                TimePickerFragment dialogo = new TimePickerFragment();
-
-                dialogo.show(fragmentManager, "tagAlerta");
+                ///TimePickerFragment dialogo = new TimePickerFragment();
+                Calendar now = Calendar.getInstance();
+                com.wdullaer.materialdatetimepicker.time.TimePickerDialog dialogo = com.wdullaer.materialdatetimepicker.time.TimePickerDialog.newInstance(
+                        Fragment_Hour.this,
+                        now.get(Calendar.HOUR_OF_DAY),
+                        now.get(Calendar.MINUTE),
+                        true //modo 24 Horas activado
+                );
+                dialogo.setAccentColor("#4FC3F7");
+                dialogo.show(getActivity().getFragmentManager(), "tagAlerta");
+                FragmentTransaction ft = fragmentManager.beginTransaction();
                 dialogo.setRetainInstance(true);
 
             }
@@ -130,24 +143,36 @@ public class Fragment_Hour extends Fragment {
             @Override
             public void onClick(View arg0) {
 
+                SharedPreferences pr = getActivity().getSharedPreferences("PRFS", getContext().MODE_PRIVATE);
+                boolean comprobar_hora = pr.getBoolean("NEW_HOUR", false);
+                if(comprobar_hora==true){
+
+                    Intent h = new Intent(getActivity(),MainActivity.class);
+                    startActivity(h);
+                    System.out.println("HA ENTRADO EN LA COMPROBACION DE SHAREDPREFERENCES");
+                    ///// IMPORTANTE : AQUI IRIA SOLAMENTE UNA CONSULTA PARA MODIFICAR LA WAKE_HOUR
 
 
 
-                System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-                for(StructureParametersBBDD.Treatment listTreatmet: listTreatment ){
-                    System.out.println(listTreatmet.getNameMedicine() + "   "+ listTreatmet.getQuantifyTake());
-                }
-                System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-                for(int i =0; i < listTreatment.size();i++){
-
-                    System.out.println(listTreatment.size());
+                }else{
 
 
-                    StructureParametersBBDD.Treatment t = listTreatment.get(i);
-                    t.setFirsTakeDay(wakeHour);
-                    new BBDDTratamiento(getContext()).setTreatment(t);
-                    // CONSULTA DE INSERCIÓN PARA CADA OBJETO t
-                }
+
+                    System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+                    for(StructureParametersBBDD.Treatment listTreatmet: listTreatment ){
+                        System.out.println(listTreatmet.getNameMedicine() + "   "+ listTreatmet.getQuantifyTake());
+                    }
+                    System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+                    for(int i =0; i < listTreatment.size();i++){
+
+                        System.out.println(listTreatment.size());
+
+
+                        StructureParametersBBDD.Treatment t = listTreatment.get(i);
+                        t.setFirsTakeDay(wakeHour);
+                        new BBDDTratamiento(getContext()).setTreatment(t);
+                        // CONSULTA DE INSERCIÓN PARA CADA OBJETO t
+                    }
 
 
 //                Intent i = new Intent(getContext(),MyserviceTwo.class);
@@ -156,10 +181,29 @@ public class Fragment_Hour extends Fragment {
 //                i.setAction(Constants.INSTALLAPP);
 //                getActivity().startService(i);
 
-                Intent in = new Intent(getContext(),MainActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                in.setFlags(Intent.FLAG_FROM_BACKGROUND);
-                getActivity().startActivity(in);
+                    final SharedPreferences prefs = getActivity().getSharedPreferences("PRFS", Context.MODE_PRIVATE);
+                    final SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("FIRST_TIME","1");
+                    editor.commit();
+
+                    Intent in = new Intent(getContext(),MainActivity.class);
+                    in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    in.setFlags(Intent.FLAG_FROM_BACKGROUND);
+                    getActivity().startActivity(in);
+
+                    getActivity().finish();
+
+
+
+
+
+
+
+
+                }
+
+
+
 
             }
 
@@ -172,6 +216,15 @@ public class Fragment_Hour extends Fragment {
 
 
         return rootView;
+    }
+
+    @Override
+    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
+        System.out.println(hourOfDay+"    "+minute);
+        wakeHour= hourOfDay+":"+minute;
+        if(wakeHour.isEmpty()==false){
+            bot2.setEnabled(true);
+        }
     }
 
     public static class TimePickerFragment extends DialogFragment

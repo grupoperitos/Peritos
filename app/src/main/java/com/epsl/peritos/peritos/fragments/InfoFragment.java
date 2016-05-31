@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -43,7 +42,6 @@ import com.epsl.peritos.peritos.R;
 import com.epsl.peritos.peritos.activity.MainActivity;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -58,6 +56,9 @@ public class InfoFragment extends Fragment {
     public static final String INFO_MESSAGE = "infomessage";
     public static final String INFO_DETAIL = "infodetail";
     public static final String INFO_URL = "infourl";
+    public static final String INFO_CAPSULE = "infocapsule";
+    public static final String INFO_INHALADOR = "ininh";
+    public static final String INFO_ACHIEVEMENT = "achv";
 
     public static final String TAG_DETAILS = "details";
 
@@ -67,6 +68,7 @@ public class InfoFragment extends Fragment {
     private String mCaption = "";
     private String mDetail = "";
     private String mURL = "";
+    private int    mAchivPoints = 0;
     int mType = -1;
 
     private View mFragmentView = null;
@@ -76,12 +78,16 @@ public class InfoFragment extends Fragment {
     private ImageView mPlayVideo = null;
     private ImageView mPrevMessage = null;
     private ImageView mNextMessage = null;
+    private ImageView mCapsule = null;
+    private ImageView mInhalador = null;
 
     private ScrollView mScrollCaption = null;
     private ScrollView mScrollMessage = null;
 
     private Handler mHandler = null;//Handled to manage tab iteration
 
+    private boolean mShowCapsule=false;
+    private boolean mShowInhalador=false;
 
     private long enqueue;
     private DownloadManager mDM;
@@ -92,7 +98,7 @@ public class InfoFragment extends Fragment {
     private MainActivity mActivity=null;
 
 
-    public static InfoFragment newInstance(int type, String title, String caption, String message, String detail, String url) {
+    public static InfoFragment newInstance(int type, String title, String caption, String message, String detail, String url,int points) {
         InfoFragment fragment = new InfoFragment();
         Bundle args = new Bundle();
         args.putInt(INFO_TYPE, type);
@@ -101,6 +107,8 @@ public class InfoFragment extends Fragment {
         args.putString(INFO_MESSAGE, message);
         args.putString(INFO_DETAIL, detail);
         args.putString(INFO_URL, url);
+        args.putInt(INFO_ACHIEVEMENT,points);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -114,6 +122,7 @@ public class InfoFragment extends Fragment {
         args.putString(INFO_MESSAGE, message.getCommentary());
         args.putString(INFO_DETAIL, message.getDetail());
         args.putString(INFO_URL, message.getURL());
+        args.putInt(INFO_ACHIEVEMENT,message.getAchievement());
         fragment.setArguments(args);
         return fragment;
     }
@@ -128,6 +137,7 @@ public class InfoFragment extends Fragment {
             mMessage = getArguments().getString(INFO_MESSAGE);
             mDetail = getArguments().getString(INFO_DETAIL);
             mURL = getArguments().getString(INFO_URL);
+            mAchivPoints = getArguments().getInt(INFO_ACHIEVEMENT);
         }
     }
 
@@ -142,6 +152,9 @@ public class InfoFragment extends Fragment {
             mMessage = savedInstanceState.getString(INFO_MESSAGE);
             mDetail = savedInstanceState.getString(INFO_DETAIL);
             mURL = savedInstanceState.getString(INFO_URL);
+            mShowCapsule = savedInstanceState.getBoolean(INFO_CAPSULE);
+            mShowInhalador = savedInstanceState.getBoolean(INFO_INHALADOR);
+            mAchivPoints = savedInstanceState.getInt(INFO_ACHIEVEMENT);
 
         }
         mFragmentView = inflater.inflate(R.layout.fragment_info, container, false);
@@ -152,6 +165,8 @@ public class InfoFragment extends Fragment {
         mPlayVideo = (ImageView) mFragmentView.findViewById(R.id.info_play);
         mPrevMessage = (ImageView) mFragmentView.findViewById(R.id.info_rewind);
         mNextMessage = (ImageView) mFragmentView.findViewById(R.id.info_fforward);
+        mCapsule = (ImageView)mFragmentView.findViewById(R.id.info_capsule);
+        mInhalador = (ImageView)mFragmentView.findViewById(R.id.info_inhalador);
 
         mScrollCaption = (ScrollView) mFragmentView.findViewById(R.id.scroll_caption);
         mScrollMessage = (ScrollView) mFragmentView.findViewById(R.id.scroll_message);
@@ -159,8 +174,7 @@ public class InfoFragment extends Fragment {
         showCaption(mCaption);
         showMessage(mMessage);
 
-        showHideVideoButton();
-
+        actualizeInterfaceButtons();
 
         return mFragmentView;
     }
@@ -173,7 +187,7 @@ public class InfoFragment extends Fragment {
         return false;
     }
 
-    private void showHideVideoButton() {
+    private void actualizeInterfaceButtons() {
         if (mPlayVideo != null)
             if (isExternalStorageWritable() && !mURL.isEmpty() && !mURL.equals("-")) {
                 mPlayVideo.setVisibility(View.VISIBLE);
@@ -181,8 +195,42 @@ public class InfoFragment extends Fragment {
                 mPlayVideo.setVisibility(View.INVISIBLE);
 
             }
+        if(mCapsule!=null) {
+            if (mShowCapsule)
+                mCapsule.setVisibility(View.VISIBLE);
+            else
+                mCapsule.setVisibility(View.INVISIBLE);
+        }
+
+        if(mInhalador!=null) {
+            if (mShowInhalador)
+                mInhalador.setVisibility(View.VISIBLE);
+            else
+                mInhalador.setVisibility(View.INVISIBLE);
+        }
     }
 
+    /**
+     *
+     * @param show true to show
+     */
+    public void showCapsule(boolean show)
+    {
+        mShowCapsule=show;
+        actualizeInterfaceButtons();
+
+    }
+
+    /**
+     *
+     * @param show true to show
+     */
+    public void showInhalador(boolean show)
+    {
+        mShowInhalador=show;
+        actualizeInterfaceButtons();
+
+    }
 
     protected void startVideo() {
         try {
@@ -198,13 +246,18 @@ public class InfoFragment extends Fragment {
                 intent.setDataAndType(Uri.parse(videoUrl), "video/mp4");
                 startActivity(intent);
 
+                //Iniciar el carrusel
+                Message msgObj1 = mActivity.mHandler.obtainMessage();
+                msgObj1.what=MainActivity.HANLDER_MESSAGE_STARTCARRUSEL;
+                mActivity.mHandler.sendMessage(msgObj1);
+
                 //Control de logros
-                Message msgObj = mActivity.mHandler.obtainMessage();
-                msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Message msgObj2 = mActivity.mHandler.obtainMessage();
+                msgObj2.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
                 Bundle b = new Bundle();
-                b.putInt(MainActivity.HANLDER_MESSAGE_WHAT7_PUNTOS, AchievementManager.ACHIEVE_VIDEO);
-                msgObj.setData(b);
-                mActivity.mHandler.sendMessage(msgObj);
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, AchievementManager.ACHIEVE_VIDEO);
+                msgObj2.setData(b);
+                mActivity.mHandler.sendMessage(msgObj2);
 
             } else {//The file does not exists, mainly due to a first run
                 //TODO: Parar el carrusel para cuando se recibe el video para que se reproduzca
@@ -279,16 +332,15 @@ public class InfoFragment extends Fragment {
                                         .getString(c
                                                 .getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
 
-                                //Iniciar el carrusel
-                                Message msgObj = mActivity.mHandler.obtainMessage();
-                                msgObj.what=MainActivity.HANLDER_MESSAGE_STARTCARRUSEL;
-                                mActivity.mHandler.sendMessage(msgObj);
                                 startVideo();
+
+
                             }
                         }
+                        getActivity().unregisterReceiver(mReceiver);
                     }
                 }
-                getActivity().unregisterReceiver(mReceiver);
+
             }
         };
 
@@ -330,9 +382,15 @@ public class InfoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 AlertDialog details = createDetailsDialog();
-                details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
+                //details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
                 details.show();
-                //Llamar al método de la interfaz con la actividad para que añada los puntos de logro
+                //Control de logros
+                Message msgObj = mActivity.mHandler.obtainMessage();
+                msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, mAchivPoints);
+                msgObj.setData(b);
+                mActivity.mHandler.sendMessage(msgObj);
             }
         });
         mCaptionView.setOnClickListener(new View.OnClickListener() {
@@ -341,7 +399,31 @@ public class InfoFragment extends Fragment {
                 AlertDialog details = createDetailsDialog();
                 details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
                 details.show();
-                //Llamar al método de la interfaz con la actividad para que añada los puntos de logro
+
+                //Control de logros
+                Message msgObj = mActivity.mHandler.obtainMessage();
+                msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, mAchivPoints);
+                msgObj.setData(b);
+                mActivity.mHandler.sendMessage(msgObj);
+            }
+        });
+
+        mTitleView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog details = createDetailsDialog();
+                details.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 600);
+                details.show();
+
+                //Control de logros
+                Message msgObj = mActivity.mHandler.obtainMessage();
+                msgObj.what=MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS;
+                Bundle b = new Bundle();
+                b.putInt(MainActivity.HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA, mAchivPoints);
+                msgObj.setData(b);
+                mActivity.mHandler.sendMessage(msgObj);
             }
         });
 
@@ -357,70 +439,79 @@ public class InfoFragment extends Fragment {
                     case MainActivity.HANLDER_MESSAGE_CAPTION:
                         //Cambiar la pestaña activa
                         mHandler.removeMessages(MainActivity.HANLDER_MESSAGE_CAPTION);
-                        final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.fade_out);
-                        final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.fade_in);
 
-                        set1.setTarget(mScrollCaption);
-                        set1.start();
-                        set2.setTarget(mScrollMessage);
-                        set1.addListener(new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-                            }
 
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                set2.start();
-                            }
+                        if(getActivity()!=null){
+                            final AnimatorSet set1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                    R.animator.fade_out);
+                            final AnimatorSet set2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                    R.animator.fade_in);
+                            set1.setTarget(mScrollCaption);
+                            set1.start();
+                            set2.setTarget(mScrollMessage);
+                            set1.addListener(new Animator.AnimatorListener() {
+                                @Override
+                                public void onAnimationStart(Animator animation) {
+                                }
 
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-                            }
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    set2.start();
+                                }
 
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {
-                            }
-                        });
-                        Message msgObj = mHandler.obtainMessage();
-                        msgObj.what = MainActivity.HANLDER_MESSAGE_COMMENTARY;
-                        mHandler.sendMessageDelayed(msgObj, MainActivity.MAIN_MESSAGE_TIME);
+                                @Override
+                                public void onAnimationCancel(Animator animation) {
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(Animator animation) {
+                                }
+                            });
+                            Message msgObj = mHandler.obtainMessage();
+                            msgObj.what = MainActivity.HANLDER_MESSAGE_COMMENTARY;
+                            mHandler.sendMessageDelayed(msgObj, MainActivity.MAIN_MESSAGE_TIME);
+                        }
+
+
+
                         break;
                     case MainActivity.HANLDER_MESSAGE_COMMENTARY:
                         //Cambiar la pestaña activa
                         mHandler.removeMessages(MainActivity.HANLDER_MESSAGE_COMMENTARY);
 
-                        final AnimatorSet set_c1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.fade_out);
-                        final AnimatorSet set_c2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                                R.animator.fade_in);
-                        set_c1.setTarget(mScrollMessage);
-                        set_c1.start();
-                        set_c2.setTarget(mScrollCaption);
-                        set_c1.addListener(new Animator.AnimatorListener() {
+                        if(getActivity()!=null){
+                            final AnimatorSet set_c1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                    R.animator.fade_out);
+                            final AnimatorSet set_c2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
+                                    R.animator.fade_in);
+                            set_c1.setTarget(mScrollMessage);
+                            set_c1.start();
+                            set_c2.setTarget(mScrollCaption);
+                            set_c1.addListener(new Animator.AnimatorListener() {
 
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-                            }
+                                @Override
+                                public void onAnimationStart(Animator animation) {
+                                }
 
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                set_c2.start();
-                            }
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    set_c2.start();
+                                }
 
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-                            }
+                                @Override
+                                public void onAnimationCancel(Animator animation) {
+                                }
 
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {
-                            }
-                        });
+                                @Override
+                                public void onAnimationRepeat(Animator animation) {
+                                }
+                            });
 
-                        Message msgObj2 = mHandler.obtainMessage();
-                        msgObj2.what = MainActivity.HANLDER_MESSAGE_CAPTION;
-                        mHandler.sendMessageDelayed(msgObj2, MainActivity.MAIN_MESSAGE_TIME);
+                            Message msgObj2 = mHandler.obtainMessage();
+                            msgObj2.what = MainActivity.HANLDER_MESSAGE_CAPTION;
+                            mHandler.sendMessageDelayed(msgObj2, MainActivity.MAIN_MESSAGE_TIME);
+                        }
+
                         break;
 
                     default:
@@ -435,7 +526,7 @@ public class InfoFragment extends Fragment {
             public void onClick(View v) {
                 Message msgObj = mHandler.obtainMessage();
                 msgObj.what = MainActivity.HANLDER_MESSAGE_PREV_TEXT;
-                ((MainActivity) getActivity()).mHandler.sendMessage(msgObj);
+                mActivity.mHandler.sendMessage(msgObj);
             }
         });
 
@@ -444,7 +535,7 @@ public class InfoFragment extends Fragment {
             public void onClick(View v) {
                 Message msgObj = mHandler.obtainMessage();
                 msgObj.what = MainActivity.HANLDER_MESSAGE_NEXT_TEXT;
-                ((MainActivity) getActivity()).mHandler.sendMessage(msgObj);
+                mActivity.mHandler.sendMessage(msgObj);
             }
         });
     }
@@ -461,7 +552,7 @@ public class InfoFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        showHideVideoButton();
+        actualizeInterfaceButtons();
 
         Message msgObj = mHandler.obtainMessage();
         msgObj.what = MainActivity.HANLDER_MESSAGE_COMMENTARY;
@@ -474,7 +565,7 @@ public class InfoFragment extends Fragment {
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        View v = inflater.inflate(R.layout.dialog_details, null);
+        View v = inflater.inflate(R.layout.dialog_details,null);
 
         builder.setView(v);
 
@@ -498,6 +589,10 @@ public class InfoFragment extends Fragment {
 
         return dialog;
     }
+
+
+
+
 
     public String getTitle() {
         return mTitle;
@@ -536,7 +631,7 @@ public class InfoFragment extends Fragment {
             showCaption(mCaption);
             showMessage(mMessage);
             showTitle(mTitle);
-            showHideVideoButton();
+            actualizeInterfaceButtons();
         }
     }
 
@@ -551,12 +646,14 @@ public class InfoFragment extends Fragment {
         outState.putString(INFO_MESSAGE, mMessage);
         outState.putString(INFO_DETAIL, mDetail);
         outState.putString(INFO_URL, mURL);
+        outState.putBoolean(INFO_CAPSULE,mShowCapsule);
+        outState.putBoolean(INFO_INHALADOR,mShowInhalador);
+        outState.putInt(INFO_ACHIEVEMENT,mAchivPoints);
 
     }
 
     void showDetailsDialog() {
         FragmentManager fm = getActivity().getSupportFragmentManager();
-
         DialogFragment newFragment = DetailsFragment.newInstance(mType, mTitle, mDetail);
         newFragment.show(fm, TAG_DETAILS);
     }

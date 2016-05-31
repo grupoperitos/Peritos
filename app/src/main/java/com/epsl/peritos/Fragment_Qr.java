@@ -1,6 +1,8 @@
 package com.epsl.peritos;
 
 import android.Manifest;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +14,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.epsl.peritos.peritos.R;
+import com.epsl.peritos.peritos.activity.MainActivity;
+import com.epsl.peritos.peritos.activity.OnlyScanner;
+import com.epsl.peritos.peritos.activity.PreferenciasActivity;
 
 import java.util.ArrayList;
 
@@ -45,8 +50,7 @@ public class Fragment_Qr extends Fragment implements ZBarScannerView.ResultHandl
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Toast.makeText(getContext(),"ESCANEE SU TRATAMIENTO",Toast.LENGTH_LONG).show();
-        Toast.makeText(getContext(),"ESCANEE SU TRATAMIENTO",Toast.LENGTH_LONG).show();
-        Toast.makeText(getContext(),"ESCANEE SU TRATAMIENTO",Toast.LENGTH_LONG).show();
+
         vp = (CustomViewPager) getActivity().findViewById(R.id.myViewPager);
         bot = (Button) getActivity().findViewById(R.id.button);
         bot.setVisibility(View.INVISIBLE);
@@ -93,7 +97,7 @@ public class Fragment_Qr extends Fragment implements ZBarScannerView.ResultHandl
     public void handleResult(me.dm7.barcodescanner.zbar.Result result) {
         // Do something with the result here
         String resultado = result.getContents();
-        Toast.makeText(getContext(),result.getContents(),Toast.LENGTH_LONG).show();
+
 
 
         vp.setCurrentItem(vp.getCurrentItem()+1);
@@ -113,10 +117,22 @@ public class Fragment_Qr extends Fragment implements ZBarScannerView.ResultHandl
            // treatment.setIntervalHour("1");
             listTreatment.add(treatment);
             System.out.println(tratamiento[i]);
-            Toast.makeText(getContext(),tratamiento[i],Toast.LENGTH_LONG).show();
+
+
+            SharedPreferences pr = getActivity().getSharedPreferences("PRFS", getContext().MODE_PRIVATE);
+            boolean comprobar_tratamiento = pr.getBoolean("NEW_TRATAMENT", false);
+            if(comprobar_tratamiento==true){
+
+                Intent h = new Intent(getActivity(),MainActivity.class);
+                startActivity(h);
+
+
+
+            }
 
         }
-        System.out.println("HAY UN AMIGO EN MIIIIIIIIIIIIIIIIIIIIIIIII");
+        Toast.makeText(getContext(),"Nuevo tratamiento escaneado",Toast.LENGTH_LONG).show();
+
         // If you would like to resume scanning, call this method below:
 
     }

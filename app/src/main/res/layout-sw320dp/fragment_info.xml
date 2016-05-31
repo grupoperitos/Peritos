@@ -92,21 +92,19 @@
         android:layout_height="wrap_content"
         android:id="@+id/info_inhalador"
         android:src="@drawable/ic_inhalador"
-        android:layout_margin="@dimen/info_play_margin"
-
         android:contentDescription="@string/content_description_medicine"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:visibility="invisible" />
+        android:layout_marginLeft="@dimen/info_play_margin"
+        android:layout_marginRight="@dimen/info_play_margin"
+        android:layout_below="@+id/scroll_caption"
+        android:layout_toEndOf="@+id/info_play" />
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/info_capsule"
         android:src="@drawable/ic_capsule"
         android:contentDescription="@string/content_description_medicine"
-        android:visibility="invisible"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="@dimen/info_play_margin" />
-
+        android:layout_marginLeft="@dimen/info_play_margin"
+        android:layout_marginRight="@dimen/info_play_margin"
+        android:layout_below="@+id/scroll_caption"
+        android:layout_toStartOf="@+id/info_play" />
 </RelativeLayout>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="achv_haganado">Ha obtenido</string>
+    <string name="achv_puntos">puntos</string>
+
+    <string name="achv_menos25_0">Debe tomarse en serio su enfermedad.</string>
+    <string name="achv_menos25_1">Entre en la aplicació e infórmese.</string>
+    <string name="achv_menos25_2">Tenga en cuenta que su salud es lo primero.</string>
+
+    <string name="achv_menos50_0">No baje la guardia, siga su tratamiento.</string>
+    <string name="achv_menos50_1">Recuerde que su salud es muy importante, la aplicación le ayudará.</string>
+    <string name="achv_menos50_2">Entre en la aplicación y diga como está.[Control de síntomas]</string>
+
+    <string name="achv_menos75_0">Siga así, su salud se lo agradecerá.</string>
+    <string name="achv_menos75_1">Recuerdo que además debe hacer ejercicio. Díganos como le ha ido.</string>
+    <string name="achv_menos75_2">Si se siente mejor, no deje de visitar la aplicación.</string>
+
+    <string name="achv_maximo_0">Muy bien, es un paciente excelente.</string>
+    <string name="achv_maximo_1">No baje la guardia, la EPOC no lo hará.</string>
+    <string name="achv_maximo_2">¡Estupendo, siga así!.</string>
+
+    <string name="achv_gretings_bad0">Bienvenido, pero haace más de cuatro semanas que no entra</string>
+    <string name="achv_gretings_bad1">Bienvenido, pero haace más de una semana que no entra</string>
+    <string name="achv_gretings_bad2">Bienvenido, pero haace más de un día que no entra</string>
+
+    <string name="achv_consequence_critical">Lo sentimos pero ha perdido su progreso, deberá empezar de nuevo.</string>
+    <string name="achv_consequence_day">Ha estado más de un día sin entrar</string>
+    <string name="achv_consequence_week">Ha estado más de una semana sin entrar</string>
+    <string name="achv_consequence_4week">Ha estado más de cuatro semanas sin entrar</string>
+
+</resources>

@@ -42,6 +42,13 @@
 
         <activity
             android:screenOrientation="portrait"
+            android:name=".activity.OnlyTimePickerActivity"
+            android:label="Activity OnlyTimePickerActivity"
+            android:parentActivityName=".activity.OnlyTimePickerActivity" >
+        </activity>
+
+        <activity
+            android:screenOrientation="portrait"
             android:name=".activity.OnlyScanner"
             android:label="Activity OnlyScanner"
             android:parentActivityName=".activity.MainActivity" >

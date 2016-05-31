@@ -15,9 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.SmsManager;
 import android.util.Base64;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,15 +24,9 @@ import android.widget.Toast;
 
 import com.epsl.peritos.peritos.R;
 
-import org.w3c.dom.Text;
-
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by noni_ on 29/05/2016.
@@ -54,6 +46,7 @@ Uri de contenido global AGENDA
         setContentView(R.layout.preferencias_activity);
 
         TextView boton_preferencias_telefono=(TextView)findViewById(R.id.txt_cuidador_pref);
+        TextView boton_nueva_hora = (TextView)findViewById(R.id.txt_nueva_hora);
         TextView boton_nuevo_tratamiento=(TextView)findViewById(R.id.txt_nuevo_tratamiento);
         TextView contactName = (TextView)findViewById(R.id.contactName);
         TextView contactPhone = (TextView)findViewById(R.id.contactPhone);
@@ -63,7 +56,9 @@ Uri de contenido global AGENDA
         SharedPreferences p = getSharedPreferences("PRFS", MODE_PRIVATE);
         final SharedPreferences.Editor ed = p.edit();
         boolean isNewTratament=false;
+         boolean isNewWakeUp = false;
         ed.putBoolean("NEW_TRATAMENT", isNewTratament);
+        ed.putBoolean("NEW_HOUR",isNewWakeUp);
         ed.apply();
 
 
@@ -102,6 +97,30 @@ Uri de contenido global AGENDA
 
         );
 
+        boton_nueva_hora.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+
+                        SharedPreferences pr = getSharedPreferences("PRFS", MODE_PRIVATE);
+                        boolean comprobar_hora = pr.getBoolean("NEW_HOUR", false);
+                        if(comprobar_hora==false){
+                            final SharedPreferences.Editor ed = pr.edit();
+                            boolean isNewWakeUp=true;
+                            ed.putBoolean("NEW_HOUR", isNewWakeUp);
+                            ed.apply();
+                            Intent i = new Intent(PreferenciasActivity.this,OnlyTimePickerActivity.class);
+                            startActivity(i);
+                            ;
+
+                        }
+
+                    }
+                }
+
+        );
 
         //Obtiene de preferencias el numero de telefono que haya almacenado y lo muestra
         //para tenerlo siempre visible

@@ -296,9 +296,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             AchievementManager.modifyAchievementPoints(MainActivity.this, points);
                             AchievementManager.setPointsToWeek(MainActivity.this, (int) week, points);
                             //TODO Borrar
-                            AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 1) % 4, points);
-                            AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 2) % 4, points);
-                            AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 3) % 4, points);
+                            //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 1) % 4, points);
+                            //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 2) % 4, points);
+                            //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 3) % 4, points);
 
 
                             nextMedal = AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week);

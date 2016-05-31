@@ -21,6 +21,7 @@
         android:layout_marginTop="450dp"
         android:text="@string/siguiente"
         android:background="#4FC3F7"
-        android:fontFamily="sans-serif"/>
+        android:fontFamily="sans-serif"
+        android:visibility="invisible"/>
 
 </android.support.design.widget.CoordinatorLayout>

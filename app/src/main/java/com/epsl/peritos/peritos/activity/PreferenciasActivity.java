@@ -1,14 +1,17 @@
 package com.epsl.peritos.peritos.activity;
 
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
@@ -51,9 +54,19 @@ Uri de contenido global AGENDA
         setContentView(R.layout.preferencias_activity);
 
         TextView boton_preferencias_telefono=(TextView)findViewById(R.id.txt_cuidador_pref);
+        TextView boton_nuevo_tratamiento=(TextView)findViewById(R.id.txt_nuevo_tratamiento);
         TextView contactName = (TextView)findViewById(R.id.contactName);
         TextView contactPhone = (TextView)findViewById(R.id.contactPhone);
         ImageView contactPic = (ImageView)findViewById(R.id.contactPic);
+
+        //Pref compartidas
+        SharedPreferences p = getSharedPreferences("PRFS", MODE_PRIVATE);
+        final SharedPreferences.Editor ed = p.edit();
+        boolean isNewTratament=false;
+        ed.putBoolean("NEW_TRATAMENT", isNewTratament);
+        ed.apply();
+
+
         boton_preferencias_telefono.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -64,11 +77,37 @@ Uri de contenido global AGENDA
         );
 
 
+        boton_nuevo_tratamiento.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+
+                        SharedPreferences pr = getSharedPreferences("PRFS", MODE_PRIVATE);
+                        boolean comprobar_tratamiento = pr.getBoolean("NEW_TRATAMENT", false);
+                        if(comprobar_tratamiento==false){
+                            final SharedPreferences.Editor ed = pr.edit();
+                            boolean isNewTratament=true;
+                            ed.putBoolean("NEW_TRATAMENT", isNewTratament);
+                            ed.apply();
+                            Intent i = new Intent(PreferenciasActivity.this,OnlyScanner.class);
+                            startActivity(i);
+                            ;
+
+                        }
+
+                    }
+                }
+
+        );
+
+
         //Obtiene de preferencias el numero de telefono que haya almacenado y lo muestra
         //para tenerlo siempre visible
-        SharedPreferences p = getSharedPreferences("PRFS", MODE_PRIVATE);
+        //SharedPreferences p = getSharedPreferences("PRFS", MODE_PRIVATE);
         String nombre = p.getString("CARER_NAME", "NO HAY CUIDADOR REGISTRADO");
-        String tlf = p.getString("CARER_PHONE", "NO HAY CUIDADOR REGISTRADO");
+        String tlf = p.getString("CARER_PHONE", " ");
         String image = p.getString("CARER_IMAGE","NO-PHOTO");
 
         Bitmap imagen_contacto=null;
@@ -98,6 +137,12 @@ Uri de contenido global AGENDA
         /*
         Crear un intent para seleccionar un contacto del dispositivo
          */
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M   && checkSelfPermission(Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
+                    0);
+        }
         Intent i = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
 
         /*

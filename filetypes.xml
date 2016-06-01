@@ -1,0 +1,12 @@
+<application>
+  <component name="FileTypeManager" version="16">
+    <extensionMap>
+      <mapping pattern="mountain" type="Images" />
+      <mapping pattern="Question" type="PLAIN_TEXT" />
+      <mapping pattern="variances" type="PLAIN_TEXT" />
+      <mapping pattern="Proximas actualizaciones" type="PLAIN_TEXT" />
+      <mapping ext="gram" type="PLAIN_TEXT" />
+      <mapping ext="dmp" type="PLAIN_TEXT" />
+    </extensionMap>
+  </component>
+</application>

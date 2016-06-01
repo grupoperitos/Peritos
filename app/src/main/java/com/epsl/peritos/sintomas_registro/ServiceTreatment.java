@@ -281,8 +281,10 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
     }
 
     /*Lanza notificaciones de tomas que no se han tomado del tratamientos, hay 3 intervalos**/
-    private void runAsForegroundInterval(StructureParametersBBDD.TakeTreatment takeTreatment,int hoursSpent,int id) {
-        System.out.println("runAsForeground");
+    private void runAsForegroundInterval(StructureParametersBBDD.TakeTreatment takeTreatment,int hoursSpent ,int id) {
+        System.out.println("runAsForeground idTratamento: de toma: "+id +" , idToma: "+takeTreatment.getIdTake() );
+       // System.out.println("runAsForeground id de toma: ");
+
         new NotificationAlarm(context).notificationStart("",takeTreatment,hoursSpent,id);
 
     }
@@ -406,7 +408,7 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
 
                     while (exit == false) {
                         try {
-                            Thread.sleep(150000);
+                            Thread.sleep(15000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

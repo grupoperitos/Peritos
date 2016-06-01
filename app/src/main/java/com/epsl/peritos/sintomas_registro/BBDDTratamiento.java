@@ -322,7 +322,28 @@ public class BBDDTratamiento {
             w.unlock();
         }
     }
+    //Metodo para sacar una lista completa de las tomas
+    public StructureParametersBBDD.TakeTreatment getIdTake(StructureParametersBBDD.TakeTreatment takeTreatment) {
+        r.lock();
+        try {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+            Cursor c = db.rawQuery(" SELECT ID_TAKE FROM TakeTreatment " +
+                    "WHERE NAME_MEDICINE = '" + takeTreatment.getNameMedicine() + "'" +
+                    "AND TYPE_MEDICINE = '" + takeTreatment.getTypeMedicine() + "'"+
+                    "AND DATE_TAKE = '" + takeTreatment.getDateTake() + "'", null);
+            if (c.moveToFirst()) {
+                do {
+                    takeTreatment.setIdTake(c.getInt(0));
+                } while (c.moveToNext());
+            }
+            db.close();
+
+            return takeTreatment;
+        } finally {
+            r.unlock();
+        }
+    }
     //Insertamos una toma nueva
     public void setTake(StructureParametersBBDD.TakeTreatment take) {
         w.lock();
@@ -348,13 +369,11 @@ public class BBDDTratamiento {
     public void setTrueTake(int idTake) {
         w.lock();
         try {
-            System.out.println("setTrueTake(int idTake) " +idTake);
-            System.out.println("Su valor es  " +getTOMETAKE( idTake));
+
 //(int idTake, String nameMedicine, String typeMedicine, int typeTreatmentNumeric, String dateTake, String timestamp, boolean isTaken)
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             db.execSQL("UPDATE TakeTreatment SET IS_TAKEN= '" + 1 + "' WHERE ID_TAKE='" + idTake + "'");
             db.close();
-            System.out.println("Tras la insercion es:   " +getTOMETAKE( idTake));
         } finally {
             w.unlock();
         }

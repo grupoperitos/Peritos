@@ -18,7 +18,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class AdapterTakes extends RecyclerView.Adapter<AdapterTakes.TakesViewHolder> {
-    private AdapterCallback mAdapterCallback;
     private ArrayList<Treatment> datos = new ArrayList<Treatment>();
     static Context context;
     //...
@@ -44,13 +43,6 @@ public class AdapterTakes extends RecyclerView.Adapter<AdapterTakes.TakesViewHol
         final Treatment componentDevice = datos.get(pos);
 
         viewHolder.bindWifi(componentDevice);
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mAdapterCallback.elementSelect(componentDevice);
-            }
-        });
-
     }
 
     @Override

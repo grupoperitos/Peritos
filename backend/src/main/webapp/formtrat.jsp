@@ -147,7 +147,7 @@ if(!t10.equals("N")){
 //String data=in1+"_"+ti1+"_"+ni1+"_"+pi1+"-"+in2+"_"+ti2+"_"+ni2+"_"+pi2;
 String datos = data.substring(0, data.length()-1);
 
-String url = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="+datos;
+String url = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=rapp"+datos;
 
 String htm = "<h2>Tratamiento</h2><h3>"+nom+"</h3><br>"+text+"<br><img src='"+url+"'/>";
 

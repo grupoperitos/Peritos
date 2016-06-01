@@ -2,14 +2,14 @@ package com.epsl.peritos.peritos.activity;
 
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,22 +18,13 @@ import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.LayoutParams;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v4.app.FragmentManager;
-
-import com.epsl.peritos.sintomas_registro.AdapterTakes;
-import com.epsl.peritos.sintomas_registro.BBDDTratamiento;
-import com.epsl.peritos.sintomas_registro.StructureParametersBBDD;
-import com.epsl.peritos.achievements.AchievementManager;
-
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,22 +36,28 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.epsl.peritos.Constants;
-import com.epsl.peritos.sintomas_registro.ServiceTreatment;
 import com.epsl.peritos.achievements.AchievementManager;
 import com.epsl.peritos.info.InformationManager;
-
 import com.epsl.peritos.info.MessageList;
 import com.epsl.peritos.info.MessageTypes;
 import com.epsl.peritos.peritos.R;
 import com.epsl.peritos.peritos.fragments.InfoFragment;
+import com.epsl.peritos.sintomas_registro.BBDDTratamiento;
+import com.epsl.peritos.sintomas_registro.ServiceTreatment;
+import com.epsl.peritos.sintomas_registro.StructureParametersBBDD;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import net.colindodd.toggleimagebutton.ToggleImageButton;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -75,19 +72,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-
-import android.content.Intent;
-import android.net.Uri;
-
-import com.epsl.peritos.sintomas_registro.ServiceTreatment;
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
-import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
-
-import net.colindodd.toggleimagebutton.ToggleImageButton;
 
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, TabLayout.OnTabSelectedListener {
@@ -1836,6 +1820,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        System.out.println("Se ejecuta createMedicacionDialog  take = true con id:"+ take.getIdTake());
                         new BBDDTratamiento(getApplicationContext()).setTrueTake(take.getIdTake());
                         dialog.dismiss();
                     }

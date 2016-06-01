@@ -1,8 +1,7 @@
 package com.epsl.peritos.sintomas_registro;
-import com.epsl.peritos.sintomas_registro.StructureParametersBBDD.*;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
+
 import com.epsl.peritos.sintomas_registro.StructureParametersBBDD.Treatment;
 
 /**
@@ -16,7 +15,6 @@ public class ReceiverDateNotify extends android.content.BroadcastReceiver {
 
     @Override
     public void onReceive(android.content.Context context, android.content.Intent intent) {
-        Toast.makeText(context, "ReceiverDateNotify", Toast.LENGTH_LONG).show();
 
         Intent intentService = new Intent(context.getApplicationContext(),ServiceTreatment.class);
         Bundle bundle = intent.getExtras();

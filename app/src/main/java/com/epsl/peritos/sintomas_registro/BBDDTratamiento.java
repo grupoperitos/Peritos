@@ -188,7 +188,7 @@ public class BBDDTratamiento {
             StructureParametersBBDD.TakeTreatment tratamiento;
 
             Cursor c = db.rawQuery(" SELECT * FROM TakeTreatment " +
-                    "WHERE INSTR(TIMESTAMP, '" + timespam.split(" ")[0] + "') > 0" +
+                    "WHERE TIMESTAMP LIKE '%" + timespam.split(" ")[0] + "%'" +
                     " GROUP BY TYPE_MEDICINE " +
                     "ORDER BY TIMESTAMP DESC " +
                     "", null);

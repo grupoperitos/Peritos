@@ -1,25 +1,17 @@
 package com.epsl.peritos.sintomas_registro;
-import com.epsl.peritos.peritos.activity.MainActivity;
-import com.epsl.peritos.sintomas_registro.StructureParametersBBDD.*;
-
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
-import android.R;
+
+import com.epsl.peritos.sintomas_registro.StructureParametersBBDD.Treatment;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -28,7 +20,6 @@ import java.util.Date;
  * Created by Vallemar on 28/05/2016.
  */
 public class ServiceTreatment extends Service implements NotificationTypes  {
-
 
     Context context;
     String action;

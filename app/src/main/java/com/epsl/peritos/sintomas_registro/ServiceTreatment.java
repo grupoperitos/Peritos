@@ -49,6 +49,10 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        isTaken();
+        if (intent != null) {
+
+
         action = intent.getAction();
         context = getApplicationContext();
         System.out.println("onStartCommand");
@@ -60,7 +64,6 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
                 //new BBDDTratamiento(context).delete();
                 System.out.println("case Constants.INSTALLAPP: Iniciando  aplicacion....");
                 ArrayList<StructureParametersBBDD.Treatment> listTreatment = new ArrayList<StructureParametersBBDD.Treatment>(getTreatmentListBBDD());
-                Toast.makeText(context, "Numero de medicamentos: " + listTreatment.size(), Toast.LENGTH_SHORT).show();
                 Treatment tt = null;
                 String date = "";
                 if (listTreatment.size() != 0 || listTreatment == null) {
@@ -98,7 +101,6 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
 
             case Constants.SENDNOTIFY:
                 System.out.println("case Constants.SENDNOTIFY:");
-                Toast.makeText(context, "case Constants.SENDNOTIFY: ", Toast.LENGTH_LONG).show();
 
                 Bundle bundle = intent.getExtras();
                 Treatment treatment = (Treatment) bundle.getSerializable("treatment");
@@ -127,7 +129,6 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
 
 
             case Constants.RUNFIRSNOTIFYDAY:
-                Toast.makeText(context, "case Constants.RUNFIRSNOTIFYDAY: ", Toast.LENGTH_LONG).show();
                 System.out.println("case Constants.RUNFIRSNOTIFYDAY:");
                 ArrayList<Treatment> list = new ArrayList<Treatment>(getTreatmentListBBDD());
                 for (Treatment treatment1 : list) {
@@ -193,8 +194,35 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
                 }
                 return Service.START_STICKY;    // El servicio no se recrea, este comprobara cuando lanze notificaciones.
 
+            case Constants.DELETEALARM:
+                System.out.println("case Constants.CONFIG:");
+                PendingIntent pIntent = PendingIntent.getBroadcast(this, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                alarmManager.cancel(pIntent);
+                ArrayList<StructureParametersBBDD.Treatment> listTreatmenttt = new ArrayList<StructureParametersBBDD.Treatment>(getTreatmentListBBDD());
+                if (listTreatmenttt.size() != 0 || listTreatmenttt == null) {
+                    for (Treatment nextNotifications : listTreatmenttt) {
+                        if (getCountTake(nextNotifications) != 1) {
+                            int count = getCountTake(nextNotifications);
+                            int hourActual = Integer.parseInt(getDate().split(" ")[1].split("[:]")[0]);
+                            for (int i = 0; i < count; i++) {
+                                if (isContainInterval(calculateHourTake(i, nextNotifications), calculateHourTake(i + 1, nextNotifications))) {
+                                    PendingIntent pIntentt = PendingIntent.getBroadcast(this, nextNotifications.getIdTreatment(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                    alarmManager.cancel(pIntentt);
+
+                                }
+                            }
+                        }
+
+                    }
+                }
+                return Service.START_NOT_STICKY;
+
+        }
         }
         return Service.START_STICKY;
+
+
+
     }
 
     /*Return Boolean, si la hora actual esta entre estas dos tomas return true*/
@@ -207,12 +235,12 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
         }
         return false;
     }
-
+    AlarmManager alarmManager;
 /*Lanza el AlarmManager para horas concretas de tomas*/
     private void managerNotify(Calendar calendar, Treatment treatment, String constants) {
         System.out.println("managerNotify");
         if (treatment.getIntervalHour().equalsIgnoreCase("24") == false) {
-            AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+             alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(this, ReceiverDateNotify.class);
             Bundle bundle = new Bundle();
 
@@ -221,7 +249,6 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
             intent.setAction(Constants.SENDNOTIFY);
             PendingIntent pIntent = PendingIntent.getBroadcast(this, treatment.getIdTreatment(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
             alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
-            Toast.makeText(context, "Hecho ", Toast.LENGTH_SHORT).show();
 
 
         }
@@ -247,7 +274,7 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
     /*Lanza notificaciones de tomas estandar de tratamientos*/
     private void runAsForeground(StructureParametersBBDD.TakeTreatment takeTreatment,int constants, Treatment treatment) {
         System.out.println("runAsForeground");
-        new NotificationAlarm(context).notificationStart(takeTreatment,constants,treatment.getIdTreatment());
+        new NotificationAlarm(context).notificationStart(treatment.getQuantifyTake(),takeTreatment,constants,treatment.getIdTreatment());
 //        //Aqui se va a decidir que tipo de tratamiento es y que poner tipo de notificacion y toda la historia
 //        Intent notificationIntent = new Intent(this, MainActivity.class);
 //        notificationIntent.setAction(Constants.INTERACTNOTIFY);
@@ -265,7 +292,7 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
     /*Lanza notificaciones de tomas que no se han tomado del tratamientos, hay 3 intervalos**/
     private void runAsForegroundInterval(StructureParametersBBDD.TakeTreatment takeTreatment,int hoursSpent,int id) {
         System.out.println("runAsForeground");
-        new NotificationAlarm(context).notificationStart(takeTreatment,hoursSpent,id);
+        new NotificationAlarm(context).notificationStart("",takeTreatment,hoursSpent,id);
 
     }
 
@@ -337,7 +364,7 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
 /*Para que nos notifique al dia siguiente la primera toma*/
     private void managerNotifyNexDay(Calendar calendar) {
         System.out.println("managerNotifyNexDay");
-        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+         alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, ReceiverDateNotify.class);
         Bundle bundle = new Bundle();
         intent.putExtras(bundle);

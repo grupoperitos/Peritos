@@ -24,7 +24,7 @@ public class InfoNotification implements NotificationTypes {
     RespiraNotif respNotif;
     int imageNotif;
 
-    public InfoNotification(SharedPreferences prefe,int tipomedicamento,String nombreMedicina, String horaToma,int tipoDialogo) {
+    public InfoNotification(SharedPreferences prefe,String numTomas,int tipomedicamento,String nombreMedicina, String horaToma,int tipoDialogo) {
         prefs = prefe;
         nombrePaciente = prefs.getString("NOM_USUARIO", "");
         if(tipomedicamento == 0){
@@ -50,7 +50,7 @@ public class InfoNotification implements NotificationTypes {
         }
 
 
-
+        this.numTomas = numTomas;
         this.respNotif = new RespiraNotif(nombreMedicina,getNotificationType(tipoDialogo),imageNotif);
 
 
@@ -65,20 +65,20 @@ public class InfoNotification implements NotificationTypes {
 
            case FIRST_DAY:
 
-               notifText = "Buenos Días "+nombrePaciente+", le toca tomarse 1 "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma;
+               notifText = "Buenos Días "+nombrePaciente+", le toca tomarse  "+numTomas +""+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma;
 
                break;
 
 
            case NORMAL:
 
-               notifText = "Hola " +nombrePaciente+"  , le toca tomarse 1 "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma;
+               notifText = "Hola " +nombrePaciente+"  , le toca tomarse " +numTomas +""+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma;
 
                break;
 
            case DELAY_1:
 
-               notifText ="Hola " + nombrePaciente+", parece que se le ha olvidado tomarse 1 "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma+ ".Es buen momento para tomársela";
+               notifText ="Hola " + nombrePaciente+", parece que se le ha olvidado tomarse " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma+ ".Es buen momento para tomársela";
 
 
 
@@ -86,14 +86,14 @@ public class InfoNotification implements NotificationTypes {
 
            case DELAY_2:
 
-               notifText ="Hola " + nombrePaciente+", tenga cuidado, recuerde tomar 1 "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma + ". Debería de tomarsela, ya que más adelante podría no ser efectiva.";
+               notifText ="Hola " + nombrePaciente+", tenga cuidado, recuerde tomar "+nombreMedicina+"("+medicamento+")"+ "a las "+horaToma + ". Debería de tomarsela, ya que más adelante podría no ser efectiva.";
 
 
                break;
 
            case NOT_TAKE:
 
-               notifText ="Hola " + nombrePaciente+", ha perdido una toma, ya NO debe tomar 1"+" "+tipoTomas+" de " +nombreMedicina+"("+medicamento+")"+ "a las "+horaToma + ". Permanezca atento a su siguiente toma";
+               notifText ="Hola " + nombrePaciente+", ha perdido una toma, ya NO debe tomar "+nombreMedicina+"("+medicamento+")"+ "a las "+horaToma + ". Permanezca atento a su siguiente toma";
 
 
                break;

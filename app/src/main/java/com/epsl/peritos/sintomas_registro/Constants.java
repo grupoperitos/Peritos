@@ -19,6 +19,7 @@ public class Constants {
     public static final  String TWOHOURSPASS = "two";
     public static final  String THREEHOURSPASS = "three";
     public static final  String ONETAKEDAY = "oneday";
+    public static final  String DELETEALARM = "delete";
 
     /*Constante para indicar al Activity que el usuario a lanzado*/
     public static final  String INTERACTNOTIFY = "touchnotify";

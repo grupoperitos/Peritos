@@ -154,7 +154,7 @@ public class Fragment_Hour extends Fragment implements  OnTimeSetListener{
                     System.out.println("HA ENTRADO EN LA COMPROBACION DE SHAREDPREFERENCES");
                     ///// IMPORTANTE : AQUI IRIA SOLAMENTE UNA CONSULTA PARA MODIFICAR LA WAKE_HOUR
 
-
+                    //new BBDDTratamiento(getContext()).setHoursTake(wakeHour);
 
                 }else{
 

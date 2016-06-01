@@ -35,7 +35,7 @@ public class NotificationAlarm extends Notification {
     }
 
 
-    public  void notificationStart(StructureParametersBBDD.TakeTreatment take,int hoursSpent ,int id) { //Esta es visible en la pantalla de bloqueo
+    public  void notificationStart(String ntomas,StructureParametersBBDD.TakeTreatment take,int hoursSpent ,int id) { //Esta es visible en la pantalla de bloqueo
         // Estructurar la notificación
 
 
@@ -49,7 +49,7 @@ public class NotificationAlarm extends Notification {
         intent.putExtras(bundle);
         intent.putExtra("hourspass",hoursSpent);
         SharedPreferences pr = context.getSharedPreferences("PRFS", context.MODE_PRIVATE);
-        InfoNotification inf = new InfoNotification(pr,Integer.parseInt(take.getTypeMedicine()),take.getNameMedicine(),take.getTimestamp(),hoursSpent);
+        InfoNotification inf = new InfoNotification(pr,ntomas,Integer.parseInt(take.getTypeMedicine()),take.getNameMedicine(),take.getTimestamp(),hoursSpent);
         PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
                 context,
                 id,

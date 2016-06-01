@@ -134,6 +134,25 @@
             android:layout_marginRight="10dp"
             android:background="#4FC3F7" />
 
+        <TextView
+            android:id="@+id/txt_visualizar_tratamiento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/inform"
+            android:drawablePadding="15dp"
+            android:gravity="center_vertical"
+            android:padding="15dp"
+            android:text="Visualizar Tratamiento"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#4FC3F7" />
+
 
     </LinearLayout>
 

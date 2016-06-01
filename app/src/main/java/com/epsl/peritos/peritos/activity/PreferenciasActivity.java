@@ -2,8 +2,11 @@ package com.epsl.peritos.peritos.activity;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,7 +17,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,10 +31,14 @@ import android.widget.Toast;
 
 
 import com.epsl.peritos.peritos.R;
+import com.epsl.peritos.sintomas_registro.AdapterTakes;
+import com.epsl.peritos.sintomas_registro.BBDDTratamiento;
+import com.epsl.peritos.sintomas_registro.StructureParametersBBDD;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 /**
  * Created by noni_ on 29/05/2016.
@@ -60,6 +72,21 @@ Uri de contenido global AGENDA
         ed.putBoolean("NEW_TRATAMENT", isNewTratament);
         ed.putBoolean("NEW_HOUR",isNewWakeUp);
         ed.apply();
+
+
+        TextView boton_tratamiento = (TextView)findViewById(R.id.txt_visualizar_tratamiento);
+        boton_tratamiento.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ArrayList<StructureParametersBBDD.Treatment> listTreatment = new ArrayList<StructureParametersBBDD.Treatment>(new BBDDTratamiento(getApplicationContext()).getListTreatment());
+                        FragmentManager fragManager = getSupportFragmentManager();
+                        DialogListFolder dialogoFolder = new DialogListFolder(listTreatment);
+                        dialogoFolder.show(fragManager, "tag");
+                    }
+                }
+        );
+
 
 
         boton_preferencias_telefono.setOnClickListener(
@@ -149,6 +176,34 @@ Uri de contenido global AGENDA
     }
 
 
+    RecyclerView recyclerFolder;
+    @SuppressLint("ValidFragment")
+    public class DialogListFolder extends DialogFragment {
+        private ArrayList<StructureParametersBBDD.Treatment> dataTreatment;
+        private AdapterTakes adaptadorTreatment;
+
+        public DialogListFolder(ArrayList<StructureParametersBBDD.Treatment> dataTreatment) {
+            this.dataTreatment = dataTreatment;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Tratamiento");
+            recyclerFolder = new RecyclerView(getContext());
+            adaptadorTreatment = new AdapterTakes(dataTreatment, getContext());
+            recyclerFolder.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+            builder.setView(recyclerFolder);
+            recyclerFolder.setAdapter(adaptadorTreatment);
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dismiss();
+                }
+            });
+            return builder.create();
+        }
+    }
 
 
 

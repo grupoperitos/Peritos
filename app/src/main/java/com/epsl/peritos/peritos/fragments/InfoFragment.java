@@ -13,6 +13,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -80,7 +82,7 @@ public class InfoFragment extends Fragment {
     private ImageView mNextMessage = null;
     private ImageView mCapsule = null;
     private ImageView mInhalador = null;
-
+    ImageView capsula;
     private ScrollView mScrollCaption = null;
     private ScrollView mScrollMessage = null;
 
@@ -167,6 +169,8 @@ public class InfoFragment extends Fragment {
         mNextMessage = (ImageView) mFragmentView.findViewById(R.id.info_fforward);
         mCapsule = (ImageView)mFragmentView.findViewById(R.id.info_capsule);
         mInhalador = (ImageView)mFragmentView.findViewById(R.id.info_inhalador);
+
+
 
         mScrollCaption = (ScrollView) mFragmentView.findViewById(R.id.scroll_caption);
         mScrollMessage = (ScrollView) mFragmentView.findViewById(R.id.scroll_message);

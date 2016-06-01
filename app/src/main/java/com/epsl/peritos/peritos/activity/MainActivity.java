@@ -2,8 +2,10 @@ package com.epsl.peritos.peritos.activity;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -16,6 +18,7 @@ import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -24,10 +27,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentManager;
 
-import com.epsl.peritos.BBDDTratamiento;
-import com.epsl.peritos.StructureParametersBBDD;
+import com.epsl.peritos.sintomas_registro.AdapterTakes;
+import com.epsl.peritos.sintomas_registro.BBDDTratamiento;
+import com.epsl.peritos.sintomas_registro.StructureParametersBBDD;
 import com.epsl.peritos.achievements.AchievementManager;
 
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,7 +52,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.epsl.peritos.Constants;
-import com.epsl.peritos.MyserviceTwo;
+import com.epsl.peritos.sintomas_registro.ServiceTreatment;
 import com.epsl.peritos.achievements.AchievementManager;
 import com.epsl.peritos.info.InformationManager;
 
@@ -158,10 +164,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
 
     static final int DIALOG_ID = 0;
-
+    StructureParametersBBDD.TakeTreatment take;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
+
 
         final SharedPreferences prefs = getSharedPreferences("PRFS", Context.MODE_PRIVATE);
         String isFirstTime = prefs.getString("FIRST_TIME", "0");
@@ -169,7 +179,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             Intent in = new Intent(this, LoginActivity.class);
             MainActivity.this.finish();
             startActivity(in);
-        }else {
+        } else {
+
+            Bundle bundle = getIntent().getExtras();
+            if (getIntent().getAction() ==  Constants.INTERACTNOTIFY){
+                take =   (StructureParametersBBDD.TakeTreatment) bundle.getSerializable("take");
+                AlertDialog dialogo_pastillas = createMedicacionDialog();
+                //dialogo_sintomas.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1000);
+                dialogo_pastillas.show();
+
+                //Cuando pulse el boton, si es que si:
+                //      new BBDDTratamiento(getApplicationContext()).setTrueTake(take.getIdTake());   Lo pone a true
+            }
 
             Intent i = new Intent(this, ServiceTreatment.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -192,11 +213,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             setContentView(R.layout.activity_main);
 
 
-        medalla1 = (ImageView) findViewById(R.id.medalla1);
-        medalla2 = (ImageView) findViewById(R.id.medalla2);
-        medalla3 = (ImageView) findViewById(R.id.medalla3);
-        medalla4 = (ImageView) findViewById(R.id.medalla4);
-        mPatientLevel = (TextView) findViewById(R.id.nivelpaciente);
+            medalla1 = (ImageView) findViewById(R.id.medalla1);
+            medalla2 = (ImageView) findViewById(R.id.medalla2);
+            medalla3 = (ImageView) findViewById(R.id.medalla3);
+            medalla4 = (ImageView) findViewById(R.id.medalla4);
+            mPatientLevel = (TextView) findViewById(R.id.nivelpaciente);
 
 
             viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -277,61 +298,61 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             //Snackbar.make(viewPager, "Handler message "+HANLDER_MESSAGE_NEXT_TEXT, Snackbar.LENGTH_SHORT).show();
                             break;
 
-                    case HANLDER_MESSAGE_ACHIEVEMENT_POINTS:
-                        Bundle data = inputMessage.getData();
-                        if (data != null) {
-                            int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
-                            long week = AchievementManager.getCurrentCycle(MainActivity.this);
-                            int total = AchievementManager.getAchievementPoints(MainActivity.this);
-                            int prevMedal = Math.max(AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week),0);
-                            int nextLevel = -1;
-                            int nextMedal = -1;
-                            int level = AchievementManager.getPatientLevel(MainActivity.this);
+                        case HANLDER_MESSAGE_ACHIEVEMENT_POINTS:
+                            Bundle data = inputMessage.getData();
+                            if (data != null) {
+                                int points = data.getInt(HANLDER_MESSAGE_ACHIEVEMENT_POINTS_DATA);
+                                long week = AchievementManager.getCurrentCycle(MainActivity.this);
+                                int total = AchievementManager.getAchievementPoints(MainActivity.this);
+                                int prevMedal = Math.max(AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week), 0);
+                                int nextLevel = -1;
+                                int nextMedal = -1;
+                                int level = AchievementManager.getPatientLevel(MainActivity.this);
 
-                            AchievementManager.modifyAchievementPoints(MainActivity.this, points);
-                            AchievementManager.setPointsToWeek(MainActivity.this, (int) week, AchievementManager.getAchievementPoints(MainActivity.this));
-                            //TODO Borrar
-                            //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 1) % 4, points);
-                            //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 2) % 4, points);
-                            //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 3) % 4, points);
+                                AchievementManager.modifyAchievementPoints(MainActivity.this, points);
+                                AchievementManager.setPointsToWeek(MainActivity.this, (int) week, AchievementManager.getAchievementPoints(MainActivity.this));
+                                //TODO Borrar
+                                //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 1) % 4, points);
+                                //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 2) % 4, points);
+                                //AchievementManager.setPointsToWeek(MainActivity.this, (int) (week + 3) % 4, points);
 
 
-                            nextMedal = AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week);
-                            nextLevel = AchievementManager.getPatientLevel(MainActivity.this);
+                                nextMedal = AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week);
+                                nextLevel = AchievementManager.getPatientLevel(MainActivity.this);
 
-                            String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[level];
+                                String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[level];
 
-                            if (prevMedal < nextMedal) {
-                                String medalla = "";
-                                switch (nextMedal) {
-                                    case 1:
-                                        medalla = getString(R.string.achv_medalladebronce);
-                                        break;
-                                    case 2:
-                                        medalla = getString(R.string.achv_medalladeplata);
-                                        break;
-                                    case 3:
-                                        medalla = getString(R.string.achv_medalladeoro);
-                                        break;
-                                    default:
-                                        medalla = "Aún no tiene ningún logro";
+                                if (prevMedal < nextMedal) {
+                                    String medalla = "";
+                                    switch (nextMedal) {
+                                        case 1:
+                                            medalla = getString(R.string.achv_medalladebronce);
+                                            break;
+                                        case 2:
+                                            medalla = getString(R.string.achv_medalladeplata);
+                                            break;
+                                        case 3:
+                                            medalla = getString(R.string.achv_medalladeoro);
+                                            break;
+                                        default:
+                                            medalla = "Aún no tiene ningún logro";
+                                    }
+                                    insertarLogro(medalla, AchievementManager.getAchievementPoints(MainActivity.this), nextMedal);
                                 }
-                                insertarLogro(medalla, AchievementManager.getAchievementPoints(MainActivity.this), nextMedal);
+                                if (level < nextLevel)
+                                    insertarLogro(nivelPaciente, AchievementManager.getAchievementPoints(MainActivity.this), 0);
+
+                                actualizeMedals();
+
+                                Snackbar.make(viewPager, getString(R.string.achv_haganado) + " " + points + " " + getString(R.string.achv_puntos) + " Total: " + total, Snackbar.LENGTH_LONG).show();
                             }
-                            if (level < nextLevel)
-                                insertarLogro(nivelPaciente, AchievementManager.getAchievementPoints(MainActivity.this), 0);
-
-                            actualizeMedals();
-
-                            Snackbar.make(viewPager, getString(R.string.achv_haganado) + " " + points + " " + getString(R.string.achv_puntos) + " Total: " + total, Snackbar.LENGTH_LONG).show();
-                        }
-                        break;
-                    default:
-                        //Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
-                        break;
+                            break;
+                        default:
+                            //Snackbar.make(viewPager, "Handler default", Snackbar.LENGTH_SHORT).show();
+                            break;
+                    }
                 }
-            }
-        };
+            };
 
             setupTabControl();
 
@@ -433,7 +454,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
             //Servicio de control de medicación
 
-        actualizeMedals();
+            actualizeMedals();
+        }
     }
 
 
@@ -1786,6 +1808,55 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         return dialog;
     }
+
+
+
+
+
+
+    public AlertDialog createMedicacionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.pastillas_dialog, null);
+
+        builder.setView(v);
+
+        Button SI = (Button) v.findViewById(R.id.pastilla_si);
+        Button NO = (Button) v.findViewById(R.id.pastilla_no);
+
+
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(true);
+
+
+        SI.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new BBDDTratamiento(getApplicationContext()).setTrueTake(take.getIdTake());
+                        dialog.dismiss();
+                    }
+                }
+        );
+
+        NO.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                }
+        );
+
+
+        return dialog;
+    }
+
+
+
 
 
 }

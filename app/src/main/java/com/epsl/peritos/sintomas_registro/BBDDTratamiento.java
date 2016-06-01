@@ -11,17 +11,14 @@ import java.util.Date;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-/**
- * Created by Vallemar on 25/05/2016.
- */
 public class BBDDTratamiento {
 
     private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
     private final Lock r = rwl.readLock();
     private final Lock w = rwl.writeLock();
     Context context;
-
     SQLiteCreateBBDD dbHelper;
+
     public BBDDTratamiento(Context context) {
         this.context = context;
         this.dbHelper = new SQLiteCreateBBDD(context.getApplicationContext());
@@ -39,7 +36,7 @@ public class BBDDTratamiento {
             if (c.moveToFirst()) {
                 do {
 
-                    firsHour= c.getString(0);
+                    firsHour = c.getString(0);
 
 
                 } while (c.moveToNext());
@@ -61,7 +58,7 @@ public class BBDDTratamiento {
             if (c.moveToFirst()) {
                 do {
 
-                    firsHour= c.getString(0);
+                    firsHour = c.getString(0);
 
 
                 } while (c.moveToNext());
@@ -119,11 +116,11 @@ public class BBDDTratamiento {
                     listTreatment.add(new StructureParametersBBDD.TakeTreatment(
 
                             c.getInt(0)
-                            ,c.getString(1)
-                            ,c.getString(2)
-                            ,c.getString(3)
-                            ,c.getString(4)
-                            ,c.getInt(5) > 0));
+                            , c.getString(1)
+                            , c.getString(2)
+                            , c.getString(3)
+                            , c.getString(4)
+                            , c.getInt(5) > 0));
                 } while (c.moveToNext());
             }
             db.close();
@@ -132,8 +129,9 @@ public class BBDDTratamiento {
             r.unlock();
         }
     }
+
     //Metodo para devolver las tomas de un dia de un medicamento
-    public int getNumTakeDate(String yearMonhtDay , String typeTake) {
+    public int getNumTakeDate(String yearMonhtDay, String typeTake) {
         r.lock();
         try {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -141,10 +139,10 @@ public class BBDDTratamiento {
             StructureParametersBBDD.TakeTreatment tratamiento;
 
             Cursor c = db.rawQuery(" SELECT COUNT(TIMESTAMP) FROM TakeTreatment " +
-                    "WHERE TIMESTAMP LIKE '%"+yearMonhtDay+"%'" +
-                    " AND TYPE_MEDICINE = '"+typeTake+"'", null);
+                    "WHERE TIMESTAMP LIKE '%" + yearMonhtDay + "%'" +
+                    " AND TYPE_MEDICINE = '" + typeTake + "'", null);
             c.moveToFirst();
-            int count= c.getInt(0);
+            int count = c.getInt(0);
 
             db.close();
             return count;
@@ -154,7 +152,7 @@ public class BBDDTratamiento {
     }
 
 
-    public StructureParametersBBDD.TakeTreatment takeTratament(String yearMonhtDay , String typeTake, String nameMedicine) {
+    public StructureParametersBBDD.TakeTreatment takeTratament(String yearMonhtDay, String typeTake, String nameMedicine) {
         r.lock();
         try {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -162,15 +160,15 @@ public class BBDDTratamiento {
             StructureParametersBBDD.TakeTreatment tratamiento = null;
 
             Cursor c = db.rawQuery(" SELECT COUNT(TIMESTAMP) FROM TakeTreatment " +
-                    "WHERE TIMESTAMP LIKE '%"+yearMonhtDay+"%'" +
-                    " AND TYPE_MEDICINE = '"+typeTake+"'"+
-                    " AND NAME_MEDICINE = '"+nameMedicine+"'", null);
+                    "WHERE TIMESTAMP LIKE '%" + yearMonhtDay + "%'" +
+                    " AND TYPE_MEDICINE = '" + typeTake + "'" +
+                    " AND NAME_MEDICINE = '" + nameMedicine + "'", null);
             if (c.moveToFirst()) {
                 do {
-                    if(!c.isNull( 0 ) ) {
+                    if (!c.isNull(0)) {
 // String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken
 
-                        tratamiento = new StructureParametersBBDD.TakeTreatment(c.getInt(0),c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getInt(5) > 0);
+                        tratamiento = new StructureParametersBBDD.TakeTreatment(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getInt(5) > 0);
                     }
                 } while (c.moveToNext());
             }
@@ -200,7 +198,7 @@ public class BBDDTratamiento {
 //TakeTreatment(int idTake, String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken) {
 
                             c.getInt(0)
-                            ,c.getString(1)
+                            , c.getString(1)
                             , c.getString(2)
                             , c.getString(3)
                             , c.getString(4)
@@ -226,7 +224,7 @@ public class BBDDTratamiento {
                     "AND TYPE_TREATMENT_NUMERIC = '" + tipeMedicine + "'", null);
             if (c.moveToFirst()) {
                 do {
-                    intervalHousTreatment =  c.getInt(0);
+                    intervalHousTreatment = c.getInt(0);
                 } while (c.moveToNext());
             }
             db.close();
@@ -235,7 +233,6 @@ public class BBDDTratamiento {
             r.unlock();
         }
     }
-
 
 
     //Metodo para sacar una lista completa de las tomas
@@ -250,12 +247,12 @@ public class BBDDTratamiento {
                     "AND TYPE_TREATMENT_NUMERIC = '" + tipeMedicine + "'", null);
             if (c.moveToFirst()) {
                 do {
-                    idTreatment =  c.getInt(0);
+                    idTreatment = c.getInt(0);
                 } while (c.moveToNext());
             }
             db.close();
-            Log.d("bbdd", "ESTE ES EL  public int getIdTreament(String nameMedicine, String tipeMedicine) { de"+nameMedicine +", con id:"+tipeMedicine+" = "+idTreatment);
-            System.out.println("ESTE ES EL  public int getIdTreament(String nameMedicine, String tipeMedicine) { de"+nameMedicine +", con id:"+tipeMedicine+" = "+idTreatment);
+            Log.d("bbdd", "ESTE ES EL  public int getIdTreament(String nameMedicine, String tipeMedicine) { de" + nameMedicine + ", con id:" + tipeMedicine + " = " + idTreatment);
+            System.out.println("ESTE ES EL  public int getIdTreament(String nameMedicine, String tipeMedicine) { de" + nameMedicine + ", con id:" + tipeMedicine + " = " + idTreatment);
             return idTreatment;
         } finally {
             r.unlock();
@@ -274,8 +271,8 @@ public class BBDDTratamiento {
 
 
             Cursor c = db.rawQuery(" SELECT * FROM TakeTreatment " +
-                    "WHERE DATE_TAKE >= '"+ firs +"'"
-                    +"AND DATE_TAKE < '"+latest +"'", null);
+                    "WHERE DATE_TAKE >= '" + firs + "'"
+                    + "AND DATE_TAKE < '" + latest + "'", null);
 
             if (c.moveToFirst()) {
                 do {
@@ -283,11 +280,11 @@ public class BBDDTratamiento {
                     listTreatment.add(new StructureParametersBBDD.TakeTreatment(
 // String nameMedicine, String typeMedicine, String dateTake, String timestamp, boolean isTaken
                             c.getInt(0)
-                            ,c.getString(1)
-                            ,c.getString(2)
-                            ,c.getString(3)
-                            ,c.getString(4)
-                            ,c.getInt(5) > 0));
+                            , c.getString(1)
+                            , c.getString(2)
+                            , c.getString(3)
+                            , c.getString(4)
+                            , c.getInt(5) > 0));
                 } while (c.moveToNext());
             }
             db.close();
@@ -325,6 +322,7 @@ public class BBDDTratamiento {
             w.unlock();
         }
     }
+
     //Insertamos una toma nueva
     public void setTake(StructureParametersBBDD.TakeTreatment take) {
         w.lock();
@@ -352,15 +350,29 @@ public class BBDDTratamiento {
         try {
 //(int idTake, String nameMedicine, String typeMedicine, int typeTreatmentNumeric, String dateTake, String timestamp, boolean isTaken)
             SQLiteDatabase db = dbHelper.getWritableDatabase();
-            db.execSQL("UPDATE TakeTreatment SET IS_TAKEN= '"+ true +"' WHERE ID_TAKE='" + idTake +"'");
+            db.execSQL("UPDATE TakeTreatment SET IS_TAKEN= '" + true + "' WHERE ID_TAKE='" + idTake + "'");
             db.close();
 
         } finally {
             w.unlock();
         }
     }
+
     //delete
-    public void delete() {
+    public void deleteTreatment() {
+        w.lock();
+        try {
+//(int idTake, String nameMedicine, String typeMedicine, int typeTreatmentNumeric, String dateTake, String timestamp, boolean isTaken)
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            db.execSQL("DELETE   FROM  Treatment");
+            db.close();
+
+        } finally {
+            w.unlock();
+        }
+    }
+
+    public void deleteTakesTreatment() {
         w.lock();
         try {
 //(int idTake, String nameMedicine, String typeMedicine, int typeTreatmentNumeric, String dateTake, String timestamp, boolean isTaken)
@@ -372,9 +384,17 @@ public class BBDDTratamiento {
             w.unlock();
         }
     }
+    public void setHoursTake(String hours) {
+        w.lock();
+        try {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            db.execSQL("UPDATE Treatment SET INTERVAL_HOUR= '"+ hours +"'");
+            db.close();
 
-
-
+        } finally {
+            w.unlock();
+        }
+    }
 
     //Actualizamos el timestamp
     public void setUpdateTimestamp(String timestamp, int idTake) {
@@ -382,7 +402,7 @@ public class BBDDTratamiento {
         try {
 //(int idTake, String nameMedicine, String typeMedicine, int typeTreatmentNumeric, String dateTake, String timestamp, boolean isTaken)
             SQLiteDatabase db = dbHelper.getWritableDatabase();
-            db.execSQL("UPDATE TakeTreatment SET TIMESTAMP= '"+ timestamp +"' WHERE ID_TAKE='" + idTake +"'");
+            db.execSQL("UPDATE TakeTreatment SET TIMESTAMP= '" + timestamp + "' WHERE ID_TAKE='" + idTake + "'");
             db.close();
 
         } finally {
@@ -392,4 +412,3 @@ public class BBDDTratamiento {
 
 
 }
-

@@ -5,15 +5,28 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="5dp">
+    android:background="@android:color/white"
+    android:paddingTop="@dimen/dialog_body"
+    android:paddingLeft="@dimen/dialog_body">
 
-    <ImageView
+    <!--<TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tratamiento Activo"
+        android:paddingLeft="@dimen/dialog_body"
+        android:textColor="#4FC3F7"
+        android:textAppearance="?android:attr/textAppearanceSearchResultTitle"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="15dp"/>-->
+
+    <!--<ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imagen"
         android:layout_marginRight="10dp"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true" />-->
 
     <TextView
         android:layout_width="wrap_content"
@@ -22,33 +35,47 @@
         android:id="@+id/name_medicine"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/imagen"
-        android:textAppearance="@android:style/TextAppearance.Holo.Large"
-        android:textStyle="normal" />
+        android:textColor="@color/colorPrimary"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginBottom="10dp"
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="quantify_take"
         android:id="@+id/quantify_take"
+        android:textStyle="italic"
+        android:textSize="16sp"
+        android:layout_marginLeft="35dp"
         android:layout_below="@+id/name_medicine"
         android:layout_toRightOf="@+id/imagen"
+        android:paddingBottom="5dp"
         android:layout_alignParentBottom="true" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="interval_hour"
         android:id="@+id/interval_hour"
+        android:textStyle="italic"
+        android:textSize="16sp"
+        android:layout_marginLeft="35dp"
         android:layout_below="@+id/name_medicine"
         android:layout_toRightOf="@+id/quantify_take"
+        android:paddingBottom="5dp"
         android:layout_alignParentBottom="true" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="hours_takes"
         android:id="@+id/hours_takes"
+        android:textStyle="italic"
+        android:textSize="16sp"
+        android:layout_marginLeft="35dp"
         android:layout_below="@+id/interval_hour"
         android:layout_toRightOf="@+id/quantify_take"
         android:layout_alignParentBottom="true" />
+
 
 
 </LinearLayout>

@@ -1811,7 +1811,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         Button NO = (Button) v.findViewById(R.id.pastilla_no);
 
 
-
         final AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(true);
 

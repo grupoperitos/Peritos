@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,7 +64,7 @@ public class AdapterTakes extends RecyclerView.Adapter<AdapterTakes.TakesViewHol
         private TextView intervalHour;
         private TextView hoursTakes;
 
-        private ImageView img;
+       // private ImageView img;
 
 
 
@@ -76,7 +77,7 @@ public class AdapterTakes extends RecyclerView.Adapter<AdapterTakes.TakesViewHol
             intervalHour = (TextView) itemView.findViewById(R.id.interval_hour);
             hoursTakes = (TextView) itemView.findViewById(R.id.hours_takes);
 
-            img = (ImageView) itemView.findViewById(R.id.imagen);
+            //img = (ImageView) itemView.findViewById(R.id.imagen);
 
         }
 
@@ -90,19 +91,30 @@ public class AdapterTakes extends RecyclerView.Adapter<AdapterTakes.TakesViewHol
             else{
                 cantidad = "puf";
             }
-            nameMedicine.setText( "Nombre de Medicamento: "+takes.getNameMedicine().toString());
+            nameMedicine.setText( "Medicamento: "+takes.getNameMedicine().toString());
             quantifyTake.setText( "Cantidad por toma: "+takes.getQuantifyTake().toString() +" "+cantidad );
-            intervalHour.setText( "Intervalo entre tomas: "+takes.getIntervalHour().toString()+" horas");
-            hoursTakes.setText( "Horario de Tomas: \n");
+            intervalHour.setText( "Tiempo entre tomas: "+takes.getIntervalHour().toString()+" horas");
+            hoursTakes.setText( "Horario de tomas: \n");
 
-            img.setBackgroundResource(inf.getRespNotif().getNotifImag());
+            //img.setBackgroundResource(inf.getRespNotif().getNotifImag());
+            //Añadir la imagen del tratamiento al mismo TextView en la izquierda del mismo
+            nameMedicine.setCompoundDrawablesWithIntrinsicBounds(inf.getRespNotif().getNotifImag(),0,0,0);
+            nameMedicine.setCompoundDrawablePadding(15);
             String hours ="";
             if (takes != null) {
                 if (getCountTake(takes) != 0) {
                     int count = getCountTake(takes);
                     for (int i = 0; i < count; i++) {
                         Calendar c =    calculateHourTake(i, takes);
-                        hours = hours+"\n- "+c.get(Calendar.HOUR_OF_DAY)+":"+c.get(Calendar.MINUTE);
+                        String hora=c.get(Calendar.HOUR_OF_DAY)+"";
+                        String min=c.get(Calendar.MINUTE)+"";
+                        if(Integer.parseInt(hora)<10){
+                            hora="0"+hora;
+                        }
+                        if(Integer.parseInt(min)<10){
+                            min="0"+min;
+                        }
+                        hours = hours+"\n\t - "+hora+":"+min+" Horas";
                     }
                 }
             } else {

@@ -96,8 +96,9 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
                 Bundle bundle = intent.getExtras();
                 Treatment treatment = (Treatment) bundle.getSerializable("treatment");
                 StructureParametersBBDD.TakeTreatment takeTreatment = new StructureParametersBBDD.TakeTreatment(treatment.getNameMedicine(), treatment.getTypeTreatmentNumeric(), getDate(), getDate(), false);
-                new BBDDTratamiento(context).setTake(takeTreatment);
-                runAsForeground(takeTreatment,NORMAL  ,treatment);
+                BBDDTratamiento bbdd = new BBDDTratamiento(context);
+                bbdd.setTake(takeTreatment);
+                runAsForeground(bbdd.getIdTake(takeTreatment),NORMAL  ,treatment);
 
                 if (isSendNotifyNex(treatment)) {
                     int countTakesDay = new BBDDTratamiento(context).getNumTakeDate(getDate().split(" ")[0], treatment.getTypeTreatmentNumeric());
@@ -124,8 +125,12 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
                 ArrayList<Treatment> list = new ArrayList<Treatment>(getTreatmentListBBDD());
                 for (Treatment treatment1 : list) {
                     StructureParametersBBDD.TakeTreatment take = new StructureParametersBBDD.TakeTreatment(treatment1.getNameMedicine(), treatment1.getTypeTreatmentNumeric(), getDate(), getDate(), false);
-                    runAsForeground(take,FIRST_DAY,treatment1);
-                    new BBDDTratamiento(context).setTake(take);
+
+                    BBDDTratamiento bbddTake = new BBDDTratamiento(context);
+                    bbddTake.setTake(take);
+                    runAsForeground(bbddTake.getIdTake(take),FIRST_DAY  ,treatment1);
+
+
                 }
 
                 return Service.START_STICKY;

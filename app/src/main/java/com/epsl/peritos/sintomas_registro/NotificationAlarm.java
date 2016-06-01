@@ -1,6 +1,5 @@
 package com.epsl.peritos.sintomas_registro;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -8,18 +7,16 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
-import com.epsl.peritos.peritos.activity.MainActivity;
 import com.epsl.peritos.peritos.R;
+import com.epsl.peritos.peritos.activity.MainActivity;
 
 /**
  * Created by JuanDeDios on 06/03/2016.
@@ -56,6 +53,9 @@ public class NotificationAlarm extends Notification {
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
+
+
+
         String aux= inf.getRespNotif().getNotifBody();
         String nombre =aux.split("[,]")[0];
         String aux2 =aux.split("[,]")[1];
@@ -66,10 +66,11 @@ public class NotificationAlarm extends Notification {
                         .setLargeIcon(BitmapFactory.decodeResource(
                                 context.getResources(), R.drawable.notify))
                         .setContentTitle(inf.getRespNotif().getNotifTitle())
-                        .setContentText(nombre)
+                        .setContentText(nombre+ ". Despliega para más información")
+                        //.setContentInfo("Despliega para más información")
                         .setColor(context.getResources().getColor(R.color.colorPrimary))
-
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(aux2))
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(aux2).setSummaryText("Entra"))
+                        .setAutoCancel(true)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
 
@@ -86,7 +87,7 @@ public class NotificationAlarm extends Notification {
 
         // Referenciar Intent para la notificación
         stackBuilder.addNextIntent(intent);
-
+//
         // Obtener PendingIntent resultante de la pila
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(id, PendingIntent.FLAG_UPDATE_CURRENT);

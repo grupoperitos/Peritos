@@ -34,7 +34,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:gravity="center"
-            android:text="¿Se ha tomado su medicación?"
+            android:text="¿Se ha tomado su medicación"
             android:textStyle="bold"
             android:layout_marginTop="@dimen/dialog_body"
             android:layout_marginBottom="20dp"

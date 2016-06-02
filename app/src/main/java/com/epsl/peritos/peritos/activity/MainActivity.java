@@ -59,6 +59,8 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import net.colindodd.toggleimagebutton.ToggleImageButton;
 
+import org.w3c.dom.Text;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -1804,7 +1806,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         LayoutInflater inflater = MainActivity.this.getLayoutInflater();
 
         View v = inflater.inflate(R.layout.pastillas_dialog, null);
-
+        TextView tratament = (TextView)v.findViewById(R.id.pregunta3);
+        tratament.setText(tratament.getText().toString()+" "+take.getNameMedicine()+"?");
         builder.setView(v);
 
         Button SI = (Button) v.findViewById(R.id.pastilla_si);

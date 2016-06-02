@@ -1,4 +1,5 @@
 package com.epsl.peritos.sintomas_registro;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -19,7 +20,7 @@ import java.util.Date;
 /**
  * Created by Vallemar on 28/05/2016.
  */
-public class ServiceTreatment extends Service implements NotificationTypes  {
+public class ServiceTreatment extends Service implements NotificationTypes {
 
     Context context;
     String action;
@@ -44,131 +45,140 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
         if (intent != null) {
 
 
-        action = intent.getAction();
-        context = getApplicationContext();
-        System.out.println("onStartCommand");
-        m = this;
-        isTaken();
-        switch (action) {
-            case Constants.INSTALLAPP:
-
-                //new BBDDTratamiento(context).delete();
-                System.out.println("case Constants.INSTALLAPP: Iniciando  aplicacion....");
-                ArrayList<StructureParametersBBDD.Treatment> listTreatment = new ArrayList<StructureParametersBBDD.Treatment>(getTreatmentListBBDD());
-                Treatment tt = null;
-                String date = "";
-                if (listTreatment.size() != 0 || listTreatment == null) {
-                    for (Treatment nextNotifications : listTreatment) {
-                        date = nextNotifications.getFirsTakeDay();
-                        if (getCountTake(nextNotifications) != 1) {
-                            int count = getCountTake(nextNotifications);
-                            int hourActual = Integer.parseInt(getDate().split(" ")[1].split("[:]")[0]);
-                            for (int i = 0; i < count; i++) {
-                                if (isContainInterval(calculateHourTake(i, nextNotifications), calculateHourTake(i + 1, nextNotifications))) {
-                                    managerNotify(calculateHourTakeCalendar(i + 1, nextNotifications), nextNotifications, Constants.SENDNOTIFY);
-                                    i = count;
+            action = intent.getAction();
+            context = getApplicationContext();
+            System.out.println("onStartCommand");
+            m = this;
+            isTaken();
+            switch (action) {
+                case Constants.INSTALLAPP:
+                    try {
+                        //new BBDDTratamiento(context).delete();
+                        System.out.println("case Constants.INSTALLAPP: Iniciando  aplicacion....");
+                        ArrayList<StructureParametersBBDD.Treatment> listTreatment = new ArrayList<StructureParametersBBDD.Treatment>(getTreatmentListBBDD());
+                        Treatment tt = null;
+                        String date = "";
+                        if (listTreatment.size() != 0 || listTreatment == null) {
+                            for (Treatment nextNotifications : listTreatment) {
+                                date = nextNotifications.getFirsTakeDay();
+                                if (getCountTake(nextNotifications) != 1) {
+                                    int count = getCountTake(nextNotifications);
+                                    int hourActual = Integer.parseInt(getDate().split(" ")[1].split("[:]")[0]);
+                                    for (int i = 0; i < count; i++) {
+                                        if (isContainInterval(calculateHourTake(i, nextNotifications), calculateHourTake(i + 1, nextNotifications)) && i + 1 < count) {
+                                            managerNotify(calculateHourTakeCalendar(i + 1, nextNotifications), nextNotifications, Constants.SENDNOTIFY);
+                                            i = count;
+                                        }
+                                    }
                                 }
+
                             }
-                        }
+                            if (date != "") {
 
-                    }
-                    if (date != "") {
+                                managerNotifyNexDay(nexNotifyDay(date));
+                            } else {
+                                Toast.makeText(context, "Ups. No Tiene ningun medicamento en su historial.", Toast.LENGTH_LONG).show();
 
-                        managerNotifyNexDay(nexNotifyDay(date));
-                    } else {
-                        Toast.makeText(context, "Ups. No Tiene ningun medicamento en su historial.", Toast.LENGTH_LONG).show();
-
-                    }
-                } else {
-                    Toast.makeText(context, "Ups. No Tiene ningun medicamento en su historial.", Toast.LENGTH_LONG).show();
-
-                }
-                return Service.START_STICKY;    // El servicio no se recrea, este comprobara cuando lanze notificaciones.
-
-            case Constants.STARTACTIVITY:
-                System.out.println("case Constants.STARTACTIVITY:");
-
-                return Service.START_STICKY;
-
-            case Constants.SENDNOTIFY:
-                System.out.println("case Constants.SENDNOTIFY:");
-
-                Bundle bundle = intent.getExtras();
-                Treatment treatment = (Treatment) bundle.getSerializable("treatment");
-                StructureParametersBBDD.TakeTreatment takeTreatment = new StructureParametersBBDD.TakeTreatment(treatment.getNameMedicine(), treatment.getTypeTreatmentNumeric(), getDate(), getDate(), false);
-                BBDDTratamiento bbdd = new BBDDTratamiento(context);
-                bbdd.setTake(takeTreatment);
-                runAsForeground(bbdd.getIdTake(takeTreatment),NORMAL  ,treatment);
-
-                if (isSendNotifyNex(treatment)) {
-                    int countTakesDay = new BBDDTratamiento(context).getNumTakeDate(getDate().split(" ")[0], treatment.getTypeTreatmentNumeric());
-                    if (countTakesDay < getCountTake(treatment)) {
-                        int hourActual = Integer.parseInt(getDate().split(" ")[1].split("[:]")[0]);
-                        for (int i = 0; i < getCountTake(treatment); i++) {
-                            if (isContainInterval(calculateHourTake(i, treatment), calculateHourTake(i + 1, treatment))) {
-
-                                managerNotify(calculateHourTakeCalendar(i + 1, treatment), treatment, Constants.SENDNOTIFY);
-                                i = getCountTake(treatment);
                             }
-                        }
+                        } else {
+                            Toast.makeText(context, "Ups. No Tiene ningun medicamento en su historial.", Toast.LENGTH_LONG).show();
 
-                        //  managerNotify(calculateHourTakeCalendar(countTakesDay+1, treatment), treatment, Constants.SENDNOTIFY);
+                        }
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Ups.", Toast.LENGTH_SHORT).show();
                     }
+
+                    return Service.START_STICKY;    // El servicio no se recrea, este comprobara cuando lanze notificaciones.
+
+                case Constants.STARTACTIVITY:
+                    System.out.println("case Constants.STARTACTIVITY:");
+
                     return Service.START_STICKY;
-                } else {
-                    return Service.START_NOT_STICKY;    //Para que el servicio no siga ejecutandose despues de la ultima toma
-                }
 
+                case Constants.SENDNOTIFY:
+                    System.out.println("case Constants.SENDNOTIFY:");
 
-            case Constants.RUNFIRSNOTIFYDAY:
-                System.out.println("case Constants.RUNFIRSNOTIFYDAY:");
-                ArrayList<Treatment> list = new ArrayList<Treatment>(getTreatmentListBBDD());
-                for (Treatment treatment1 : list) {
-                    StructureParametersBBDD.TakeTreatment take = new StructureParametersBBDD.TakeTreatment(treatment1.getNameMedicine(), treatment1.getTypeTreatmentNumeric(), getDate(), getDate(), false);
+                    Bundle bundle = intent.getExtras();
+                    Treatment treatment = (Treatment) bundle.getSerializable("treatment");
+                    StructureParametersBBDD.TakeTreatment takeTreatment = new StructureParametersBBDD.TakeTreatment(treatment.getNameMedicine(), treatment.getTypeTreatmentNumeric(), getDate(), getDate(), false);
+                    BBDDTratamiento bbdd = new BBDDTratamiento(context);
+                    bbdd.setTake(takeTreatment);
+                    runAsForeground(bbdd.getIdTake(takeTreatment), NORMAL, treatment);
 
-                    BBDDTratamiento bbddTake = new BBDDTratamiento(context);
-                    bbddTake.setTake(take);
-                    runAsForeground(bbddTake.getIdTake(take),FIRST_DAY  ,treatment1);
-
-
-                }
-
-                return Service.START_STICKY;
-
-            case Constants.REBOOTMOBILE:
-                System.out.println("case Constants.REBOOTMOBILE:");
-                ArrayList<Treatment> listTreatmen = new ArrayList<Treatment>(getTreatmentListBBDD());
-                String datee = "";
-                int noTakes = 0;
-                ArrayList<StructureParametersBBDD.TakeTreatment> datosFolder = new ArrayList<StructureParametersBBDD.TakeTreatment>();
-                ArrayList<StructureParametersBBDD.TakeTreatment> tomasNoRegistradas = new ArrayList<StructureParametersBBDD.TakeTreatment>();
-
-                if (listTreatmen.size() != 0 || listTreatmen == null) {
-                    for (Treatment nextNotifications : listTreatmen) {
-                        datee = nextNotifications.getFirsTakeDay();
-                        if (getCountTake(nextNotifications) != 1) {
-                            int count = getCountTake(nextNotifications);
+                    if (isSendNotifyNex(treatment)) {
+                        int countTakesDay = new BBDDTratamiento(context).getNumTakeDate(getDate().split(" ")[0], treatment.getTypeTreatmentNumeric());
+                        if (countTakesDay < getCountTake(treatment)) {
                             int hourActual = Integer.parseInt(getDate().split(" ")[1].split("[:]")[0]);
-                            for (int i = 0; i < count; i++) {
-                                if (isContainInterval(calculateHourTake(i, nextNotifications), calculateHourTake(i + 1, nextNotifications))) {
+                            for (int i = 0; i < getCountTake(treatment); i++) {
+                                if (isContainInterval(calculateHourTake(i, treatment), calculateHourTake(i + 1, treatment)) && i + 1 < getCountTake(treatment)) {
 
-                                    // if (hourActual >= calculateHourTake(i, nextNotifications) && hourActual < calculateHourTake(i + 1, nextNotifications)) {
-                                    managerNotify(calculateHourTakeCalendar(i + 1, nextNotifications), nextNotifications, Constants.SENDNOTIFY);
-                                    i = count;
-                                } else {
-                                    noTakes++;
-                                    datosFolder.add(new StructureParametersBBDD.TakeTreatment(nextNotifications.nameMedicine, nextNotifications.getTypeTreatmentNumeric(), getDate(), getDate(), false));
+                                    managerNotify(calculateHourTakeCalendar(i + 1, treatment), treatment, Constants.SENDNOTIFY);
+                                    i = getCountTake(treatment);
                                 }
                             }
+
+                            //  managerNotify(calculateHourTakeCalendar(countTakesDay+1, treatment), treatment, Constants.SENDNOTIFY);
                         }
-
+                        return Service.START_STICKY;
+                    } else {
+                        return Service.START_NOT_STICKY;    //Para que el servicio no siga ejecutandose despues de la ultima toma
                     }
-                    if (datee != "") {
-                        managerNotifyNexDay(nexNotifyDay(datee));
-                        if (noTakes != 0) {
 
 
-                            //Comprobar si las tomas se han tomado o no en la base de datos, y si existen
+                case Constants.RUNFIRSNOTIFYDAY:
+                    System.out.println("case Constants.RUNFIRSNOTIFYDAY:");
+                    try {
+                        ArrayList<Treatment> list = new ArrayList<Treatment>(getTreatmentListBBDD());
+                        for (Treatment treatment1 : list) {
+                            StructureParametersBBDD.TakeTreatment take = new StructureParametersBBDD.TakeTreatment(treatment1.getNameMedicine(), treatment1.getTypeTreatmentNumeric(), getDate(), getDate(), false);
+
+                            BBDDTratamiento bbddTake = new BBDDTratamiento(context);
+                            bbddTake.setTake(take);
+                            runAsForeground(bbddTake.getIdTake(take), FIRST_DAY, treatment1);
+                        }
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Ups.", Toast.LENGTH_SHORT).show();
+                    }
+
+                    return Service.START_STICKY;
+
+                case Constants.REBOOTMOBILE:
+                    System.out.println("case Constants.REBOOTMOBILE:");
+                    try {
+                        ArrayList<Treatment> listTreatmen = new ArrayList<Treatment>(getTreatmentListBBDD());
+                        String datee = "";
+                        int noTakes = 0;
+                        ArrayList<StructureParametersBBDD.TakeTreatment> datosFolder = new ArrayList<StructureParametersBBDD.TakeTreatment>();
+                        ArrayList<StructureParametersBBDD.TakeTreatment> tomasNoRegistradas = new ArrayList<StructureParametersBBDD.TakeTreatment>();
+
+                        if (listTreatmen.size() != 0 || listTreatmen == null) {
+                            for (Treatment nextNotifications : listTreatmen) {
+                                datee = nextNotifications.getFirsTakeDay();
+                                if (getCountTake(nextNotifications) != 1) {
+                                    int count = getCountTake(nextNotifications);
+                                    int hourActual = Integer.parseInt(getDate().split(" ")[1].split("[:]")[0]);
+                                    for (int i = 0; i < count; i++) {
+                                        if (isContainInterval(calculateHourTake(i, nextNotifications), calculateHourTake(i + 1, nextNotifications)) && i + 1 < count) {
+
+                                            // if (hourActual >= calculateHourTake(i, nextNotifications) && hourActual < calculateHourTake(i + 1, nextNotifications)) {
+                                            managerNotify(calculateHourTakeCalendar(i + 1, nextNotifications), nextNotifications, Constants.SENDNOTIFY);
+                                            i = count;
+                                        } else {
+                                            noTakes++;
+                                            // datosFolder.add(new StructureParametersBBDD.TakeTreatment(nextNotifications.nameMedicine, nextNotifications.getTypeTreatmentNumeric(), getDate(), getDate(), false));
+                                        }
+                                    }
+                                }
+
+                            }
+                            if (datee != "") {
+                                managerNotifyNexDay(nexNotifyDay(datee));
+                                if (noTakes != 0) {
+
+
+                                    //Comprobar si las tomas se han tomado o no en la base de datos, y si existen
 //                            Intent in = new Intent(this,MainActivity.class);
 //                            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //                            in.setFlags(Intent.FLAG_FROM_BACKGROUND);
@@ -179,44 +189,51 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
 //                            DialogListFolder dialogoFolder = new DialogListFolder(datosFolder);
 //                            dialogoFolder.show(fragManager, "tag");
 //                            dialogoFolder.setRetainInstance(true);
-                        }
-                    } else {
-                        Toast.makeText(context, "Ups. No Tiene ningun medicamento en su historial.", Toast.LENGTH_LONG).show();
-
-                    }
-                } else {
-                    Toast.makeText(context, "Ups. No Tiene ningun medicamento en su historial.", Toast.LENGTH_LONG).show();
-
-                }
-                return Service.START_STICKY;    // El servicio no se recrea, este comprobara cuando lanze notificaciones.
-
-            case Constants.DELETEALARM:
-                System.out.println("case Constants.CONFIG:");
-                PendingIntent pIntent = PendingIntent.getBroadcast(this, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                alarmManager.cancel(pIntent);
-                ArrayList<StructureParametersBBDD.Treatment> listTreatmenttt = new ArrayList<StructureParametersBBDD.Treatment>(getTreatmentListBBDD());
-                if (listTreatmenttt.size() != 0 || listTreatmenttt == null) {
-                    for (Treatment nextNotifications : listTreatmenttt) {
-                        if (getCountTake(nextNotifications) != 1) {
-                            int count = getCountTake(nextNotifications);
-                            int hourActual = Integer.parseInt(getDate().split(" ")[1].split("[:]")[0]);
-                            for (int i = 0; i < count; i++) {
-                                if (isContainInterval(calculateHourTake(i, nextNotifications), calculateHourTake(i + 1, nextNotifications))) {
-                                    PendingIntent pIntentt = PendingIntent.getBroadcast(this, nextNotifications.getIdTreatment(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                    alarmManager.cancel(pIntentt);
-
                                 }
+                            } else {
+                                Toast.makeText(context, "Ups. No Tiene ningun medicamento en su historial.", Toast.LENGTH_LONG).show();
+
+                            }
+                        } else {
+                            Toast.makeText(context, "Ups. No Tiene ningun medicamento en su historial.", Toast.LENGTH_LONG).show();
+
+                        }
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Ups.", Toast.LENGTH_SHORT).show();
+                    }
+                    return Service.START_STICKY;    // El servicio no se recrea, este comprobara cuando lanze notificaciones.
+
+                case Constants.DELETEALARM:
+                    System.out.println("case Constants.CONFIG:");
+                    PendingIntent pIntent = PendingIntent.getBroadcast(this, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    alarmManager.cancel(pIntent);
+                    try {
+                        ArrayList<StructureParametersBBDD.Treatment> listTreatmenttt = new ArrayList<StructureParametersBBDD.Treatment>(getTreatmentListBBDD());
+                        if (listTreatmenttt.size() != 0 || listTreatmenttt == null) {
+                            for (Treatment nextNotifications : listTreatmenttt) {
+                                if (getCountTake(nextNotifications) != 1) {
+                                    int count = getCountTake(nextNotifications);
+                                    int hourActual = Integer.parseInt(getDate().split(" ")[1].split("[:]")[0]);
+                                    for (int i = 0; i < count; i++) {
+                                        if (isContainInterval(calculateHourTake(i, nextNotifications), calculateHourTake(i + 1, nextNotifications))) {
+                                            PendingIntent pIntentt = PendingIntent.getBroadcast(this, nextNotifications.getIdTreatment(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                            alarmManager.cancel(pIntentt);
+
+                                        }
+                                    }
+                                }
+
                             }
                         }
-
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
                     }
-                }
-                return Service.START_NOT_STICKY;
+                    return Service.START_NOT_STICKY;
 
-        }
+            }
         }
         return Service.START_STICKY;
-
 
 
     }
@@ -231,12 +248,14 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
         }
         return false;
     }
+
     AlarmManager alarmManager;
-/*Lanza el AlarmManager para horas concretas de tomas*/
+
+    /*Lanza el AlarmManager para horas concretas de tomas*/
     private void managerNotify(Calendar calendar, Treatment treatment, String constants) {
         System.out.println("managerNotify");
         if (treatment.getIntervalHour().equalsIgnoreCase("24") == false) {
-             alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(this, ReceiverDateNotify.class);
             Bundle bundle = new Bundle();
 
@@ -250,7 +269,7 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
         }
     }
 
-/*Return, se calcula la hora de la ultima toma del tratamiento pasado, si es superior no se lanza la notificacion*/
+    /*Return, se calcula la hora de la ultima toma del tratamiento pasado, si es superior no se lanza la notificacion*/
     public boolean isSendNotifyNex(Treatment treatment) {
         System.out.println("isSendNotifyNex");
         Date actual = new Date();
@@ -268,9 +287,9 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
 
 
     /*Lanza notificaciones de tomas estandar de tratamientos*/
-    private void runAsForeground(StructureParametersBBDD.TakeTreatment takeTreatment,int constants, Treatment treatment) {
+    private void runAsForeground(StructureParametersBBDD.TakeTreatment takeTreatment, int constants, Treatment treatment) {
         System.out.println("runAsForeground");
-        new NotificationAlarm(context).notificationStart(treatment.getQuantifyTake(),takeTreatment,constants,treatment.getIdTreatment());
+        new NotificationAlarm(context).notificationStart(treatment.getQuantifyTake(), takeTreatment, constants, treatment.getIdTreatment());
 //        //Aqui se va a decidir que tipo de tratamiento es y que poner tipo de notificacion y toda la historia
 //        Intent notificationIntent = new Intent(this, MainActivity.class);
 //        notificationIntent.setAction(Constants.INTERACTNOTIFY);
@@ -286,11 +305,11 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
     }
 
     /*Lanza notificaciones de tomas que no se han tomado del tratamientos, hay 3 intervalos**/
-    private void runAsForegroundInterval(StructureParametersBBDD.TakeTreatment takeTreatment,int hoursSpent ,int id) {
-        System.out.println("runAsForeground idTratamento: de toma: "+id +" , idToma: "+takeTreatment.getIdTake() );
-       // System.out.println("runAsForeground id de toma: ");
+    private void runAsForegroundInterval(StructureParametersBBDD.TakeTreatment takeTreatment, int hoursSpent, int id) {
+        System.out.println("runAsForeground idTratamento: de toma: " + id + " , idToma: " + takeTreatment.getIdTake());
+        // System.out.println("runAsForeground id de toma: ");
 
-        new NotificationAlarm(context).notificationStart("",takeTreatment,hoursSpent,id);
+        new NotificationAlarm(context).notificationStart("", takeTreatment, hoursSpent, id);
 
     }
 
@@ -337,7 +356,7 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
     }
 
 
-/*Return tomas del dia*/
+    /*Return tomas del dia*/
     public int getNumTakeDate(Treatment treatment) {        //Metodo que devuelve las tomas que lleva en el dia
         System.out.println("getNumTakeDate");
         return new BBDDTratamiento(context).getNumTakeDate(getDate().split(" ")[0], treatment.getTypeTreatmentNumeric());
@@ -352,17 +371,17 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
         return cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
     }
 
-/*Return la lista de tipos tratamientos de la base de datos*/
+    /*Return la lista de tipos tratamientos de la base de datos*/
     public ArrayList<StructureParametersBBDD.Treatment> getTreatmentListBBDD() {
         System.out.println("getTreatmentListBBDD");
         ArrayList<StructureParametersBBDD.Treatment> listTreatment = new ArrayList<StructureParametersBBDD.Treatment>(new BBDDTratamiento(context).getListTreatment());
         return listTreatment;
     }
 
-/*Para que nos notifique al dia siguiente la primera toma*/
+    /*Para que nos notifique al dia siguiente la primera toma*/
     private void managerNotifyNexDay(Calendar calendar) {
         System.out.println("managerNotifyNexDay");
-         alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, ReceiverDateNotify.class);
         Bundle bundle = new Bundle();
         intent.putExtras(bundle);
@@ -401,7 +420,6 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
     }
 
 
-
     Thread isTake;
 
     public void isTaken() {
@@ -413,41 +431,44 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
 
                     while (exit == false) {
                         try {
-                            Thread.sleep(15000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        ArrayList<Treatment> listTreatment = new ArrayList<Treatment>(getTreatmentListBBDD());
-                        ArrayList<StructureParametersBBDD.TakeTreatment> listTreatmentTakes = new ArrayList<StructureParametersBBDD.TakeTreatment>(new BBDDTratamiento(context).getListTreamentDay(getDate()));
-                        for (StructureParametersBBDD.TakeTreatment takesTreatment : listTreatmentTakes) {
-                            Calendar c = Calendar.getInstance();
-                            c.setTime(new Date());
+                            Thread.sleep(150000);
 
-                            if (new Date().after(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(0)).getTime()) && new Date().before(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(1)).getTime())) {  //Compruebo que la hora actual este entre el rango de la primera notificacion
+                            ArrayList<StructureParametersBBDD.TakeTreatment> listTreatmentTakes = new ArrayList<StructureParametersBBDD.TakeTreatment>(new BBDDTratamiento(context).getListTreamentDay(getDate()));
+                            for (StructureParametersBBDD.TakeTreatment takesTreatment : listTreatmentTakes) {
+                                Calendar c = Calendar.getInstance();
+                                c.setTime(new Date());
 
-                                if (parsTimespanToCalendar(takesTreatment.getTimestamp()).getTime().before(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(0)).getTime())) {    //Compruebo que el timestamp este antes de el 1ª incremento, asi entrara la primera vez ya que si se notifica se incrementa el timespan y ya no entrara
-                                    if (takesTreatment.isTaken() == false) {    //Si la toma no es tomada notifico si no, no.
-                                        runAsForegroundInterval(takesTreatment,DELAY_1,new BBDDTratamiento(context).getIdTreament(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine()));
-                                        new BBDDTratamiento(context).setUpdateTimestamp(getDate(), takesTreatment.getIdTake());
+                                if (new Date().after(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(0)).getTime()) && new Date().before(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(1)).getTime())) {  //Compruebo que la hora actual este entre el rango de la primera notificacion
+
+                                    if (parsTimespanToCalendar(takesTreatment.getTimestamp()).getTime().before(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(0)).getTime())) {    //Compruebo que el timestamp este antes de el 1ª incremento, asi entrara la primera vez ya que si se notifica se incrementa el timespan y ya no entrara
+                                        if (takesTreatment.isTaken() == false) {    //Si la toma no es tomada notifico si no, no.
+                                            runAsForegroundInterval(takesTreatment, DELAY_1, new BBDDTratamiento(context).getIdTreament(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine()));
+                                            new BBDDTratamiento(context).setUpdateTimestamp(getDate(), takesTreatment.getIdTake());
+                                        }
                                     }
-                                }
 
-                            } else if (new Date().after(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(1)).getTime()) && new Date().before(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(2)).getTime())) {
-                                if (parsTimespanToCalendar(takesTreatment.getTimestamp()).getTime().before(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(1)).getTime())) {
-                                    if (takesTreatment.isTaken() == false) {
-                                        runAsForegroundInterval(takesTreatment,DELAY_2,new BBDDTratamiento(context).getIdTreament(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine()));
-                                        new BBDDTratamiento(context).setUpdateTimestamp(getDate(), takesTreatment.getIdTake());
+                                } else if (new Date().after(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(1)).getTime()) && new Date().before(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(2)).getTime())) {
+                                    if (parsTimespanToCalendar(takesTreatment.getTimestamp()).getTime().before(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(1)).getTime())) {
+                                        if (takesTreatment.isTaken() == false) {
+                                            runAsForegroundInterval(takesTreatment, DELAY_2, new BBDDTratamiento(context).getIdTreament(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine()));
+                                            new BBDDTratamiento(context).setUpdateTimestamp(getDate(), takesTreatment.getIdTake());
+                                        }
                                     }
-                                }
-                            } else if (new Date().after(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(2)).getTime())) {
-                                if (parsTimespanToCalendar(takesTreatment.getTimestamp()).getTime().before(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(2)).getTime())) {
-                                    if (takesTreatment.isTaken() == false) {
-                                        runAsForegroundInterval(takesTreatment,NOT_TAKE,new BBDDTratamiento(context).getIdTreament(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine()));
-                                        new BBDDTratamiento(context).setUpdateTimestamp(getDate(), takesTreatment.getIdTake());
+                                } else if (new Date().after(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(2)).getTime())) {
+                                    if (parsTimespanToCalendar(takesTreatment.getTimestamp()).getTime().before(getIncrementHours(takesTreatment.getDateTake(), getRangeShotsNotTaken(new BBDDTratamiento(context).getTimeBetweenShots(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine())).get(2)).getTime())) {
+                                        if (takesTreatment.isTaken() == false) {
+                                            runAsForegroundInterval(takesTreatment, NOT_TAKE, new BBDDTratamiento(context).getIdTreament(takesTreatment.getNameMedicine(), takesTreatment.getTypeMedicine()));
+                                            new BBDDTratamiento(context).setUpdateTimestamp(getDate(), takesTreatment.getIdTake());
 
+                                        }
                                     }
                                 }
                             }
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
 
                     }
@@ -483,7 +504,7 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
         return calendar;
     }
 
-/*Return Calendar de hora de toma mas el incremento*/
+    /*Return Calendar de hora de toma mas el incremento*/
     public Calendar getIncrementHours(String dateTake, String increment) {
 
         System.out.println("getIncrementHours " + dateTake + " , " + increment);
@@ -491,8 +512,8 @@ public class ServiceTreatment extends Service implements NotificationTypes  {
         int inicrementMinutes = Integer.parseInt(dateTake.split(" ")[1].split(":")[1]) + Integer.parseInt(increment.split(":")[1]);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        if((incrementHours)== 24){
-            incrementHours= 00;
+        if ((incrementHours) == 24) {
+            incrementHours = 00;
         }
         calendar.set(Calendar.HOUR_OF_DAY, incrementHours);
         calendar.set(Calendar.MINUTE, inicrementMinutes);

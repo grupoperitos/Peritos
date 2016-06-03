@@ -25,6 +25,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.LayoutParams;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentManager;
+import com.epsl.peritos.achievements.AchievementManager;
+
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -306,9 +309,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                                 nextMedal = AchievementManager.getWeeklyAchievement(MainActivity.this, (int) week);
                                 nextLevel = AchievementManager.getPatientLevel(MainActivity.this);
 
-                                String nivelPaciente = "Nivel de paciente " + AchievementManager.PATIENT_LEVEL_TEXT[level];
+                                String nivelPaciente = getString(R.string.achv_nivelpaciente) + AchievementManager.PATIENT_LEVEL_TEXT[level];
 
                                 if (prevMedal < nextMedal) {
+                                    //El paciente ha mejorado dentro de una semana su nivel y ha conseguido una medalla
                                     String medalla = "";
                                     switch (nextMedal) {
                                         case 1:
@@ -321,10 +325,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                                             medalla = getString(R.string.achv_medalladeoro);
                                             break;
                                         default:
-                                            medalla = "Aún no tiene ningún logro";
+                                            medalla = getString(R.string.achv_nologro);
                                     }
                                     insertarLogro(medalla, AchievementManager.getAchievementPoints(MainActivity.this), nextMedal);
-                                }
+                                }else if(prevMedal>nextMedal)
+                                    insertarLogro(getString(R.string.achv_perdermedalla), AchievementManager.getAchievementPoints(MainActivity.this), nextMedal);
+
                                 if (level < nextLevel)
                                     insertarLogro(nivelPaciente, AchievementManager.getAchievementPoints(MainActivity.this), 0);
 
@@ -445,6 +451,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             //Servicio de control de medicación
 
             actualizeMedals();
+
+            mPatientLevel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int level = AchievementManager.getPatientLevel(MainActivity.this);
+                    Toast.makeText(MainActivity.this, "Su nivel de paciente de EPOC es " + AchievementManager.PATIENT_LEVEL_TEXT[level] + " El máximo es A+", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -549,7 +563,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
+        //getMenuInflater().inflate(R.menu.menu, menu);
+        openBottomSheet(null);
         return true;
     }
 
@@ -738,6 +753,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                 insertarLogro(getString(R.string.achv_consequence_day), AchievementManager.ACHIEVE_NOENTER, -1);
 
+            }else
+            {
+                long ciclo = AchievementManager.getCurrentCycle(this);
+                if(ciclo>=4)
+                {
+
+                }
             }
 
 

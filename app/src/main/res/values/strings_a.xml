@@ -2,6 +2,7 @@
 <resources>
     <string name="achv_haganado">Ha obtenido</string>
     <string name="achv_puntos">puntos</string>
+    <string name="achv_nivelpaciente">Nivel de paciente</string>
 
     <string name="achv_menos25_0">Debe tomarse en serio su enfermedad.</string>
     <string name="achv_menos25_1">Entre en la aplicació e infórmese.</string>
@@ -32,4 +33,7 @@
     <string name="achv_medalladeplata">Medalla de plata</string>
     <string name="achv_medalladebronce">Medalla de bronce</string>
 
+    <string name="achv_nomedalla">Ha perdido la medalla que había conseguido</string>
+    <string name="achv_perdermedalla">Ha perdido la medalla que había conseguido</string>
+    <string name="achv_nologro">Aún no tiene ningún logro</string>
 </resources>

@@ -59,6 +59,8 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import net.colindodd.toggleimagebutton.ToggleImageButton;
 
+import org.w3c.dom.Text;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -350,7 +352,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             miniFAB_SR.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.CALL_PHONE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
+                                0);
+                    }
                     Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + 902505060));
                     if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
@@ -1804,12 +1810,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         LayoutInflater inflater = MainActivity.this.getLayoutInflater();
 
         View v = inflater.inflate(R.layout.pastillas_dialog, null);
-
+        TextView tratament = (TextView)v.findViewById(R.id.pregunta3);
+        tratament.setText(tratament.getText().toString()+" "+take.getNameMedicine()+"?");
         builder.setView(v);
 
         Button SI = (Button) v.findViewById(R.id.pastilla_si);
         Button NO = (Button) v.findViewById(R.id.pastilla_no);
-
 
 
         final AlertDialog dialog = builder.create();

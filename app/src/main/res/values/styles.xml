@@ -48,4 +48,10 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="boton_dialogo">
+
+        <item name="android:textColor">#f0f0</item>
+        <item name="android:textColorPrimary">#f0f0</item>
+    </style>
+
 </resources>

@@ -94,14 +94,14 @@ if(horaToma.equalsIgnoreCase("") == false) {
 
            case DELAY_2:
 
-               notifText ="Hola " + nombrePaciente+",Tenga cuidado, recuerde tomar "+nombreMedicina+" ("+medicamento+") "+ "a las "+horaToma + ". Debería de tomarsela, ya que más adelante podría no ser efectiva.";
+               notifText ="Hola " + nombrePaciente+",Tenga cuidado. Recuerde tomar "+nombreMedicina+" ("+medicamento+") "+ "se ha saltado la toma de las "+horaToma + ". Debería de tomarsela ya que más adelante podría no ser efectiva.";
 
 
                break;
 
            case NOT_TAKE:
 
-               notifText ="Hola " + nombrePaciente+",Ha perdido una toma, ya NO debe tomar "+nombreMedicina+" ("+medicamento+") "+ "a las "+horaToma + ". Permanezca atento a su siguiente toma";
+               notifText ="Hola " + nombrePaciente+",Ha perdido una toma. Ya NO debe tomar "+nombreMedicina+" ("+medicamento+") "+ "de las "+horaToma + ". Permanezca atento a su siguiente toma";
 
 
                break;

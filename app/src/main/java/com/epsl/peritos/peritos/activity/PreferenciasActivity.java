@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,10 +22,13 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Base64;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,7 +77,6 @@ Uri de contenido global AGENDA
         ed.putBoolean("NEW_HOUR",isNewWakeUp);
         ed.apply();
 
-
         TextView boton_tratamiento = (TextView)findViewById(R.id.txt_visualizar_tratamiento);
         boton_tratamiento.setOnClickListener(
                 new View.OnClickListener() {
@@ -83,6 +86,7 @@ Uri de contenido global AGENDA
                         FragmentManager fragManager = getSupportFragmentManager();
                         DialogListFolder dialogoFolder = new DialogListFolder(listTreatment);
                         dialogoFolder.show(fragManager, "tag");
+
                     }
                 }
         );
@@ -189,21 +193,25 @@ Uri de contenido global AGENDA
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Tratamiento");
+            builder.setTitle(Html.fromHtml("<font color='#4fc3f7' size='20'><b>Tratamiento</b></font>"));
             recyclerFolder = new RecyclerView(getContext());
             adaptadorTreatment = new AdapterTakes(dataTreatment, getContext());
             recyclerFolder.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
             builder.setView(recyclerFolder);
             recyclerFolder.setAdapter(adaptadorTreatment);
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+            builder.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dismiss();
                 }
             });
+
+
             return builder.create();
         }
     }
+
 
 
 

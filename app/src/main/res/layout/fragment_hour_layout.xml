@@ -2,19 +2,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:orientation="vertical"
-    android:weightSum="1"
-    >
+    android:weightSum="1">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_weight="0.4"
         android:background="#4FC3F7"
         android:weightSum="1">
-    <TextView
+
+        <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -24,7 +24,18 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:layout_gravity="center"
-        android:text="INDIQUE A QUE HORA SE DESPIERTA" />
+        android:text="INDIQUE A QUÉ HORA SE DESPIERTA"
+            android:layout_weight="0.81" />
+
+        <ImageView
+            android:id="@+id/man"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_man"
+            app:layout_anchorGravity="center"
+            android:layout_margin="16dp"
+
+            android:layout_gravity="right" />
 
     </LinearLayout>
     <!--android:textColor="#4FC3F7"-->
@@ -40,7 +51,6 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:src="@mipmap/clock"
-        android:gravity="end||bottom"
         android:scaleType="fitXY"
         android:background="@null"
         android:layout_gravity="center_horizontal"
@@ -55,7 +65,7 @@
             android:textSize="12sp"
             android:fontFamily="sans-serif-medium"
             android:layout_gravity="center"
-            android:text="Pulsa el reloj" />
+            android:text="Pulse sobre el reloj" />
         <!--android:layout_marginTop="100dp"-->
 
     </LinearLayout>

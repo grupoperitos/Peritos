@@ -37,6 +37,7 @@ public class ServiceTreatment extends Service implements NotificationTypes {
     @Override
     public void onCreate() {
         System.out.println("onCreate()");
+        exit =false;
     }
 
     @Override
@@ -205,27 +206,19 @@ public class ServiceTreatment extends Service implements NotificationTypes {
                     return Service.START_STICKY;    // El servicio no se recrea, este comprobara cuando lanze notificaciones.
 
                 case Constants.DELETEALARM:
-                    System.out.println("case Constants.CONFIG:");
+                    System.out.println("case Constants.DELETEALARM:");
                     PendingIntent pIntent = PendingIntent.getBroadcast(this, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                     alarmManager.cancel(pIntent);
                     try {
                         ArrayList<StructureParametersBBDD.Treatment> listTreatmenttt = new ArrayList<StructureParametersBBDD.Treatment>(getTreatmentListBBDD());
                         if (listTreatmenttt.size() != 0 || listTreatmenttt == null) {
                             for (Treatment nextNotifications : listTreatmenttt) {
-                                if (getCountTake(nextNotifications) != 1) {
-                                    int count = getCountTake(nextNotifications);
-                                    int hourActual = Integer.parseInt(getDate().split(" ")[1].split("[:]")[0]);
-                                    for (int i = 0; i < count; i++) {
-                                        if (isContainInterval(calculateHourTake(i, nextNotifications), calculateHourTake(i + 1, nextNotifications))) {
                                             PendingIntent pIntentt = PendingIntent.getBroadcast(this, nextNotifications.getIdTreatment(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
                                             alarmManager.cancel(pIntentt);
-
-                                        }
-                                    }
-                                }
-
+                                            exit = true;
                             }
                         }
+                        stopSelf();
                     } catch (NullPointerException e) {
                         e.printStackTrace();
                     }

@@ -64,7 +64,7 @@ public class NotificationAlarm extends Notification {
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(inf.getRespNotif().getNotifImag())
                         .setLargeIcon(BitmapFactory.decodeResource(
-                                context.getResources(), R.drawable.alarma))
+                                context.getResources(), R.drawable.notify))
                         .setContentTitle(inf.getRespNotif().getNotifTitle())
                         .setContentText(nombre+ ". Despliega para más información")
                         //.setContentInfo("Despliega para más información")

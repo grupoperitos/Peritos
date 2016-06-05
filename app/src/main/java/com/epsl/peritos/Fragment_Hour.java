@@ -23,13 +23,14 @@ import com.epsl.peritos.peritos.R;
 import com.epsl.peritos.peritos.activity.LoginActivity;
 import com.epsl.peritos.peritos.activity.MainActivity;
 import com.epsl.peritos.sintomas_registro.BBDDTratamiento;
+import com.epsl.peritos.sintomas_registro.ServiceTreatment;
 import com.epsl.peritos.sintomas_registro.StructureParametersBBDD;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog.OnTimeSetListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-
+import com.epsl.peritos.sintomas_registro.Constants;
 
 public class Fragment_Hour extends Fragment implements  OnTimeSetListener{
 
@@ -147,6 +148,7 @@ public class Fragment_Hour extends Fragment implements  OnTimeSetListener{
 
                 SharedPreferences pr = getActivity().getSharedPreferences("PRFS", getContext().MODE_PRIVATE);
                 boolean comprobar_hora = pr.getBoolean("NEW_HOUR", false);
+                System.out.println("1111111111111111111111111111111");
                 if(comprobar_hora==true){
 
                     Intent h = new Intent(getActivity(),MainActivity.class);
@@ -154,7 +156,14 @@ public class Fragment_Hour extends Fragment implements  OnTimeSetListener{
                     System.out.println("HA ENTRADO EN LA COMPROBACION DE SHAREDPREFERENCES");
                     ///// IMPORTANTE : AQUI IRIA SOLAMENTE UNA CONSULTA PARA MODIFICAR LA WAKE_HOUR
 
-                    //new BBDDTratamiento(getContext()).setHoursTake(wakeHour);
+
+                    Intent i = new Intent(getContext(),ServiceTreatment.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    i.setFlags(Intent.FLAG_FROM_BACKGROUND);
+                    i.setAction(Constants.DELETEALARM);
+                    getActivity().startService(i);
+
+                    new BBDDTratamiento(getContext()).setFirsTake(wakeHour);
 
                 }else{
 
@@ -177,11 +186,6 @@ public class Fragment_Hour extends Fragment implements  OnTimeSetListener{
                     }
 
 
-//                Intent i = new Intent(getContext(),MyserviceTwo.class);
-//                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                i.setFlags(Intent.FLAG_FROM_BACKGROUND);
-//                i.setAction(Constants.INSTALLAPP);
-//                getActivity().startService(i);
 
                     final SharedPreferences prefs = getActivity().getSharedPreferences("PRFS", Context.MODE_PRIVATE);
                     final SharedPreferences.Editor editor = prefs.edit();
@@ -247,7 +251,7 @@ public class Fragment_Hour extends Fragment implements  OnTimeSetListener{
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             System.out.println(hourOfDay+"    "+minute);
-            wakeHour= hourOfDay+":"+minute;
+            wakeHour = hourOfDay+":"+minute;
             if(wakeHour.isEmpty()==false){
                 bot2.setEnabled(true);
             }

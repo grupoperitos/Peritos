@@ -442,7 +442,17 @@ public class BBDDTratamiento {
         }
     }
 
+    public void setFirsTake(String hours) {
+        w.lock();
+        try {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            db.execSQL("UPDATE Treatment SET FIRS_TAKE_HOUR_DAY= '"+ hours +"'");
+            db.close();
 
+        } finally {
+            w.unlock();
+        }
+    }
 
 
     //Actualizamos el timestamp

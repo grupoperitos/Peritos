@@ -73,14 +73,14 @@ if(horaToma.equalsIgnoreCase("") == false) {
 
            case FIRST_DAY:
 
-               notifText = "Buenos Días "+nombrePaciente+",Le toca tomarse  "+numTomas +""+tipoTomas+" de " +nombreMedicina+" ("+medicamento+") "+ "a las "+horaToma;
+               notifText = "Buenos Días "+nombrePaciente+",Le toca tomarse  "+numTomas +" "+tipoTomas+" de " +nombreMedicina+" ("+medicamento+") "+ "a las "+horaToma;
 
                break;
 
 
            case NORMAL:
 
-               notifText = "Hola " +nombrePaciente+"  ,Le toca tomarse " +numTomas +""+tipoTomas+" de " +nombreMedicina+" ("+medicamento+") "+ "a las "+horaToma;
+               notifText = "Hola " +nombrePaciente+"  ,Le toca tomarse " +numTomas +" "+tipoTomas+" de " +nombreMedicina+" ("+medicamento+") "+ "a las "+horaToma;
 
                break;
 

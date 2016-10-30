@@ -37,4 +37,11 @@
     <string name="content_description_medicine">Tomar la medicación</string>
     <string name="siguiente">Siguiente</string>
     <string name="controlsintomas_fatiga_maxima">Máxima</string>
+
+    <!-- Fragment hour layout-->
+    <string name="fragment_hour_push">Pulse sobre el reloj</string>
+    <string name="fragment_hour_wakeup">Indique a qué hora se despierta</string>
+    <string name="fragment_hour_startup">Comenzar</string>
+    <string name="content_description_clock">Reloj</string>
+    <string name="content_description_bed">Cama</string>
 </resources>
